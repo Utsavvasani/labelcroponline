@@ -38,15 +38,15 @@ export function Footer() {
             <h4 className="font-semibold text-base tracking-wide">Contact</h4>
             <ul className="space-y-3 text-sm text-white/70">
               <li>
-                <a href="tel:+918141925344" className="flex items-center gap-2 hover:text-white transition-colors">
+                <a href="tel:+919909520532" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Phone size={15} />
-                  <span>+91 81419 25344</span>
+                  <span>+91 99095 20532</span>
                 </a>
               </li>
               <li>
-                <a href="mailto:info@labelcrop.online" className="flex items-center gap-2 hover:text-white transition-colors">
+                <a href="mailto:labelcroponline@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
                   <Mail size={15} />
-                  <span>info@labelcrop.online</span>
+                  <span>labelcroponline@gmail.com</span>
                 </a>
               </li>
             </ul>
