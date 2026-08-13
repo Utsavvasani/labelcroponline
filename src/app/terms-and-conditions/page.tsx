@@ -108,21 +108,21 @@ const sections = [
 export default function TermsAndConditions() {
   return (
     <>
-      {/* Hero — full width bg, content in container */}
-      <div className="bg-[#051448] text-white">
-        <div className="max-w-[1200px] mx-auto px-6 py-14">
-          <p className="text-sm font-semibold tracking-widest uppercase text-blue-300 mb-3">
+      {/* Hero — full width light bg, content in container */}
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
+        <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-14">
+          <p className="text-sm font-semibold tracking-widest uppercase text-[#051448]/60 mb-3">
             Legal
           </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#051448] mb-4">
             Terms &amp; Conditions
           </h1>
-          <p className="text-white/70 text-base max-w-xl leading-relaxed">
+          <p className="text-slate-500 text-base max-w-xl leading-relaxed">
             These Terms constitute a legal agreement governing your access to
             and use of LabelCropOnline's services. Please read them carefully.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs text-white/80">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+          <div className="mt-6 inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 text-xs text-slate-500 shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
             Last Updated: July 2025
           </div>
         </div>

@@ -96,7 +96,7 @@ export function Navbar() {
     <div className="relative w-full">
       {/* Single fixed header wrapper — slides as one unit on scroll */}
       <div
-        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-300 ${
+        className={`fixed top-0 left-0 z-50 w-full ${
           hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
         }`}
       >
