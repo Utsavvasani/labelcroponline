@@ -190,11 +190,17 @@ export function Navbar() {
                 <Link href="/">Home</Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/editor">Editor</Link>
+                <Link href="/editor">Meesho Label Crop </Link>
+              </li>
+              <li className="hover:text-[#051448] cursor-pointer transition-colors">
+                <Link href="/editor">Flipkart Label Crop </Link>
+              </li>
+              <li className="hover:text-[#051448] cursor-pointer transition-colors">
+                <Link href="/editor">Amazon Label Crop </Link>
               </li>
 
               {/* Product / Tools Dropdown */}
-              <li
+              {/* <li
                 className="hover:text-[#051448] relative cursor-pointer"
                 onMouseEnter={() => setShowToolsDropdown(true)}
                 onMouseLeave={() => setShowToolsDropdown(false)}
@@ -245,11 +251,8 @@ export function Navbar() {
                     ))}
                   </div>
                 )}
-              </li>
+              </li> */}
 
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/about-us">About Us</Link>
-              </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
                 <Link href="/contact">Contact Us</Link>
               </li>
@@ -300,10 +303,20 @@ export function Navbar() {
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
                   <Link href="/editor" onClick={() => setSheetOpen(false)}>
-                    Editor
+                    Flipkart Label Crop
                   </Link>
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
+                  <Link href="/editor" onClick={() => setSheetOpen(false)}>
+                    Meesho Label Crop
+                  </Link>
+                </li>
+                <li className="hover:text-[#051448] cursor-pointer">
+                  <Link href="/editor" onClick={() => setSheetOpen(false)}>
+                    Amazon Label Crop
+                  </Link>
+                </li>
+                {/* <li className="hover:text-[#051448] cursor-pointer">
                   <div className="flex items-center justify-between">
                     <Link
                       href="/editor"
@@ -359,12 +372,7 @@ export function Navbar() {
                       ))}
                     </div>
                   )}
-                </li>
-                <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/about" onClick={() => setSheetOpen(false)}>
-                    About Us
-                  </Link>
-                </li>
+                </li> */}
                 <li className="hover:text-[#051448] cursor-pointer">
                   <Link href="/contact" onClick={() => setSheetOpen(false)}>
                     Contact Us
