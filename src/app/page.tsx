@@ -1,4 +1,33 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Crop & Process Shipping Labels Online – Free Label Tool",
+  description:
+    "LabelCropOnline is a free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents. Perfect for ecommerce sellers and warehouses.",
+  keywords: [
+    "crop shipping labels online",
+    "free label crop tool",
+    "shipping label processor",
+    "bulk label cropping",
+    "PDF shipping label cropper",
+    "label tool for ecommerce",
+    "online label resizer",
+    "labelcroponline",
+  ],
+  alternates: { canonical: "https://www.labelcroponline.com" },
+  openGraph: {
+    url: "https://www.labelcroponline.com",
+    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    description:
+      "Free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents for ecommerce sellers.",
+  },
+  twitter: {
+    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    description:
+      "Free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents for ecommerce sellers.",
+  },
+};
 
 export default function Home() {
   return (

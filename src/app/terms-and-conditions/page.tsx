@@ -1,9 +1,29 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Terms & Conditions | Label Crop Online",
+    title: "Terms & Conditions – User Agreement for LabelCropOnline",
     description:
-        "Read the Terms & Conditions governing your use of Label Crop Online's services.",
+        "Read the Terms & Conditions governing your use of LabelCropOnline's shipping label and document processing services. Understand your rights, responsibilities, and our service policies.",
+    keywords: [
+        "labelcroponline terms and conditions",
+        "label crop user agreement",
+        "shipping label tool terms",
+        "label processing service terms",
+        "labelcroponline legal",
+    ],
+    alternates: { canonical: "https://www.labelcroponline.com/terms-and-conditions" },
+    robots: { index: true, follow: true },
+    openGraph: {
+        url: "https://www.labelcroponline.com/terms-and-conditions",
+        title: "Terms & Conditions | LabelCropOnline",
+        description:
+            "The legal agreement governing your access to and use of LabelCropOnline's shipping label and document processing services.",
+    },
+    twitter: {
+        title: "Terms & Conditions | LabelCropOnline",
+        description:
+            "The legal agreement governing your access to and use of LabelCropOnline's shipping label and document processing services.",
+    },
 };
 
 const sections = [
