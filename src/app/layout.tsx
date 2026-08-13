@@ -25,7 +25,7 @@ export default function RootLayout({
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col pt-[100px] sm:pt-[105px] font-sans">
+      <body className="min-h-full flex flex-col pt-[97px] sm:pt-[97px] font-sans">
         <Navbar />
         <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 sm:px-6">
           {children}

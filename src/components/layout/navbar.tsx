@@ -94,12 +94,15 @@ export function Navbar() {
 
   return (
     <div className="relative w-full">
-      {/* Blue Top Announcement Bar */}
+      {/* Single fixed header wrapper — slides as one unit on scroll */}
       <div
-        className={`${hideAppbar ? "-translate-y-full" : "translate-y-0"
-          } bg-[#051448] fixed top-0 z-40 w-full px-4 py-3 text-white transition-transform duration-300`}
+        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-300 ${
+          hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
+        }`}
       >
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-4">
+        {/* Blue Top Announcement Bar */}
+        <div className="bg-[#051448] w-full px-4 py-3 text-white">
+          <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-4">
           {/* Contact Info */}
           <div className="flex flex-wrap items-center gap-4">
             <a
@@ -166,14 +169,11 @@ export function Navbar() {
             </a>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Main Nav Bar - full-width dark wrapper, white container inside */}
-      <div
-        className={`${hideAppbar ? "top-0" : "top-[49px]"
-          } fixed left-0 z-50 w-full bg-[#000000] shadow-md transition-all duration-300`}
-      >
-        <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl">
+        {/* Main Nav Bar - dark full-width wrapper, white container inside */}
+        <div className="w-full bg-[#000000] shadow-md">
+          <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl">
           {/* Logo with labelcroponline.png */}
           <Link href="/">
             <img
@@ -263,6 +263,7 @@ export function Navbar() {
             <Menu className="h-8 w-8" />
           </button>
         </nav>
+        </div>
       </div>
 
       {/* Mobile Sheet / Drawer Menu */}
