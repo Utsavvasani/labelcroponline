@@ -171,9 +171,9 @@ export function Navbar() {
         </div>
         </div>
 
-        {/* Main Nav Bar - dark full-width wrapper, white container inside */}
-        <div className="w-full bg-[#000000] shadow-md">
-          <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl">
+        {/* Nav wrapper — transparent so page background shows through on both sides */}
+        <div className="w-full">
+          <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl shadow-lg">
           {/* Logo with labelcroponline.png */}
           <Link href="/">
             <img
