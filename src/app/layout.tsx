@@ -11,8 +11,59 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Label Crop Online - PDF & Image Label Cropper",
-  description: "Organize, crop, and format shipping labels and PDF pages online effortlessly.",
+  metadataBase: new URL("https://www.labelcroponline.com"),
+  title: {
+    default: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    template: "%s | LabelCropOnline",
+  },
+  description:
+    "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple, browser-based label processing for ecommerce sellers and businesses.",
+  keywords: [
+    "shipping label cropper",
+    "crop shipping labels online",
+    "bulk label processing",
+    "PDF label crop",
+    "label crop tool",
+    "shipping label tool",
+    "ecommerce label processor",
+    "online label cropper",
+    "resize shipping labels",
+    "split PDF labels",
+    "labelcroponline",
+  ],
+  authors: [{ name: "LabelCropOnline", url: "https://www.labelcroponline.com" }],
+  creator: "LabelCropOnline",
+  publisher: "LabelCropOnline",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: "https://www.labelcroponline.com",
+    siteName: "LabelCropOnline",
+    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    description:
+      "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "LabelCropOnline – Shipping Label Processing Tool",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    description:
+      "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
+    images: ["/og-image.png"],
+    creator: "@labelcroponline",
+  },
 };
 
 export default function RootLayout({

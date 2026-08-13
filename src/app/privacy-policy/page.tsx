@@ -1,9 +1,29 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy | Label Crop Online",
+    title: "Privacy Policy – How We Protect Your Data",
     description:
-        "Learn how Label Crop Online collects, uses, and protects your personal information.",
+        "Read LabelCropOnline's Privacy Policy to understand how we collect, use, store, and protect your personal information and uploaded documents. Your privacy matters to us.",
+    keywords: [
+        "labelcroponline privacy policy",
+        "label crop data protection",
+        "shipping label app privacy",
+        "data privacy label tool",
+        "GDPR label processing",
+    ],
+    alternates: { canonical: "https://www.labelcroponline.com/privacy-policy" },
+    robots: { index: true, follow: true },
+    openGraph: {
+        url: "https://www.labelcroponline.com/privacy-policy",
+        title: "Privacy Policy | LabelCropOnline",
+        description:
+            "How LabelCropOnline collects, uses, and protects your personal information and uploaded documents.",
+    },
+    twitter: {
+        title: "Privacy Policy | LabelCropOnline",
+        description:
+            "How LabelCropOnline collects, uses, and protects your personal information and uploaded documents.",
+    },
 };
 
 const sections = [
