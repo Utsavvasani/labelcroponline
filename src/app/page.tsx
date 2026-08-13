@@ -17,7 +17,7 @@ export default function Home() {
 
         <div className="flex flex-col items-center gap-4 text-center my-12">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-           Label Crop Online
+           live, Label Crop Online
           </h1>
           <p className="max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
             Professional, scalable tool for cropping shipping labels, bulk PDF management, and custom label sizing.
