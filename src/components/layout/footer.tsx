@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, Crop } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,13 +8,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="bg-white text-[#051448] p-2 rounded-xl">
-                <Crop size={20} />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-tight tracking-tight">Label Crop</span>
-                <span className="text-[10px] uppercase tracking-widest font-semibold text-blue-300">ONLINE</span>
+            <Link href="/" className="inline-block">
+              <div className="bg-white rounded-xl px-4 py-2 inline-block">
+                <img
+                  src="/labelcroponline.png"
+                  alt="Label Crop Online Logo"
+                  className="h-9 w-auto object-contain"
+                />
               </div>
             </Link>
             <p className="text-sm text-white/70 leading-relaxed">
