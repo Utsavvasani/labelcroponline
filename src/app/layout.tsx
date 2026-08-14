@@ -12,6 +12,10 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.labelcroponline.com"),
+  icons: {
+    icon: "/tab_logo.png",
+    apple: "/tab_logo.png",
+  },
   title: {
     default: "LabelCropOnline – Crop & Process Shipping Labels Online",
     template: "%s | LabelCropOnline",

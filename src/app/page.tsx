@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Crop & Process Shipping Labels Online – Free Label Tool",
@@ -29,45 +30,228 @@ export const metadata: Metadata = {
   },
 };
 
+const heroPlatforms = [
+  {
+    name: "Amazon",
+    logo: "/amazon_logo.svg",
+    href: "/editor?platform=amazon",
+    logoH: "h-8",
+    lightBg: "#FFF8EC",
+  },
+  {
+    name: "Flipkart",
+    logo: "/flipkart_logo.svg",
+    href: "/editor?platform=flipkart",
+    logoH: "h-10",
+    lightBg: "#EEF4FF",
+  },
+  {
+    name: "Meesho",
+    logo: "/meesho_logo.svg",
+    href: "/editor?platform=meesho",
+    logoH: "h-9",
+    lightBg: "#F7EEFE",
+  },
+];
+
+const cardPlatforms = [
+  {
+    name: "Amazon",
+    logo: "/amazon_logo.svg",
+    href: "/editor?platform=amazon",
+    color: "#FF9900",
+    lightBg: "#FFF8EC",
+    logoClass: "h-10 w-auto",
+    desc: "Crop and resize Amazon shipping labels from seller central PDF downloads. Perfectly sized for thermal printers and A4 sheets with one click.",
+    tag: "Amazon Label Crop",
+  },
+  {
+    name: "Flipkart",
+    logo: "/flipkart_logo.svg",
+    href: "/editor?platform=flipkart",
+    color: "#2874F0",
+    lightBg: "#EEF4FF",
+    logoClass: "h-14 w-auto",
+    desc: "Process Flipkart seller hub shipping labels in bulk. Split multi-label PDFs, crop to standard size, and download print-ready files instantly.",
+    tag: "Flipkart Label Crop",
+  },
+  {
+    name: "Meesho",
+    logo: "/meesho_logo.svg",
+    href: "/editor?platform=meesho",
+    color: "#9B1FE8",
+    lightBg: "#F7EEFE",
+    logoClass: "h-12 w-auto",
+    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel for fast and efficient dispatching.",
+    tag: "Meesho Label Crop",
+  },
+];
+
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black p-6 sm:p-12">
-      <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-between py-16 px-8 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center gap-3">
-          <Image
-            className="dark:invert h-6 w-[120px]"
-            src="/next.svg"
-            alt="Next.js logo"
-            width={120}
-            height={24}
-            priority
-          />
-        </div>
+    <>
+      {/* ─── Hero ─── */}
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
+        <div className="max-w-[1200px] mx-auto px-6 pt-28 pb-16">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
 
-        <div className="flex flex-col items-center gap-4 text-center my-12">
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            live, Label Crop Online
-          </h1>
-          <p className="max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-            Professional, scalable tool for cropping shipping labels, bulk PDF management, and custom label sizing.
-          </p>
-        </div>
+            {/* ── Left: Text + Platform Banners ── */}
+            <div>
 
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-          <div className="p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Crop Canvas</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Precise label area selection and multi-page batch cropping.</p>
-          </div>
-          <div className="p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">PDF Engine</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Client-side high performance PDF processing and extraction.</p>
-          </div>
-          <div className="p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-800/50">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">Presets & Export</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Standard 4x6, thermal printer presets, and instant download.</p>
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4 leading-tight">
+                Crop Shipping Labels
+                <br />
+                <span className="text-[#051448]">in Seconds</span>
+              </h1>
+
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-8 max-w-md">
+                Upload your PDF shipping labels, crop, resize, and download
+                instantly — built for ecommerce sellers on every major platform.
+              </p>
+
+              {/* Platform Banners */}
+              <p className="text-black text-xs font-semibold uppercase tracking-widest mb-3">
+                Supported Platforms
+              </p>
+
+              {/* Mobile: 2-part pill — fixed logo box + text */}
+              <div className="flex flex-col gap-2 mb-8 sm:hidden">
+                {heroPlatforms.map((p) => (
+                  <Link
+                    key={p.name}
+                    href={p.href}
+                    className="flex items-stretch border border-[#051448] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    {/* Part 1: Logo — fixed width, brand bg */}
+                    <div
+                      className="w-28 flex-shrink-0 flex items-center justify-center px-3 py-3"
+                      style={{ backgroundColor: p.lightBg }}
+                    >
+                      <Image
+                        src={p.logo}
+                        alt={`${p.name} Label Crop`}
+                        width={100}
+                        height={40}
+                        className="object-contain w-full h-8"
+                      />
+                    </div>
+                    {/* Part 2: Text — remaining width, white bg */}
+                    <div className="flex-1 flex items-center justify-between px-4 py-3 bg-white">
+                      <span className="text-[#051448] text-sm font-semibold">
+                        {p.name} Label Crop
+                      </span>
+                      <span className="text-[#051448]/40 text-xs ml-2">→</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Desktop: equal square cards */}
+              <div className="hidden sm:grid grid-cols-3 gap-3 mb-8">
+                {heroPlatforms.map((p) => (
+                  <Link
+                    key={p.name}
+                    href={p.href}
+                    className="group flex flex-col items-center justify-center gap-2 border border-[#051448] rounded-xl py-4 px-3 transition-all duration-200 hover:scale-105"
+                    style={{ backgroundColor: p.lightBg }}
+                  >
+                    <Image
+                      src={p.logo}
+                      alt={`${p.name} Label Crop`}
+                      width={120}
+                      height={48}
+                      className={`object-contain w-auto ${p.logoH}`}
+                    />
+                    <span className="text-[#051448] text-[10px] font-medium">
+                      {p.name} Labels
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Right: Illustration ── */}
+            <div className="hidden lg:flex items-center justify-center">
+              <div className="relative w-full max-w-md">
+                {/* Glow */}
+                <div className="absolute inset-0 bg-blue-400/10 rounded-3xl blur-3xl" />
+                <Image
+                  src="/hero_illustration.jpg"
+                  alt="Shipping label processing illustration"
+                  width={500}
+                  height={400}
+                  className="relative rounded-2xl object-cover w-full shadow-2xl shadow-blue-900/40"
+                  priority
+                />
+              </div>
+            </div>
+
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* ─── Platform Cards Section ─── */}
+      <div className="bg-white border-b border-slate-100">
+        <div className="max-w-[1200px] mx-auto px-6 py-16">
+
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#051448]/50 mb-2">
+              How It Works
+            </p>
+            <h2 className="text-3xl font-bold text-[#051448]">
+              Pick your platform, crop your labels
+            </h2>
+            <p className="text-slate-500 text-sm mt-3 max-w-lg mx-auto leading-relaxed">
+              Whether you sell on Amazon, Flipkart, or Meesho — our tools are
+              built to handle your labels, your way.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            {cardPlatforms.map((p) => (
+              <Link
+                key={p.name}
+                href={p.href}
+                className="group block border border-slate-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
+                style={{ "--hover-color": p.color } as React.CSSProperties}
+              >
+                {/* Logo area */}
+                <div
+                  className="flex items-center justify-center px-8 py-10 transition-colors duration-200"
+                  style={{ backgroundColor: p.lightBg }}
+                >
+                  <Image
+                    src={p.logo}
+                    alt={`${p.name} Label Crop`}
+                    width={160}
+                    height={80}
+                    className={`object-contain ${p.logoClass}`}
+                  />
+                </div>
+
+                {/* Text area */}
+                <div className="p-6 bg-white">
+                  <span
+                    className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-3"
+                    style={{ backgroundColor: p.lightBg, color: p.color }}
+                  >
+                    {p.tag}
+                  </span>
+                  <p className="text-slate-600 text-sm leading-relaxed">
+                    {p.desc}
+                  </p>
+                  <p
+                    className="mt-4 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all"
+                    style={{ color: p.color }}
+                  >
+                    Crop {p.name} Labels →
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
