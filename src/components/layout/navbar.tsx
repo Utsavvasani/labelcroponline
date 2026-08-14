@@ -254,7 +254,7 @@ export function Navbar() {
               </li> */}
 
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/contact-us">Contact Us</Link>
               </li>
             </ul>
 
@@ -374,7 +374,7 @@ export function Navbar() {
                   )}
                 </li> */}
                 <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/contact" onClick={() => setSheetOpen(false)}>
+                  <Link href="/contact-us" onClick={() => setSheetOpen(false)}>
                     Contact Us
                   </Link>
                 </li>
