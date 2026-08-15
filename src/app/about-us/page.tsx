@@ -77,7 +77,7 @@ export default function AboutUs() {
                     <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4">
                         About Us
                     </h1>
-                    <p className="text-black text-base max-w-xl leading-relaxed">
+                    <p className="text-black text-base max-w-xl leading-relaxed  text-justify">
                         We are focused on making shipping label and document processing faster,
                         simpler, and more efficient for every ecommerce business.
                     </p>
@@ -112,7 +112,7 @@ export default function AboutUs() {
                     <main className="flex-1 min-w-0">
                         {/* Intro box */}
                         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10">
-                            <p className="text-sm text-black leading-relaxed">
+                            <p className="text-sm text-black leading-relaxed  text-justify">
                                 LabelCropOnline is built for ecommerce sellers who want to spend
                                 less time on manual document work and more time growing their
                                 business. Our tools are simple, reliable, and designed for everyday
@@ -134,7 +134,7 @@ export default function AboutUs() {
                                             <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-black text-sm leading-relaxed">
+                                            <p className="text-black text-sm leading-relaxed  text-justify">
                                                 {section.content}
                                             </p>
                                         </div>
