@@ -42,7 +42,7 @@ const heroPlatforms = [
     name: "Flipkart",
     logo: "/flipkart_logo.svg",
     href: "/editor?platform=flipkart",
-    logoH: "h-10",
+    logoH: "h-8",
     lightBg: "#EEF4FF",
   },
   {
@@ -61,7 +61,7 @@ const cardPlatforms = [
     href: "/editor?platform=amazon",
     color: "#FF9900",
     lightBg: "#FFF8EC",
-    logoClass: "h-10 w-auto",
+    logoClass: "h-12 w-auto",
     desc: "Crop and resize Amazon shipping labels from seller central PDF downloads. Perfectly sized for thermal printers and A4 sheets with one click.",
     tag: "Amazon Label Crop",
   },
@@ -71,7 +71,7 @@ const cardPlatforms = [
     href: "/editor?platform=flipkart",
     color: "#2874F0",
     lightBg: "#EEF4FF",
-    logoClass: "h-14 w-auto",
+    logoClass: "h-12 w-auto",
     desc: "Process Flipkart seller hub shipping labels in bulk. Split multi-label PDFs, crop to standard size, and download print-ready files instantly.",
     tag: "Flipkart Label Crop",
   },
@@ -212,19 +212,18 @@ export default function Home() {
               <Link
                 key={p.name}
                 href={p.href}
-                className="group block border border-slate-100 rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
-                style={{ "--hover-color": p.color } as React.CSSProperties}
+                className="group block border border-[#051448] rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
               >
-                {/* Logo area */}
+                {/* Logo area — fixed h-32 so all 3 cards are identical */}
                 <div
-                  className="flex items-center justify-center px-8 py-10 transition-colors duration-200"
+                  className="flex items-center justify-center h-32"
                   style={{ backgroundColor: p.lightBg }}
                 >
                   <Image
                     src={p.logo}
                     alt={`${p.name} Label Crop`}
                     width={160}
-                    height={80}
+                    height={60}
                     className={`object-contain ${p.logoClass}`}
                   />
                 </div>
