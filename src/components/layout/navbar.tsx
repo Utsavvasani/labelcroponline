@@ -185,7 +185,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <ul className="text-[#333333] hidden space-x-6 text-sm font-medium md:flex">
+            <ul className="text-black hidden space-x-6 text-sm font-semibold md:flex">
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
                 <Link href="/">Home</Link>
               </li>

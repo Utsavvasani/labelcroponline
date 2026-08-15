@@ -170,20 +170,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Right: Illustration ── */}
-            <div className="hidden lg:flex items-center justify-center">
-              <div className="relative w-full max-w-md">
-                {/* Glow */}
-                <div className="absolute inset-0 bg-blue-400/10 rounded-3xl blur-3xl" />
-                <Image
-                  src="/hero_illustration.jpg"
-                  alt="Shipping label processing illustration"
-                  width={500}
-                  height={400}
-                  className="relative rounded-2xl object-cover w-full shadow-2xl shadow-blue-900/40"
-                  priority
-                />
-              </div>
+            {/* ── Right: Simple SEO Text Paragraph ── */}
+            <div>
+              <p className="text-black text-sm sm:text-base leading-relaxed">
+                LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Amazon Seller Central, Flipkart Seller Hub, and Meesho Supplier Panel. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or 2-up and 4-up A4 sheets instantly in your browser without software installation or signup.
+              </p>
             </div>
 
           </div>
@@ -195,13 +186,13 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto px-6 py-16">
 
           <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-[#051448]/50 mb-2">
+            <p className="text-xs font-semibold tracking-widest uppercase text-black mb-2">
               How It Works
             </p>
-            <h2 className="text-3xl font-bold text-[#051448]">
+            <h2 className="text-3xl font-bold text-black">
               Pick your platform, crop your labels
             </h2>
-            <p className="text-slate-500 text-sm mt-3 max-w-lg mx-auto leading-relaxed">
+            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed">
               Whether you sell on Amazon, Flipkart, or Meesho — our tools are
               built to handle your labels, your way.
             </p>
@@ -236,7 +227,7 @@ export default function Home() {
                   >
                     {p.tag}
                   </span>
-                  <p className="text-slate-600 text-sm leading-relaxed">
+                  <p className="text-black text-sm leading-relaxed">
                     {p.desc}
                   </p>
                   <p

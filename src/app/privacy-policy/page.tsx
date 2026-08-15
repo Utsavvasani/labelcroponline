@@ -113,17 +113,17 @@ export default function PrivacyPolicy() {
             {/* Hero — full width light bg, content in container */}
             <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
                 <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-14">
-                    <p className="text-sm font-semibold tracking-widest uppercase text-[#051448]/60 mb-3">
+                    <p className="text-sm font-semibold tracking-widest uppercase text-black mb-3">
                         Legal
                     </p>
-                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#051448] mb-4">
+                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4">
                         Privacy Policy
                     </h1>
-                    <p className="text-slate-500 text-base max-w-xl leading-relaxed">
+                    <p className="text-black text-base max-w-xl leading-relaxed">
                         We are committed to protecting your privacy. This policy explains
                         how we collect, use, and safeguard your information.
                     </p>
-                    <div className="mt-6 inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 text-xs text-slate-500 shadow-sm">
+                    <div className="mt-6 inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 text-xs text-black shadow-sm">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
                         Last Updated: July 2025
                     </div>
@@ -137,7 +137,7 @@ export default function PrivacyPolicy() {
                     {/* Table of Contents — desktop sidebar */}
                     <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
                         <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-black mb-4">
                                 Table of Contents
                             </p>
                             <nav className="space-y-2">
@@ -145,7 +145,7 @@ export default function PrivacyPolicy() {
                                     <a
                                         key={s.id}
                                         href={`#${s.id}`}
-                                        className="block text-xs text-gray-500 hover:text-[#051448] hover:font-medium transition-colors leading-snug py-0.5"
+                                        className="block text-xs text-black hover:text-[#051448] hover:font-semibold transition-colors leading-snug py-0.5"
                                     >
                                         {s.title}
                                     </a>
@@ -158,7 +158,7 @@ export default function PrivacyPolicy() {
                     <main className="flex-1 min-w-0">
                         {/* Intro box */}
                         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10">
-                            <p className="text-sm text-[#051448]/80 leading-relaxed">
+                            <p className="text-sm text-black leading-relaxed">
                                 LabelCropOnline respects your privacy and is committed to
                                 protecting the information you provide while using our website,
                                 web application, document-processing tools, and related
@@ -178,10 +178,10 @@ export default function PrivacyPolicy() {
                                     <div className="flex items-start gap-4">
                                         <div className="w-1 h-6 bg-[#051448] rounded-full mt-1 flex-shrink-0" />
                                         <div>
-                                            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                                            <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-gray-600 text-sm leading-relaxed">
+                                            <p className="text-black text-sm leading-relaxed">
                                                 {section.content}
                                             </p>
                                         </div>
@@ -190,6 +190,11 @@ export default function PrivacyPolicy() {
                                 </section>
                             ))}
                         </div>
+
+                        {/* Footer note */}
+                        <p className="mt-10 text-xs text-black/70 italic">
+                            LabelCropOnline — Simplify Your Labels. Streamline Your Business.
+                        </p>
                     </main>
                 </div>
             </div>

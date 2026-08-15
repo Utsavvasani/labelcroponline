@@ -71,13 +71,13 @@ export default function AboutUs() {
             {/* ── Hero ── */}
             <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
                 <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-14">
-                    <p className="text-sm font-semibold tracking-widest uppercase text-[#051448]/60 mb-3">
+                    <p className="text-sm font-semibold tracking-widest uppercase text-black mb-3">
                         Our Story
                     </p>
-                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-[#051448] mb-4">
+                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4">
                         About Us
                     </h1>
-                    <p className="text-slate-500 text-base max-w-xl leading-relaxed">
+                    <p className="text-black text-base max-w-xl leading-relaxed">
                         We are focused on making shipping label and document processing faster,
                         simpler, and more efficient for every ecommerce business.
                     </p>
@@ -91,7 +91,7 @@ export default function AboutUs() {
                     {/* Table of Contents — desktop sidebar */}
                     <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
                         <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-black mb-4">
                                 Contents
                             </p>
                             <nav className="space-y-2">
@@ -99,7 +99,7 @@ export default function AboutUs() {
                                     <a
                                         key={s.id}
                                         href={`#${s.id}`}
-                                        className="block text-xs text-gray-500 hover:text-[#051448] hover:font-medium transition-colors leading-snug py-0.5"
+                                        className="block text-xs text-black hover:text-[#051448] hover:font-semibold transition-colors leading-snug py-0.5"
                                     >
                                         {s.title}
                                     </a>
@@ -112,7 +112,7 @@ export default function AboutUs() {
                     <main className="flex-1 min-w-0">
                         {/* Intro box */}
                         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10">
-                            <p className="text-sm text-[#051448]/80 leading-relaxed">
+                            <p className="text-sm text-black leading-relaxed">
                                 LabelCropOnline is built for ecommerce sellers who want to spend
                                 less time on manual document work and more time growing their
                                 business. Our tools are simple, reliable, and designed for everyday
@@ -131,10 +131,10 @@ export default function AboutUs() {
                                     <div className="flex items-start gap-4">
                                         <div className="w-1 h-6 bg-[#051448] rounded-full mt-1 flex-shrink-0" />
                                         <div>
-                                            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                                            <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-gray-600 text-sm leading-relaxed">
+                                            <p className="text-black text-sm leading-relaxed">
                                                 {section.content}
                                             </p>
                                         </div>
@@ -145,7 +145,7 @@ export default function AboutUs() {
                         </div>
 
                         {/* Footer note */}
-                        <p className="mt-10 text-xs text-gray-400 italic">
+                        <p className="mt-10 text-xs text-black/70 italic">
                             LabelCropOnline — Simplify Your Labels. Streamline Your Business.
                         </p>
                     </main>
