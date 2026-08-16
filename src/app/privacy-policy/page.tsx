@@ -158,7 +158,7 @@ export default function PrivacyPolicy() {
                     <main className="flex-1 min-w-0">
                         {/* Intro box */}
                         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10">
-                            <p className="text-sm text-black leading-relaxed">
+                            <p className="text-sm text-black leading-relaxed  text-justify">
                                 LabelCropOnline respects your privacy and is committed to
                                 protecting the information you provide while using our website,
                                 web application, document-processing tools, and related
@@ -181,7 +181,7 @@ export default function PrivacyPolicy() {
                                             <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-black text-sm leading-relaxed">
+                                            <p className="text-black text-sm leading-relaxed  text-justify">
                                                 {section.content}
                                             </p>
                                         </div>

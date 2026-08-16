@@ -69,7 +69,7 @@ const cardPlatforms = [
     name: "Flipkart",
     logo: "/flipkart_logo.svg",
     href: "/editor?platform=flipkart",
-    color: "#2874F0",
+    color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
     desc: "Process Flipkart seller hub shipping labels in bulk. Split multi-label PDFs, crop to standard size, and download print-ready files instantly.",
@@ -79,7 +79,7 @@ const cardPlatforms = [
     name: "Meesho",
     logo: "/meesho_logo.svg",
     href: "/editor?platform=meesho",
-    color: "#9B1FE8",
+    color: "#580a46",
     lightBg: "#F7EEFE",
     logoClass: "h-9 w-auto",
     desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel for fast and efficient dispatching.",
@@ -172,7 +172,7 @@ export default function Home() {
 
             {/* ── Right: Simple SEO Text Paragraph ── */}
             <div>
-              <p className="text-black text-sm sm:text-base leading-relaxed">
+              <p className="text-black text-sm sm:text-base leading-relaxed text-justify">
                 LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Amazon Seller Central, Flipkart Seller Hub, and Meesho Supplier Panel. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or 2-up and 4-up A4 sheets instantly in your browser without software installation or signup.
               </p>
             </div>
@@ -192,7 +192,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold text-black">
               Pick your platform, crop your labels
             </h2>
-            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed">
+            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed  text-justify">
               Whether you sell on Amazon, Flipkart, or Meesho — our tools are
               built to handle your labels, your way.
             </p>
@@ -227,7 +227,7 @@ export default function Home() {
                   >
                     {p.tag}
                   </span>
-                  <p className="text-black text-sm leading-relaxed">
+                  <p className="text-black text-sm leading-relaxed  text-justify">
                     {p.desc}
                   </p>
                   <p

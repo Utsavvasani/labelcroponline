@@ -201,7 +201,7 @@ export default function TermsAndConditions() {
                                             <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-black text-sm leading-relaxed">
+                                            <p className="text-black text-sm leading-relaxed  text-justify">
                                                 {section.content}
                                             </p>
                                         </div>
