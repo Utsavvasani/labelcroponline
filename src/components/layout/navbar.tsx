@@ -193,7 +193,7 @@ export function Navbar() {
                 <Link href="/editor">Meesho Label Crop </Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/editor">Flipkart Label Crop </Link>
+                <Link href="/flipkart-label-crop">Flipkart Label Crop </Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
                 <Link href="/editor">Amazon Label Crop </Link>
@@ -302,7 +302,7 @@ export function Navbar() {
                   </Link>
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/editor" onClick={() => setSheetOpen(false)}>
+                  <Link href="/flipkart-label-crop" onClick={() => setSheetOpen(false)}>
                     Flipkart Label Crop
                   </Link>
                 </li>
