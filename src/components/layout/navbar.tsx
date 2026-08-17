@@ -175,10 +175,10 @@ export function Navbar() {
         {/* Nav wrapper — transparent so page background shows through on both sides */}
         <div className="w-full">
           <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl shadow-lg">
-            {/* Logo with labelcroponline.png */}
+            {/* Logo with labelcroponline.svg */}
             <Link href="/">
               <img
-                src="/labelcroponline.png"
+                src="/labelcroponline.svg"
                 alt="Label Crop Online Logo"
                 className="w-40 h-auto object-contain"
               />
@@ -282,7 +282,7 @@ export function Navbar() {
               <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                 <Link href="/" onClick={() => setSheetOpen(false)}>
                   <img
-                    src="/labelcroponline.png"
+                    src="/labelcroponline.svg"
                     alt="Logo"
                     className="w-36 h-auto object-contain"
                   />
