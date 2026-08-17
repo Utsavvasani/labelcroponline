@@ -41,7 +41,7 @@ const heroPlatforms = [
   {
     name: "Flipkart",
     logo: "/flipkart_logo.svg",
-    href: "/editor?platform=flipkart",
+    href: "/flipkart-label-crop",
     logoH: "h-9",
     lightBg: "#EEF4FF",
   },
@@ -68,7 +68,7 @@ const cardPlatforms = [
   {
     name: "Flipkart",
     logo: "/flipkart_logo.svg",
-    href: "/editor?platform=flipkart",
+    href: "/flipkart-label-crop",
     color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
