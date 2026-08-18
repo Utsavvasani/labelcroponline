@@ -118,8 +118,8 @@ export async function cropMeeshoPdf(
   const croppedBlob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(croppedBlob);
 
-  const baseName = originalFileName.replace(/\.pdf$/i, "");
-  const outputFileName = `${baseName}_${option.suffix}.pdf`;
+  const baseName = originalFileName.replace(/^labelcroponline_/i, "").replace(/\.pdf$/i, "");
+  const outputFileName = `labelcroponline_${baseName}_${option.suffix}.pdf`;
 
   return {
     blobUrl,

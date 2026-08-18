@@ -67,8 +67,11 @@ export async function cropFlipkartPdf(
   const blobUrl = URL.createObjectURL(blob);
 
   // Generate friendly output name
-  const cleanBaseName = fileName.replace(/\.[^/.]+$/, "").replace(/_cropped/g, "");
-  const outputFileName = `${cleanBaseName}_Cropped_Label.pdf`;
+  const cleanBaseName = fileName
+    .replace(/^labelcroponline_/i, "")
+    .replace(/\.[^/.]+$/, "")
+    .replace(/_cropped/g, "");
+  const outputFileName = `labelcroponline_${cleanBaseName}_cropped.pdf`;
 
   return {
     pdfBytes,
