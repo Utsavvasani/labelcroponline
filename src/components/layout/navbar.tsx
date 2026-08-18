@@ -43,8 +43,9 @@ export function Navbar() {
       desc: "Crop thermal & shipping labels",
       icon: Crop,
       subItems: [
+        { id: "meesho", name: "Meesho Shipping Labels", desc: "Clean label & slip crop" },
+        { id: "flipkart", name: "Flipkart Shipping Labels", desc: "Automatic 1-click crop" },
         { id: "amazon", name: "Amazon Shipping Labels", desc: "Standard 4x6 prep" },
-        { id: "flipkart", name: "Flipkart Shipping Labels", desc: "2-up & 4-up formats" },
         { id: "shopify", name: "Shopify Packing Slips", desc: "Custom bounding crop" },
         { id: "custom", name: "Custom Bounding Crop", desc: "Manual marquee selection" },
       ],
@@ -83,6 +84,18 @@ export function Navbar() {
   }, []);
 
   const navigateToTool = (catId: string, subId?: string) => {
+    if (subId === "flipkart") {
+      router.push("/flipkart-label-crop");
+      setShowToolsDropdown(false);
+      setSheetOpen(false);
+      return;
+    }
+    if (subId === "meesho") {
+      router.push("/meesho-label-crop");
+      setShowToolsDropdown(false);
+      setSheetOpen(false);
+      return;
+    }
     let url = "/editor?category=" + catId;
     if (subId) {
       url += "&preset=" + subId;

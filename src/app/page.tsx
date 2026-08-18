@@ -32,11 +32,11 @@ export const metadata: Metadata = {
 
 const heroPlatforms = [
   {
-    name: "Amazon",
-    logo: "/amazon_logo.svg",
-    href: "/editor?platform=amazon",
-    logoH: "h-8",
-    lightBg: "#FFF8EC",
+    name: "Meesho",
+    logo: "/meesho_logo.svg",
+    href: "/meesho-label-crop",
+    logoH: "h-[30px]",
+    lightBg: "#F7EEFE",
   },
   {
     name: "Flipkart",
@@ -46,24 +46,24 @@ const heroPlatforms = [
     lightBg: "#EEF4FF",
   },
   {
-    name: "Meesho",
-    logo: "/meesho_logo.svg",
-    href: "/editor?platform=meesho",
-    logoH: "h-[30px]",
-    lightBg: "#F7EEFE",
+    name: "Amazon",
+    logo: "/amazon_logo.svg",
+    href: "/editor?platform=amazon",
+    logoH: "h-8",
+    lightBg: "#FFF8EC",
   },
 ];
 
 const cardPlatforms = [
   {
-    name: "Amazon",
-    logo: "/amazon_logo.svg",
-    href: "/editor?platform=amazon",
-    color: "#FF9900",
-    lightBg: "#FFF8EC",
-    logoClass: "h-10 w-auto",
-    desc: "Crop and resize Amazon shipping labels from seller central PDF downloads. Perfectly sized for thermal printers and A4 sheets with one click.",
-    tag: "Amazon Label Crop",
+    name: "Meesho",
+    logo: "/meesho_logo.svg",
+    href: "/meesho-label-crop",
+    color: "#580a46",
+    lightBg: "#F7EEFE",
+    logoClass: "h-9 w-auto",
+    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel for fast and efficient dispatching.",
+    tag: "Meesho Label Crop",
   },
   {
     name: "Flipkart",
@@ -76,14 +76,14 @@ const cardPlatforms = [
     tag: "Flipkart Label Crop",
   },
   {
-    name: "Meesho",
-    logo: "/meesho_logo.svg",
-    href: "/editor?platform=meesho",
-    color: "#580a46",
-    lightBg: "#F7EEFE",
-    logoClass: "h-9 w-auto",
-    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel for fast and efficient dispatching.",
-    tag: "Meesho Label Crop",
+    name: "Amazon",
+    logo: "/amazon_logo.svg",
+    href: "/editor?platform=amazon",
+    color: "#FF9900",
+    lightBg: "#FFF8EC",
+    logoClass: "h-10 w-auto",
+    desc: "Crop and resize Amazon shipping labels from seller central PDF downloads. Perfectly sized for thermal printers and A4 sheets with one click.",
+    tag: "Amazon Label Crop",
   },
 ];
 
@@ -173,7 +173,7 @@ export default function Home() {
             {/* ── Right: Simple SEO Text Paragraph ── */}
             <div>
               <p className="text-black text-sm sm:text-base leading-relaxed text-justify">
-                LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Amazon Seller Central, Flipkart Seller Hub, and Meesho Supplier Panel. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or 2-up and 4-up A4 sheets instantly in your browser without software installation or signup.
+                LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Meesho Supplier Panel, Flipkart Seller Hub, and Amazon Seller Central. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or 2-up and 4-up A4 sheets instantly in your browser without software installation or signup.
               </p>
             </div>
 
@@ -193,7 +193,7 @@ export default function Home() {
               Pick your platform, crop your labels
             </h2>
             <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed  text-justify">
-              Whether you sell on Amazon, Flipkart, or Meesho — our tools are
+              Whether you sell on Meesho, Flipkart, or Amazon — our tools are
               built to handle your labels, your way.
             </p>
           </div>

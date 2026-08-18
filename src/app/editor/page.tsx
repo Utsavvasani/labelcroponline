@@ -10,7 +10,9 @@ function EditorRedirectContent() {
 
   useEffect(() => {
     const platform = searchParams.get("platform");
-    if (platform === "flipkart" || !platform) {
+    if (platform === "meesho" || !platform) {
+      router.replace("/meesho-label-crop");
+    } else if (platform === "flipkart") {
       router.replace("/flipkart-label-crop");
     } else {
       router.replace(`/${platform}-label-crop`);
