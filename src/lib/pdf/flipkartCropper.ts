@@ -46,15 +46,12 @@ export async function cropFlipkartPdf(
     const page = pdfDoc.getPage(i);
     const { width, height } = page.getSize();
 
-    // Exact reference cut matching cropped_label.pdf:
-    // x: 165 pt (27.73% of width)
-    // y: 460 pt (54.63% of height)
-    // width: 265 pt (44.54% of width)
-    // height: 360 pt (42.76% of height)
-    const cropX = (165 / 595) * width;
-    const cropY = (460 / 842) * height;
-    const cropW = (265 / 595) * width;
-    const cropH = (360 / 842) * height;
+    // Exact symmetrical crop with equal spacing on all sides (3.5 pt margins around border):
+    // x: 165 pt, y: 459.5 pt, width: 265 pt, height: 361.5 pt
+    const cropX = (165 / 595.28) * width;
+    const cropY = (459.5 / 841.89) * height;
+    const cropW = (265 / 595.28) * width;
+    const cropH = (361.5 / 841.89) * height;
 
     page.setCropBox(cropX, cropY, cropW, cropH);
     page.setMediaBox(cropX, cropY, cropW, cropH);
