@@ -35,10 +35,8 @@ export default function FlipkartLabelCropPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cropResult, setCropResult] = useState<CropResult | null>(null);
-  const [originalPreviewUrl, setOriginalPreviewUrl] = useState<string | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
-  const [previewTab, setPreviewTab] = useState<"cropped" | "original">("cropped");
   const [sampleLoading, setSampleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -48,9 +46,8 @@ export default function FlipkartLabelCropPage() {
   useEffect(() => {
     return () => {
       if (cropResult?.blobUrl) URL.revokeObjectURL(cropResult.blobUrl);
-      if (originalPreviewUrl) URL.revokeObjectURL(originalPreviewUrl);
     };
-  }, [cropResult, originalPreviewUrl]);
+  }, [cropResult]);
 
   // Process the uploaded PDF
   const handleCropAndDownload = async (inputFile?: File | Blob, customName?: string) => {
@@ -66,10 +63,6 @@ export default function FlipkartLabelCropPage() {
     setErrorMsg(null);
 
     try {
-      if (originalPreviewUrl) URL.revokeObjectURL(originalPreviewUrl);
-      const origUrl = URL.createObjectURL(targetFile);
-      setOriginalPreviewUrl(origUrl);
-
       const result = await cropFlipkartPdf(targetFile, name);
       setCropResult(result);
 
@@ -147,8 +140,6 @@ export default function FlipkartLabelCropPage() {
   const handleReset = () => {
     setFile(null);
     setCropResult(null);
-    if (originalPreviewUrl) URL.revokeObjectURL(originalPreviewUrl);
-    setOriginalPreviewUrl(null);
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -367,42 +358,21 @@ export default function FlipkartLabelCropPage() {
       {showPreviewModal && cropResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
           <div className="bg-white border border-[#051448] rounded-md w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-
+            
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#051448] bg-slate-50">
-              <div className="flex items-center gap-3">
-                <span className="font-bold text-sm text-black">PDF Preview</span>
-                <div className="flex items-center border border-[#051448] rounded overflow-hidden text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setPreviewTab("cropped")}
-                    className={`px-3 py-1 font-semibold transition-colors cursor-pointer ${previewTab === "cropped"
-                      ? "bg-[#051448] text-white"
-                      : "bg-white text-black hover:bg-slate-100"
-                      }`}
-                  >
-                    Cropped Label
-                  </button>
-                  {originalPreviewUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setPreviewTab("original")}
-                      className={`px-3 py-1 font-semibold transition-colors cursor-pointer border-l border-[#051448] ${previewTab === "original"
-                        ? "bg-[#051448] text-white"
-                        : "bg-white text-black hover:bg-slate-100"
-                        }`}
-                    >
-                      Original A4
-                    </button>
-                  )}
-                </div>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-[#051448] bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <span className="font-bold text-sm text-black">Cropped Labels Preview</span>
+                <span className="text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => triggerDownload(cropResult.blobUrl, cropResult.fileName)}
-                  className="flex items-center gap-1 text-xs font-bold text-[#051448] border border-[#051448] px-2.5 py-1 rounded hover:bg-blue-50 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 text-xs font-bold text-white bg-[#051448] hover:bg-[#071a5e] px-3 py-1.5 rounded transition-colors cursor-pointer"
                 >
                   <Download size={13} />
                   Download
@@ -418,23 +388,13 @@ export default function FlipkartLabelCropPage() {
               </div>
             </div>
 
-            {/* Modal Body: High-Quality Canvas PDF viewer */}
-            <div className="flex-1 bg-slate-100 p-2 min-h-[500px] h-[650px] flex flex-col">
-              {previewTab === "cropped" ? (
-                <PdfPreviewViewer
-                  key={`cropped-${cropResult.blobUrl}`}
-                  url={cropResult.blobUrl}
-                  initialScale={1.3}
-                />
-              ) : (
-                originalPreviewUrl && (
-                  <PdfPreviewViewer
-                    key={`orig-${originalPreviewUrl}`}
-                    url={originalPreviewUrl}
-                    initialScale={0.9}
-                  />
-                )
-              )}
+            {/* Modal Body: Searchable, Continuous-Scroll Canvas PDF viewer */}
+            <div className="flex-1 bg-slate-100 p-2 min-h-[500px] h-[650px] flex flex-col overflow-hidden">
+              <PdfPreviewViewer
+                key={`cropped-${cropResult.blobUrl}`}
+                url={cropResult.blobUrl}
+                initialScale={1.3}
+              />
             </div>
           </div>
         </div>
