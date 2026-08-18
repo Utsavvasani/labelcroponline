@@ -11,7 +11,6 @@ import {
   Info,
   Loader2,
   X,
-  Sparkles,
   Scissors,
   Check,
   FileCheck,
@@ -46,7 +45,6 @@ export default function MeeshoLabelCropPage() {
   const [cropResult, setCropResult] = useState<CropResult | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
-  const [sampleLoading, setSampleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -154,25 +152,6 @@ export default function MeeshoLabelCropPage() {
     }
   };
 
-  const handleLoadSamplePdf = async () => {
-    setSampleLoading(true);
-    setErrorMsg(null);
-    try {
-      const response = await fetch("/Meesho.pdf");
-      if (!response.ok) throw new Error("Could not load sample Meesho.pdf");
-      const blob = await response.blob();
-      const sampleFile = new File([blob], "Meesho.pdf", { type: "application/pdf" });
-      setFile(sampleFile);
-      setCropResult(null);
-      await handleProcessPdf(sampleFile, "Meesho.pdf", cropMode, false);
-    } catch (err: unknown) {
-      console.error("Error loading sample:", err);
-      setErrorMsg("Failed to load sample Meesho.pdf from public folder.");
-    } finally {
-      setSampleLoading(false);
-    }
-  };
-
   const handleCropAndDownloadClick = () => {
     if (cropResult) {
       triggerDownload(cropResult.blobUrl, cropResult.fileName);
@@ -203,8 +182,8 @@ export default function MeeshoLabelCropPage() {
 
   return (
     <>
-      {/* ── Main Content Form Container (Optimized for Mobile Viewport) ── */}
-      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 py-4 sm:py-8 mt-12">
+      {/* ── Main Content Form Container (Proper spacing below fixed navigation bar) ── */}
+      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[96px] sm:pt-32 pb-6 sm:pb-10">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -253,23 +232,9 @@ export default function MeeshoLabelCropPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-3 hidden sm:block">
+              <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
                 Crop Meesho shipping labels with clean border margins. Choose Full with Tax, Label + SKU, or Half Crop.
               </p>
-
-              <button
-                type="button"
-                onClick={handleLoadSamplePdf}
-                disabled={isProcessing || sampleLoading}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-3 py-1.5 rounded hover:bg-blue-50 transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {sampleLoading ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Sparkles size={12} />
-                )}
-                Try with Sample PDF
-              </button>
             </div>
 
             {/* ── Right Column: Mode Selector, Upload & Actions ── */}
