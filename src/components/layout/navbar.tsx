@@ -203,13 +203,13 @@ export function Navbar() {
                 <Link href="/">Home</Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/editor">Meesho Label Crop </Link>
+                <Link href="/meesho-label-crop">Meesho Label Crop</Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/flipkart-label-crop">Flipkart Label Crop </Link>
+                <Link href="/flipkart-label-crop">Flipkart Label Crop</Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/editor">Amazon Label Crop </Link>
+                <Link href="/editor?platform=amazon">Amazon Label Crop</Link>
               </li>
 
               {/* Product / Tools Dropdown */}
@@ -315,17 +315,17 @@ export function Navbar() {
                   </Link>
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
+                  <Link href="/meesho-label-crop" onClick={() => setSheetOpen(false)}>
+                    Meesho Label Crop
+                  </Link>
+                </li>
+                <li className="hover:text-[#051448] cursor-pointer">
                   <Link href="/flipkart-label-crop" onClick={() => setSheetOpen(false)}>
                     Flipkart Label Crop
                   </Link>
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/editor" onClick={() => setSheetOpen(false)}>
-                    Meesho Label Crop
-                  </Link>
-                </li>
-                <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/editor" onClick={() => setSheetOpen(false)}>
+                  <Link href="/editor?platform=amazon" onClick={() => setSheetOpen(false)}>
                     Amazon Label Crop
                   </Link>
                 </li>
