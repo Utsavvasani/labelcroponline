@@ -14,6 +14,8 @@ function EditorRedirectContent() {
       router.replace("/meesho-label-crop");
     } else if (platform === "flipkart") {
       router.replace("/flipkart-label-crop");
+    } else if (platform === "merge") {
+      router.replace("/merge-pdf");
     } else {
       router.replace(`/${platform}-label-crop`);
     }

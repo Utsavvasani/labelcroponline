@@ -45,7 +45,7 @@ export function Navbar() {
       subItems: [
         { id: "meesho", name: "Meesho Shipping Labels", desc: "Clean label & slip crop" },
         { id: "flipkart", name: "Flipkart Shipping Labels", desc: "Automatic 1-click crop" },
-        { id: "amazon", name: "Amazon Shipping Labels", desc: "Standard 4x6 prep" },
+        { id: "merge", name: "Merge PDF Files", desc: "Combine multiple documents" },
         { id: "shopify", name: "Shopify Packing Slips", desc: "Custom bounding crop" },
         { id: "custom", name: "Custom Bounding Crop", desc: "Manual marquee selection" },
       ],
@@ -56,6 +56,7 @@ export function Navbar() {
       desc: "Split, merge & crop PDF pages",
       icon: FileText,
       subItems: [
+        { id: "merge", name: "Merge PDF Documents", desc: "Combine multiple files into one" },
         { id: "batch-crop", name: "Batch Multi-Page Crop", desc: "Process all pages at once" },
         { id: "page-split", name: "Split Multi-Label Pages", desc: "Separate 4-on-1 PDF pages" },
         { id: "auto-detect", name: "Auto Margin Removal", desc: "Remove blank borders" },
@@ -92,6 +93,12 @@ export function Navbar() {
     }
     if (subId === "meesho") {
       router.push("/meesho-label-crop");
+      setShowToolsDropdown(false);
+      setSheetOpen(false);
+      return;
+    }
+    if (subId === "merge" || catId === "merge") {
+      router.push("/merge-pdf");
       setShowToolsDropdown(false);
       setSheetOpen(false);
       return;
@@ -209,63 +216,8 @@ export function Navbar() {
                 <Link href="/flipkart-label-crop">Flipkart Label Crop</Link>
               </li>
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/editor?platform=amazon">Amazon Label Crop</Link>
+                <Link href="/merge-pdf">Merge PDF</Link>
               </li>
-
-              {/* Product / Tools Dropdown */}
-              {/* <li
-                className="hover:text-[#051448] relative cursor-pointer"
-                onMouseEnter={() => setShowToolsDropdown(true)}
-                onMouseLeave={() => setShowToolsDropdown(false)}
-              >
-                <div className="flex items-center gap-1">
-                  <Link href="/editor">Tools & Presets</Link>
-                  <ChevronDown size={14} />
-                </div>
-
-                {showToolsDropdown && (
-                  <div className="absolute top-full left-0 z-50 w-64 rounded-md bg-white p-2 shadow-lg">
-                    {toolCategories.map((category) => (
-                      <div
-                        key={category.id}
-                        className="relative"
-                        onMouseEnter={() => setActiveCategory(category.id)}
-                        onMouseLeave={() => setActiveCategory(null)}
-                      >
-                        <div
-                          onClick={() => navigateToTool(category.id)}
-                          className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-gray-100"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Crop size={16} className="text-[#051448]" />
-                            <span className="text-sm font-medium">{category.name}</span>
-                          </div>
-                          {category.subItems && category.subItems.length > 0 && (
-                            <ChevronDown size={14} className="ml-auto" />
-                          )}
-                        </div>
-
-                        {activeCategory === category.id &&
-                          category.subItems &&
-                          category.subItems.length > 0 && (
-                            <div className="absolute top-0 right-full z-50 w-60 rounded-md bg-white p-2 shadow-lg">
-                              {category.subItems.map((subItem) => (
-                                <div
-                                  key={subItem.id}
-                                  onClick={() => navigateToTool(category.id, subItem.id)}
-                                  className="flex cursor-pointer items-center gap-2 rounded-md p-2 hover:bg-gray-100"
-                                >
-                                  <span className="text-xs">{subItem.name}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </li> */}
-
               <li className="hover:text-[#051448] cursor-pointer transition-colors">
                 <Link href="/contact-us">Contact Us</Link>
               </li>
@@ -325,8 +277,8 @@ export function Navbar() {
                   </Link>
                 </li>
                 <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/editor?platform=amazon" onClick={() => setSheetOpen(false)}>
-                    Amazon Label Crop
+                  <Link href="/merge-pdf" onClick={() => setSheetOpen(false)}>
+                    Merge PDF
                   </Link>
                 </li>
                 {/* <li className="hover:text-[#051448] cursor-pointer">

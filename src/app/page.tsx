@@ -1,32 +1,34 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Crop & Process Shipping Labels Online – Free Label Tool",
+  title: "Crop Shipping Labels Online - Free Ecommerce PDF Label Cropper",
   description:
-    "LabelCropOnline is a free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents. Perfect for ecommerce sellers and warehouses.",
+    "Crop and resize PDF shipping labels for Meesho, Flipkart, and merge multi-page PDF documents for 4x6 thermal printers and A4 sheets. Free, fast, and secure.",
   keywords: [
-    "crop shipping labels online",
-    "free label crop tool",
-    "shipping label processor",
-    "bulk label cropping",
-    "PDF shipping label cropper",
-    "label tool for ecommerce",
-    "online label resizer",
-    "labelcroponline",
+    "label cropper",
+    "crop shipping labels",
+    "flipkart label crop",
+    "meesho label crop",
+    "merge pdf",
+    "combine pdf files",
+    "thermal printer label crop",
+    "4x6 label crop",
+    "ecommerce label resize",
   ],
-  alternates: { canonical: "https://www.labelcroponline.com" },
   openGraph: {
-    url: "https://www.labelcroponline.com",
-    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    title: "Crop Shipping Labels Online - Free Ecommerce PDF Cropper",
     description:
-      "Free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents for ecommerce sellers.",
+      "Instant, lossless shipping label cropping and PDF merging for ecommerce sellers. Works directly in your browser.",
+    type: "website",
+    url: "https://labelcroponline.com",
   },
   twitter: {
-    title: "LabelCropOnline – Crop & Process Shipping Labels Online",
+    card: "summary_large_image",
+    title: "Crop Shipping Labels Online - LabelCropOnline",
     description:
-      "Free online tool to crop, resize, sort, split, and bulk-process shipping labels and PDF documents for ecommerce sellers.",
+      "Instant, lossless shipping label cropping and PDF merging for ecommerce sellers.",
   },
 };
 
@@ -37,6 +39,7 @@ const heroPlatforms = [
     href: "/meesho-label-crop",
     logoH: "h-[30px]",
     lightBg: "#F7EEFE",
+    tagText: "Meesho Labels",
   },
   {
     name: "Flipkart",
@@ -44,13 +47,15 @@ const heroPlatforms = [
     href: "/flipkart-label-crop",
     logoH: "h-9",
     lightBg: "#EEF4FF",
+    tagText: "Flipkart Labels",
   },
   {
-    name: "Amazon",
-    logo: "/amazon_logo.svg",
-    href: "/editor?platform=amazon",
-    logoH: "h-8",
-    lightBg: "#FFF8EC",
+    name: "Merge PDF",
+    logo: "/merge_icon.svg",
+    href: "/merge-pdf",
+    logoH: "h-12",
+    lightBg: "#FEF2F2",
+    tagText: "Merge PDFs",
   },
 ];
 
@@ -62,8 +67,9 @@ const cardPlatforms = [
     color: "#580a46",
     lightBg: "#F7EEFE",
     logoClass: "h-9 w-auto",
-    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel for fast and efficient dispatching.",
+    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel with clean border margins for fast dispatching.",
     tag: "Meesho Label Crop",
+    cta: "Crop Meesho Labels →",
   },
   {
     name: "Flipkart",
@@ -72,18 +78,20 @@ const cardPlatforms = [
     color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
-    desc: "Process Flipkart seller hub shipping labels in bulk. Split multi-label PDFs, crop to standard size, and download print-ready files instantly.",
+    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the middle shipping label cleanly, strip extra margins, and download print-ready files instantly.",
     tag: "Flipkart Label Crop",
+    cta: "Crop Flipkart Labels →",
   },
   {
-    name: "Amazon",
-    logo: "/amazon_logo.svg",
-    href: "/editor?platform=amazon",
-    color: "#FF9900",
-    lightBg: "#FFF8EC",
-    logoClass: "h-10 w-auto",
-    desc: "Crop and resize Amazon shipping labels from seller central PDF downloads. Perfectly sized for thermal printers and A4 sheets with one click.",
-    tag: "Amazon Label Crop",
+    name: "Merge PDF",
+    logo: "/merge_icon.svg",
+    href: "/merge-pdf",
+    color: "#B42024",
+    lightBg: "#FEF2F2",
+    logoClass: "h-14 w-auto",
+    desc: "Combine multiple shipping labels, packing slips, or document PDFs into one single file. Easily reorder files by position number and download immediately.",
+    tag: "PDF Merge Tool",
+    cta: "Merge PDF Files →",
   },
 ];
 
@@ -105,17 +113,12 @@ export default function Home() {
               </h1>
 
               <p className="text-black text-sm sm:text-base leading-relaxed mb-8 max-w-md">
-                Upload your PDF shipping labels, crop, resize, and download
-                instantly — built for ecommerce sellers on every major platform.
+                Upload your PDF shipping labels, crop, resize, or merge
+                instantly — built for ecommerce sellers and warehouse dispatchers.
               </p>
 
-              {/* Platform Banners */}
-              <p className="text-black text-xs font-semibold uppercase tracking-widest mb-3">
-                Supported Platforms
-              </p>
-
-              {/* Mobile: 2-part pill — fixed logo box + text */}
-              <div className="flex flex-col gap-2 mb-8 sm:hidden">
+              {/* Mobile: stacked horizontal cards */}
+              <div className="flex flex-col gap-2.5 sm:hidden mb-8">
                 {heroPlatforms.map((p) => (
                   <Link
                     key={p.name}
@@ -129,7 +132,7 @@ export default function Home() {
                     >
                       <Image
                         src={p.logo}
-                        alt={`${p.name} Label Crop`}
+                        alt={`${p.name} Tool`}
                         width={100}
                         height={40}
                         className="object-contain w-full h-8"
@@ -138,7 +141,7 @@ export default function Home() {
                     {/* Part 2: Text — remaining width, white bg */}
                     <div className="flex-1 flex items-center justify-between px-4 py-3 bg-white">
                       <span className="text-[#051448] text-sm font-semibold">
-                        {p.name} Label Crop
+                        {p.tagText}
                       </span>
                       <span className="text-[#051448]/40 text-xs ml-2">→</span>
                     </div>
@@ -146,7 +149,7 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Desktop: equal square cards */}
+              {/* Desktop: 3 equal cards */}
               <div className="hidden sm:grid grid-cols-3 gap-3 mb-8">
                 {heroPlatforms.map((p) => (
                   <Link
@@ -157,13 +160,13 @@ export default function Home() {
                   >
                     <Image
                       src={p.logo}
-                      alt={`${p.name} Label Crop`}
+                      alt={`${p.name} Tool`}
                       width={120}
                       height={48}
                       className={`object-contain w-auto ${p.logoH}`}
                     />
                     <span className="text-[#051448] text-[10px] font-medium">
-                      {p.name} Labels
+                      {p.tagText}
                     </span>
                   </Link>
                 ))}
@@ -173,7 +176,7 @@ export default function Home() {
             {/* ── Right: Simple SEO Text Paragraph ── */}
             <div>
               <p className="text-black text-sm sm:text-base leading-relaxed text-justify">
-                LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Meesho Supplier Panel, Flipkart Seller Hub, and Amazon Seller Central. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or 2-up and 4-up A4 sheets instantly in your browser without software installation or signup.
+                LabelCropOnline is a free, fast, and secure online tool designed for ecommerce sellers and warehouse teams to crop, resize, split, and bulk-process shipping labels from Meesho Supplier Panel and Flipkart Seller Hub, or merge multiple PDFs into one unified document. Convert multi-page PDF orders into print-ready 4x6 inch thermal printer labels or A4 sheets instantly in your browser without software installation or signup.
               </p>
             </div>
 
@@ -190,11 +193,10 @@ export default function Home() {
               How It Works
             </p>
             <h2 className="text-3xl font-bold text-black">
-              Pick your platform, crop your labels
+              Pick your tool, process your files
             </h2>
-            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed  text-justify">
-              Whether you sell on Meesho, Flipkart, or Amazon — our tools are
-              built to handle your labels, your way.
+            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed text-center">
+              Whether you sell on Meesho or Flipkart, or need to merge multiple PDF documents — our tools are built for speed and precision.
             </p>
           </div>
 
@@ -212,7 +214,7 @@ export default function Home() {
                 >
                   <Image
                     src={p.logo}
-                    alt={`${p.name} Label Crop`}
+                    alt={`${p.name} Tool`}
                     width={160}
                     height={60}
                     className={`object-contain ${p.logoClass}`}
@@ -227,14 +229,14 @@ export default function Home() {
                   >
                     {p.tag}
                   </span>
-                  <p className="text-black text-sm leading-relaxed  text-justify">
+                  <p className="text-black text-sm leading-relaxed text-justify">
                     {p.desc}
                   </p>
                   <p
                     className="mt-4 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all"
                     style={{ color: p.color }}
                   >
-                    Crop {p.name} Labels →
+                    {p.cta}
                   </p>
                 </div>
               </Link>
