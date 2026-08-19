@@ -13,8 +13,15 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.labelcroponline.com"),
   icons: {
-    icon: "/tab_logo.png",
-    apple: "/tab_logo.png",
+    icon: [
+      { url: "/tab_logo.svg", type: "image/svg+xml" },
+      { url: "/tab_logo.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/tab_logo.svg",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   title: {
     default: "LabelCropOnline – Crop & Process Shipping Labels Online",
