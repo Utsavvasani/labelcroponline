@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, DragEvent, ChangeEvent } from "react";
+import Image from "next/image";
 import {
   UploadCloud,
   FileText,
@@ -264,7 +265,7 @@ export default function MergePdfPage() {
     <>
       {/* ── Main Content Form Container (Proper spacing below fixed navigation bar) ── */}
       <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[96px] sm:pt-32 pb-6 sm:pb-10">
-        
+
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -298,13 +299,18 @@ export default function MergePdfPage() {
 
             {/* ── Left Column: Tool Info & Actions ── */}
             <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-4 md:pb-0 md:pr-6">
-              
-              {/* Icon & Title */}
+
+              {/* Logo & Title */}
               <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-2 md:mb-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 border border-[#051448] flex items-center justify-center text-[#051448] shadow-sm">
-                  <Layers size={26} />
-                </div>
-                <h1 className="text-base sm:text-lg font-bold text-black md:mt-3">
+                <Image
+                  src="/merge_icon.svg"
+                  alt="Merge PDF"
+                  width={250}
+                  height={60}
+                  className="h-20 sm:h-24 w-auto object-contain"
+                  priority
+                />
+                <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
                   Merge PDF Files
                 </h1>
               </div>
@@ -346,9 +352,8 @@ export default function MergePdfPage() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`border border-[#051448] rounded-md p-6 sm:p-10 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${
-                    isDragging ? "bg-blue-50/80 border-dashed" : ""
-                  }`}
+                  className={`border border-[#051448] rounded-md p-6 sm:p-10 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : ""
+                    }`}
                 >
                   <div className="w-11 h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2.5">
                     <UploadCloud size={24} />
@@ -362,7 +367,7 @@ export default function MergePdfPage() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  
+
                   {/* File List Header with Drag Hint */}
                   <div className="flex items-center justify-between pb-1 border-b border-[#051448]/15">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-black">
@@ -388,13 +393,12 @@ export default function MergePdfPage() {
                         onDragOver={(e) => handleItemDragOver(e, index)}
                         onDrop={(e) => handleItemDrop(e, index)}
                         onDragEnd={handleItemDragEnd}
-                        className={`flex items-center justify-between gap-2 p-2.5 sm:p-3 border rounded-md transition-all shadow-xs cursor-grab active:cursor-grabbing select-none ${
-                          draggedItemIndex === index
+                        className={`flex items-center justify-between gap-2 p-2.5 sm:p-3 border rounded-md transition-all shadow-xs cursor-grab active:cursor-grabbing select-none ${draggedItemIndex === index
                             ? "opacity-40 scale-[0.98] border-dashed border-[#051448] bg-blue-50/50"
                             : dragOverItemIndex === index
-                            ? "border-2 border-[#051448] bg-blue-50/80 shadow-md ring-2 ring-[#051448]/20"
-                            : "border-[#051448]/30 bg-white hover:border-[#051448]"
-                        }`}
+                              ? "border-2 border-[#051448] bg-blue-50/80 shadow-md ring-2 ring-[#051448]/20"
+                              : "border-[#051448]/30 bg-white hover:border-[#051448]"
+                          }`}
                       >
                         {/* Drag Handle Grip Icon */}
                         <div
@@ -470,9 +474,8 @@ export default function MergePdfPage() {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border border-dashed border-[#051448]/40 rounded-md p-2 text-center text-xs font-semibold text-[#051448] cursor-pointer hover:bg-blue-50/40 transition-colors ${
-                      isDragging ? "bg-blue-50 border-[#051448]" : ""
-                    }`}
+                    className={`border border-dashed border-[#051448]/40 rounded-md p-2 text-center text-xs font-semibold text-[#051448] cursor-pointer hover:bg-blue-50/40 transition-colors ${isDragging ? "bg-blue-50 border-[#051448]" : ""
+                      }`}
                   >
                     + Drop more PDF files here to append
                   </div>
@@ -482,7 +485,7 @@ export default function MergePdfPage() {
 
               {/* Action Buttons & Status Row */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
-                
+
                 {/* Left: Merge / Download Action */}
                 <div className="flex flex-wrap items-center gap-2">
                   <button
@@ -571,7 +574,7 @@ export default function MergePdfPage() {
       {showPreviewModal && mergeResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
           <div className="bg-white border border-[#051448] rounded-md w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            
+
             {/* Modal Header */}
             <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-[#051448] bg-slate-50">
               <div className="flex items-center gap-2">
@@ -617,7 +620,7 @@ export default function MergePdfPage() {
       {showMetaModal && mergeResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white border border-[#051448] rounded-md w-full max-w-md p-6 shadow-2xl">
-            
+
             <div className="flex items-center justify-between pb-3 border-b border-[#051448]/20 mb-4">
               <div className="flex items-center gap-2">
                 <FileText size={18} className="text-[#051448]" />
