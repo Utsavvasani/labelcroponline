@@ -380,6 +380,11 @@ export async function cropMeeshoPdf(
   );
   const partnerSummaryText = partnerSummaryList.join(" • ");
 
+  const partnerSummaryList = Object.entries(detectedPartners).map(
+    ([name, count]) => `${name} (${count})`
+  );
+  const partnerSummaryText = partnerSummaryList.join(" • ");
+
   return {
     blobUrl,
     pdfBytes,

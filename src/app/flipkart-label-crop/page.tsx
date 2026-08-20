@@ -13,9 +13,12 @@ import {
   X,
   Scissors,
   FileCheck,
+  Crop,
+  Check,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cropFlipkartPdf, triggerDownload, CropResult } from "@/lib/pdf/flipkartCropper";
+import { cropPdfCustomArea, CustomCropBox, CustomCropResult } from "@/lib/pdf/customCropper";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -30,13 +33,25 @@ const PdfPreviewViewer = dynamic(
   }
 );
 
+const CustomPdfCropModal = dynamic(
+  () => import("@/components/pdf/CustomPdfCropModal").then((m) => m.CustomPdfCropModal),
+  {
+    ssr: false,
+  }
+);
+
+type FlipkartCropMode = "auto" | "custom";
+
 export default function FlipkartLabelCropPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cropResult, setCropResult] = useState<CropResult | null>(null);
+  const [cropMode, setCropMode] = useState<FlipkartCropMode>("auto");
+  const [customCropBox, setCustomCropBox] = useState<CustomCropBox | null>(null);
+  const [cropResult, setCropResult] = useState<CropResult | CustomCropResult | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
+  const [showCustomCropModal, setShowCustomCropModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,10 +63,12 @@ export default function FlipkartLabelCropPage() {
     };
   }, [cropResult]);
 
-  // Process the uploaded PDF (no auto-download)
+  // Process the uploaded PDF (Auto or Custom)
   const handleProcessPdf = async (
     inputFile?: File | Blob,
     customName?: string,
+    mode: FlipkartCropMode = cropMode,
+    activeCustomBox: CustomCropBox | null = customCropBox,
     shouldDownload: boolean = false
   ) => {
     const targetFile = inputFile || file;
@@ -70,7 +87,13 @@ export default function FlipkartLabelCropPage() {
         URL.revokeObjectURL(cropResult.blobUrl);
       }
 
-      const result = await cropFlipkartPdf(targetFile, name);
+      let result: CropResult | CustomCropResult;
+      if (mode === "custom" && activeCustomBox) {
+        result = await cropPdfCustomArea(targetFile, name, activeCustomBox);
+      } else {
+        result = await cropFlipkartPdf(targetFile, name);
+      }
+
       setCropResult(result);
 
       if (shouldDownload) {
@@ -88,6 +111,29 @@ export default function FlipkartLabelCropPage() {
     }
   };
 
+  const handleModeChange = (newMode: FlipkartCropMode) => {
+    setCropMode(newMode);
+    if (newMode === "custom") {
+      if (file) {
+        setShowCustomCropModal(true);
+      } else {
+        fileInputRef.current?.click();
+      }
+    } else {
+      if (file) {
+        handleProcessPdf(file, file.name, "auto", null, false);
+      }
+    }
+  };
+
+  const handleApplyCustomCrop = (appliedBox: CustomCropBox) => {
+    setCustomCropBox(appliedBox);
+    setCropMode("custom");
+    if (file) {
+      handleProcessPdf(file, file.name, "custom", appliedBox, false);
+    }
+  };
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
@@ -101,7 +147,12 @@ export default function FlipkartLabelCropPage() {
       setFile(selectedFile);
       setCropResult(null);
       setErrorMsg(null);
-      handleProcessPdf(selectedFile, selectedFile.name, false);
+
+      if (cropMode === "custom") {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(selectedFile, selectedFile.name, "auto", null, false);
+      }
     }
   };
 
@@ -131,7 +182,12 @@ export default function FlipkartLabelCropPage() {
       setFile(droppedFile);
       setCropResult(null);
       setErrorMsg(null);
-      handleProcessPdf(droppedFile, droppedFile.name, false);
+
+      if (cropMode === "custom") {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(droppedFile, droppedFile.name, "auto", null, false);
+      }
     }
   };
 
@@ -139,7 +195,11 @@ export default function FlipkartLabelCropPage() {
     if (cropResult) {
       triggerDownload(cropResult.blobUrl, cropResult.fileName);
     } else if (file) {
-      handleProcessPdf(file, file.name, true);
+      if (cropMode === "custom" && !customCropBox) {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(file, file.name, cropMode, customCropBox, true);
+      }
     } else {
       fileInputRef.current?.click();
     }
@@ -151,6 +211,8 @@ export default function FlipkartLabelCropPage() {
       URL.revokeObjectURL(cropResult.blobUrl);
     }
     setCropResult(null);
+    setCustomCropBox(null);
+    setCropMode("auto");
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -165,7 +227,7 @@ export default function FlipkartLabelCropPage() {
 
   return (
     <>
-      {/* ── Main Content Form Container (Proper spacing below fixed navigation bar) ── */}
+      {/* ── Main Content Form Container ── */}
       <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[96px] sm:pt-32 pb-6 sm:pb-10">
         {/* Hidden File Input */}
         <input
@@ -216,12 +278,93 @@ export default function FlipkartLabelCropPage() {
               </div>
 
               <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
-                Extracts the middle shipping label box, strips extra margins, and prepares your PDF for thermal or A4 printing.
+                Crop Flipkart shipping labels automatically or select your own custom crop area interactively.
               </p>
             </div>
 
-            {/* ── Right Column: Upload & Actions (Above-the-fold) ── */}
+            {/* ── Right Column: Mode Selector, Upload & Actions ── */}
             <div className="md:col-span-8 flex flex-col justify-center">
+
+              {/* Crop Mode Selection Tabs */}
+              <div className="mb-3.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-bold text-black uppercase tracking-wider">
+                    Crop Option:
+                  </span>
+                  {cropResult && (
+                    <span className="text-[11px] font-semibold text-[#051448] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} Ready
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* Option 1: Standard Auto Crop */}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange("auto")}
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
+                      cropMode === "auto"
+                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
+                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    }`}
+                  >
+                    <div
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
+                        cropMode === "auto"
+                          ? "border-white bg-white text-[#051448]"
+                          : "border-black/40 bg-white"
+                      }`}
+                    >
+                      {cropMode === "auto" && <Check size={9} strokeWidth={3} />}
+                    </div>
+                    <div>
+                      <div className="text-[11px] sm:text-xs font-bold leading-tight">Standard Crop</div>
+                      <div
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
+                          cropMode === "auto" ? "text-white/80" : "text-black/60"
+                        }`}
+                      >
+                        Auto Flipkart Label Box
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Option 2: Custom Area Crop */}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange("custom")}
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
+                      cropMode === "custom"
+                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
+                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    }`}
+                  >
+                    <div
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
+                        cropMode === "custom"
+                          ? "border-white bg-white text-[#051448]"
+                          : "border-black/40 bg-white"
+                      }`}
+                    >
+                      {cropMode === "custom" && <Check size={9} strokeWidth={3} />}
+                    </div>
+                    <div>
+                      <div className="text-[11px] sm:text-xs font-bold leading-tight flex items-center gap-1">
+                        <Crop size={11} />
+                        Custom Crop
+                      </div>
+                      <div
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
+                          cropMode === "custom" ? "text-white/80" : "text-black/60"
+                        }`}
+                      >
+                        {customCropBox ? "Area Selected (Click to change)" : "Select Area in PDF"}
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
 
               {/* Drop / Select Zone */}
               <div
@@ -229,8 +372,9 @@ export default function FlipkartLabelCropPage() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border border-[#051448] rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : ""
-                  }`}
+                className={`border border-[#051448] rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${
+                  isDragging ? "bg-blue-50/80 border-dashed" : ""
+                }`}
               >
                 <div className="w-9 h-9 sm:w-11 sm:h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
                   {isProcessing ? (
@@ -246,7 +390,7 @@ export default function FlipkartLabelCropPage() {
                   {file ? file.name : "Click to select or drop Flipkart PDF"}
                 </p>
                 <p className="text-[10px] sm:text-xs text-black/60">
-                  {file ? "PDF loaded • Click button below to crop & download" : "Single or bulk multi-page order PDF"}
+                  {file ? "PDF loaded • Ready to crop & download" : "Single or bulk multi-page order PDF"}
                 </p>
               </div>
 
@@ -278,6 +422,19 @@ export default function FlipkartLabelCropPage() {
                       </>
                     )}
                   </button>
+
+                  {/* Customize Area Button if file uploaded */}
+                  {file && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomCropModal(true)}
+                      className="text-xs font-semibold text-black border border-[#051448] px-2.5 py-2 rounded hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Select custom area to crop"
+                    >
+                      <Crop size={13} className="text-[#051448]" />
+                      <span>{customCropBox ? "Adjust Area" : "Custom Area"}</span>
+                    </button>
+                  )}
 
                   {file && (
                     <button
@@ -323,7 +480,9 @@ export default function FlipkartLabelCropPage() {
               {/* Status Note */}
               {cropResult && (
                 <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex items-center justify-between">
-                  <span>Label cropped and ready for download.</span>
+                  <span>
+                    Ready: <strong className="text-black uppercase">{cropMode === "custom" ? "Custom Selected Area" : "Standard Label Crop"}</strong>
+                  </span>
                   <span className="font-semibold text-black">
                     {cropResult.pageCount} Page(s) • {formatFileSize(cropResult.croppedSize)}
                   </span>
@@ -334,6 +493,18 @@ export default function FlipkartLabelCropPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Interactive Custom Crop Area Selection Modal ── */}
+      {file && (
+        <CustomPdfCropModal
+          isOpen={showCustomCropModal}
+          onClose={() => setShowCustomCropModal(false)}
+          file={file}
+          onApplyCrop={handleApplyCustomCrop}
+          title="Select Area to Crop (Flipkart PDF)"
+          initialCropBox={customCropBox || undefined}
+        />
+      )}
 
       {/* ── Preview Modal (Opens when Eye is clicked) ── */}
       {showPreviewModal && cropResult && (

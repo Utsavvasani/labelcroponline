@@ -14,6 +14,7 @@ import {
   Scissors,
   Check,
   FileCheck,
+  Crop,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
@@ -23,6 +24,7 @@ import {
   MeeshoCropMode,
   MEESHO_CROP_OPTIONS,
 } from "@/lib/pdf/meeshoCropper";
+import { cropPdfCustomArea, CustomCropBox, CustomCropResult } from "@/lib/pdf/customCropper";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -37,14 +39,25 @@ const PdfPreviewViewer = dynamic(
   }
 );
 
+const CustomPdfCropModal = dynamic(
+  () => import("@/components/pdf/CustomPdfCropModal").then((m) => m.CustomPdfCropModal),
+  {
+    ssr: false,
+  }
+);
+
+type ExtendedMeeshoCropMode = MeeshoCropMode | "custom";
+
 export default function MeeshoLabelCropPage() {
   const [file, setFile] = useState<File | null>(null);
-  const [cropMode, setCropMode] = useState<MeeshoCropMode>("invoice");
+  const [cropMode, setCropMode] = useState<ExtendedMeeshoCropMode>("invoice");
+  const [customCropBox, setCustomCropBox] = useState<CustomCropBox | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cropResult, setCropResult] = useState<CropResult | null>(null);
+  const [cropResult, setCropResult] = useState<CropResult | CustomCropResult | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
+  const [showCustomCropModal, setShowCustomCropModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,16 +69,16 @@ export default function MeeshoLabelCropPage() {
     };
   }, [cropResult]);
 
-  // Process the uploaded PDF with background courier partner auto-detection
+  // Process the uploaded PDF with background courier partner auto-detection or custom crop
   const handleProcessPdf = async (
     inputFile?: File | Blob,
     customName?: string,
-    modeToUse?: MeeshoCropMode,
+    modeToUse: ExtendedMeeshoCropMode = cropMode,
+    activeCustomBox: CustomCropBox | null = customCropBox,
     shouldDownload: boolean = false
   ) => {
     const targetFile = inputFile || file;
     const name = customName || (targetFile instanceof File ? targetFile.name : "Meesho.pdf");
-    const activeMode = modeToUse || cropMode;
 
     if (!targetFile) {
       setErrorMsg("Please upload or select a Meesho PDF first.");
@@ -80,8 +93,14 @@ export default function MeeshoLabelCropPage() {
         URL.revokeObjectURL(cropResult.blobUrl);
       }
 
-      // Auto-detects partner (Delhivery, Shadowfax, Valmo, Valmo Plus, Xpressbees) in the background
-      const result = await cropMeeshoPdf(targetFile, name, activeMode, "auto");
+      let result: CropResult | CustomCropResult;
+      if (modeToUse === "custom" && activeCustomBox) {
+        result = await cropPdfCustomArea(targetFile, name, activeCustomBox);
+      } else {
+        const standardMode: MeeshoCropMode = modeToUse === "custom" ? "invoice" : modeToUse;
+        result = await cropMeeshoPdf(targetFile, name, standardMode, "auto");
+      }
+
       setCropResult(result);
 
       if (shouldDownload) {
@@ -99,10 +118,26 @@ export default function MeeshoLabelCropPage() {
     }
   };
 
-  const handleModeChange = (newMode: MeeshoCropMode) => {
+  const handleModeChange = (newMode: ExtendedMeeshoCropMode) => {
     setCropMode(newMode);
+    if (newMode === "custom") {
+      if (file) {
+        setShowCustomCropModal(true);
+      } else {
+        fileInputRef.current?.click();
+      }
+    } else {
+      if (file) {
+        handleProcessPdf(file, file.name, newMode, null, false);
+      }
+    }
+  };
+
+  const handleApplyCustomCrop = (appliedBox: CustomCropBox) => {
+    setCustomCropBox(appliedBox);
+    setCropMode("custom");
     if (file) {
-      handleProcessPdf(file, file.name, newMode, false);
+      handleProcessPdf(file, file.name, "custom", appliedBox, false);
     }
   };
 
@@ -119,7 +154,12 @@ export default function MeeshoLabelCropPage() {
       setFile(selectedFile);
       setCropResult(null);
       setErrorMsg(null);
-      handleProcessPdf(selectedFile, selectedFile.name, cropMode, false);
+
+      if (cropMode === "custom") {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(selectedFile, selectedFile.name, cropMode, null, false);
+      }
     }
   };
 
@@ -149,7 +189,12 @@ export default function MeeshoLabelCropPage() {
       setFile(droppedFile);
       setCropResult(null);
       setErrorMsg(null);
-      handleProcessPdf(droppedFile, droppedFile.name, cropMode, false);
+
+      if (cropMode === "custom") {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(droppedFile, droppedFile.name, cropMode, null, false);
+      }
     }
   };
 
@@ -157,7 +202,11 @@ export default function MeeshoLabelCropPage() {
     if (cropResult) {
       triggerDownload(cropResult.blobUrl, cropResult.fileName);
     } else if (file) {
-      handleProcessPdf(file, file.name, cropMode, true);
+      if (cropMode === "custom" && !customCropBox) {
+        setShowCustomCropModal(true);
+      } else {
+        handleProcessPdf(file, file.name, cropMode, customCropBox, true);
+      }
     } else {
       fileInputRef.current?.click();
     }
@@ -169,6 +218,8 @@ export default function MeeshoLabelCropPage() {
       URL.revokeObjectURL(cropResult.blobUrl);
     }
     setCropResult(null);
+    setCustomCropBox(null);
+    setCropMode("invoice");
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -179,6 +230,11 @@ export default function MeeshoLabelCropPage() {
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  };
+
+  const getActiveModeName = () => {
+    if (cropMode === "custom") return "Custom Selected Area";
+    return MEESHO_CROP_OPTIONS[cropMode]?.name || "Meesho Label";
   };
 
   return (
@@ -211,7 +267,7 @@ export default function MeeshoLabelCropPage() {
           </div>
         )}
 
-        {/* ── Main Card Form matching Contact Us Style ── */}
+        {/* ── Main Single Card Form matching Contact Us Style ── */}
         <div className="border border-[#051448] rounded-md p-4 sm:p-7 bg-white shadow-sm">
           <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-center">
 
@@ -234,7 +290,7 @@ export default function MeeshoLabelCropPage() {
               </div>
 
               <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
-                Crop Meesho shipping labels with clean border margins. Choose Full with Tax or Label + SKU.
+                Crop Meesho shipping labels with clean border margins, auto delivery partner sorting, or select your own custom area.
               </p>
             </div>
 
@@ -254,7 +310,7 @@ export default function MeeshoLabelCropPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-3 gap-2">
 
                   {/* Option 1: Full with Tax Invoice */}
                   <button
@@ -318,6 +374,40 @@ export default function MeeshoLabelCropPage() {
                     </div>
                   </button>
 
+                  {/* Option 3: Custom Area Crop */}
+                  <button
+                    type="button"
+                    onClick={() => handleModeChange("custom")}
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
+                      cropMode === "custom"
+                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
+                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    }`}
+                  >
+                    <div
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
+                        cropMode === "custom"
+                          ? "border-white bg-white text-[#051448]"
+                          : "border-black/40 bg-white"
+                      }`}
+                    >
+                      {cropMode === "custom" && <Check size={9} strokeWidth={3} />}
+                    </div>
+                    <div>
+                      <div className="text-[11px] sm:text-xs font-bold leading-tight flex items-center gap-1">
+                        <Crop size={11} />
+                        Custom Crop
+                      </div>
+                      <div
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
+                          cropMode === "custom" ? "text-white/80" : "text-black/60"
+                        }`}
+                      >
+                        {customCropBox ? "Area Selected" : "Select Area in PDF"}
+                      </div>
+                    </div>
+                  </button>
+
                 </div>
               </div>
 
@@ -345,14 +435,14 @@ export default function MeeshoLabelCropPage() {
                   {file ? file.name : "Click to select or drop Meesho PDF"}
                 </p>
                 <p className="text-[10px] sm:text-xs text-black/60">
-                  {file ? "PDF loaded • Click button below to crop & download" : "Single or bulk multi-page order PDF"}
+                  {file ? "PDF loaded • Ready to crop & download" : "Single or bulk multi-page order PDF"}
                 </p>
               </div>
 
               {/* Action Buttons & Status Row */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5">
 
-                {/* Left side actions: Crop & Download button */}
+                {/* Left side actions: Crop / Download button */}
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
@@ -377,6 +467,19 @@ export default function MeeshoLabelCropPage() {
                       </>
                     )}
                   </button>
+
+                  {/* Customize Area Button if file uploaded */}
+                  {file && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCustomCropModal(true)}
+                      className="text-xs font-semibold text-black border border-[#051448] px-2.5 py-2 rounded hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Select custom area to crop"
+                    >
+                      <Crop size={13} className="text-[#051448]" />
+                      <span>{customCropBox ? "Adjust Area" : "Custom Area"}</span>
+                    </button>
+                  )}
 
                   {file && (
                     <button
@@ -441,6 +544,18 @@ export default function MeeshoLabelCropPage() {
         </div>
       </div>
 
+      {/* ── Interactive Custom Crop Area Selection Modal ── */}
+      {file && (
+        <CustomPdfCropModal
+          isOpen={showCustomCropModal}
+          onClose={() => setShowCustomCropModal(false)}
+          file={file}
+          onApplyCrop={handleApplyCustomCrop}
+          title="Select Area to Crop (Meesho PDF)"
+          initialCropBox={customCropBox || undefined}
+        />
+      )}
+
       {/* ── Preview Modal (Opens when Eye is clicked) ── */}
       {showPreviewModal && cropResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
@@ -450,7 +565,7 @@ export default function MeeshoLabelCropPage() {
             <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-[#051448] bg-slate-50">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-xs sm:text-sm text-black">
-                  Meesho ({MEESHO_CROP_OPTIONS[cropResult.cropMode].shortLabel})
+                  Meesho ({getActiveModeName()})
                 </span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
                   {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by Courier
@@ -480,7 +595,7 @@ export default function MeeshoLabelCropPage() {
             {/* Modal Body: Searchable, Continuous-Scroll Canvas PDF viewer */}
             <div className="flex-1 bg-slate-100 p-2 min-h-[480px] h-[650px] flex flex-col overflow-hidden">
               <PdfPreviewViewer
-                key={`cropped-${cropResult.blobUrl}-${cropResult.cropMode}`}
+                key={`cropped-${cropResult.blobUrl}`}
                 url={cropResult.blobUrl}
                 initialScale={1.3}
               />
@@ -515,7 +630,7 @@ export default function MeeshoLabelCropPage() {
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Crop Option:</span>
-                <span className="font-semibold capitalize">{MEESHO_CROP_OPTIONS[cropResult.cropMode].name}</span>
+                <span className="font-semibold capitalize">{getActiveModeName()}</span>
               </div>
               {cropResult.partnerSummaryText && (
                 <div className="flex justify-between py-1 border-b border-slate-100">
@@ -534,10 +649,6 @@ export default function MeeshoLabelCropPage() {
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Cropped Size:</span>
                 <span className="font-semibold">{formatFileSize(cropResult.croppedSize)}</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-black/60">Format:</span>
-                <span className="font-semibold">Vector Clean Bounding Box</span>
               </div>
             </div>
 
