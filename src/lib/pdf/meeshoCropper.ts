@@ -1,5 +1,13 @@
 import { PDFDocument } from "pdf-lib";
 
+export type MeeshoPartner =
+  | "auto"
+  | "delhivery"
+  | "shadowfax"
+  | "valmo"
+  | "valmo_plus"
+  | "xpressbees";
+
 export type MeeshoCropMode = "half" | "label_sku" | "invoice";
 
 export interface MeeshoCropOption {
@@ -14,43 +22,235 @@ export interface MeeshoCropOption {
   h: number;
 }
 
+export interface MeeshoPartnerInfo {
+  id: MeeshoPartner;
+  name: string;
+  shortName: string;
+  keywords: string[];
+  options: Record<MeeshoCropMode, MeeshoCropOption>;
+}
+
 export const MEESHO_CROP_ORDER: MeeshoCropMode[] = ["invoice", "label_sku", "half"];
 
-export const MEESHO_CROP_OPTIONS: Record<MeeshoCropMode, MeeshoCropOption> = {
-  invoice: {
-    id: "invoice",
-    name: "Full with Tax Invoice",
-    shortLabel: "With Tax Invoice",
-    desc: "Shipping label, SKU table + GST Tax Invoice",
-    suffix: "with_invoice",
-    x: 6,
-    y: 233,
-    w: 583,
-    h: 603,
+export const MEESHO_PARTNER_LIST: Array<{ id: MeeshoPartner; name: string; shortName: string }> = [
+  { id: "auto", name: "Auto-Detect Courier", shortName: "Auto Detect" },
+  { id: "delhivery", name: "Delhivery", shortName: "Delhivery" },
+  { id: "shadowfax", name: "Shadowfax", shortName: "Shadowfax" },
+  { id: "valmo", name: "Valmo", shortName: "Valmo" },
+  { id: "valmo_plus", name: "Valmo Plus", shortName: "Valmo Plus" },
+  { id: "xpressbees", name: "Xpressbees", shortName: "Xpressbees" },
+];
+
+export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartnerInfo> = {
+  delhivery: {
+    id: "delhivery",
+    name: "Delhivery",
+    shortName: "Delhivery",
+    keywords: ["delhivery"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "Delhivery shipping label, SKU table + GST Tax Invoice",
+        suffix: "delhivery_invoice",
+        x: 0,
+        y: 233,
+        w: 595,
+        h: 609,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Delhivery shipping label + Product SKU table",
+        suffix: "delhivery_sku",
+        x: 6,
+        y: 476,
+        w: 583,
+        h: 360,
+      },
+      half: {
+        id: "half",
+        name: "Half Crop (Label Only)",
+        shortLabel: "Half Crop",
+        desc: "Delhivery address & barcode label only",
+        suffix: "delhivery_half",
+        x: 6,
+        y: 531.5,
+        w: 583,
+        h: 304.5,
+      },
+    },
   },
-  label_sku: {
-    id: "label_sku",
-    name: "Label + SKU Details",
-    shortLabel: "Label + SKU",
-    desc: "Shipping label + Product details (SKU, Qty, Order ID)",
-    suffix: "label_sku",
-    x: 6,
-    y: 476,
-    w: 583,
-    h: 360,
+  shadowfax: {
+    id: "shadowfax",
+    name: "Shadowfax",
+    shortName: "Shadowfax",
+    keywords: ["shadowfax", "sfx"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "Shadowfax shipping label + Tax Invoice",
+        suffix: "shadowfax_invoice",
+        x: 0,
+        y: 222,
+        w: 595,
+        h: 620,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Shadowfax shipping label + SKU table",
+        suffix: "shadowfax_sku",
+        x: 6,
+        y: 466,
+        w: 583,
+        h: 370,
+      },
+      half: {
+        id: "half",
+        name: "Half Crop (Label Only)",
+        shortLabel: "Half Crop",
+        desc: "Shadowfax barcode & routing label only",
+        suffix: "shadowfax_half",
+        x: 6,
+        y: 526,
+        w: 583,
+        h: 310,
+      },
+    },
   },
-  half: {
-    id: "half",
-    name: "Half Crop (Label Only)",
-    shortLabel: "Half Crop",
-    desc: "Customer address, return address & barcode",
-    suffix: "half_label",
-    x: 6,
-    y: 531.5,
-    w: 583,
-    h: 304.5,
+  valmo: {
+    id: "valmo",
+    name: "Valmo",
+    shortName: "Valmo",
+    keywords: ["valmo", "meesho logistics"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "Valmo shipping label + Tax Invoice",
+        suffix: "valmo_invoice",
+        x: 0,
+        y: 240,
+        w: 595,
+        h: 602,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Valmo shipping label + SKU table",
+        suffix: "valmo_sku",
+        x: 6,
+        y: 485,
+        w: 583,
+        h: 351,
+      },
+      half: {
+        id: "half",
+        name: "Half Crop (Label Only)",
+        shortLabel: "Half Crop",
+        desc: "Valmo barcode & address label",
+        suffix: "valmo_half",
+        x: 6,
+        y: 538,
+        w: 583,
+        h: 298,
+      },
+    },
+  },
+  valmo_plus: {
+    id: "valmo_plus",
+    name: "Valmo Plus",
+    shortName: "Valmo Plus",
+    keywords: ["valmo plus", "valmoplus", "valmo+"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "Valmo Plus shipping label + Tax Invoice",
+        suffix: "valmoplus_invoice",
+        x: 0,
+        y: 230,
+        w: 595,
+        h: 612,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Valmo Plus shipping label + SKU table",
+        suffix: "valmoplus_sku",
+        x: 6,
+        y: 472,
+        w: 583,
+        h: 364,
+      },
+      half: {
+        id: "half",
+        name: "Half Crop (Label Only)",
+        shortLabel: "Half Crop",
+        desc: "Valmo Plus barcode & priority badge",
+        suffix: "valmoplus_half",
+        x: 6,
+        y: 529,
+        w: 583,
+        h: 307,
+      },
+    },
+  },
+  xpressbees: {
+    id: "xpressbees",
+    name: "Xpressbees",
+    shortName: "Xpressbees",
+    keywords: ["xpressbees", "xpress bees", "xb"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "Xpressbees shipping label + Tax Invoice",
+        suffix: "xpressbees_invoice",
+        x: 0,
+        y: 216,
+        w: 595,
+        h: 626,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Xpressbees shipping label + SKU table",
+        suffix: "xpressbees_sku",
+        x: 6,
+        y: 462,
+        w: 583,
+        h: 374,
+      },
+      half: {
+        id: "half",
+        name: "Half Crop (Label Only)",
+        shortLabel: "Half Crop",
+        desc: "Xpressbees barcode & address label",
+        suffix: "xpressbees_half",
+        x: 6,
+        y: 522,
+        w: 583,
+        h: 314,
+      },
+    },
   },
 };
+
+// Default fallback options
+export const MEESHO_CROP_OPTIONS = MEESHO_PARTNERS.delhivery.options;
 
 export interface CropResult {
   blobUrl: string;
@@ -60,20 +260,69 @@ export interface CropResult {
   originalSize: number;
   croppedSize: number;
   cropMode: MeeshoCropMode;
+  selectedPartner: MeeshoPartner;
+  detectedPartners: Record<string, number>;
 }
 
 /**
- * Precision rectangle crop for Meesho Seller shipping labels with clean border spacing:
- *
- * Page Reference (A4: 595 x 842 pt):
- * - "invoice": Full with Tax (Shipping label + product details + Tax Invoice) (x: 6, y: 233, w: 583, h: 603)
- * - "label_sku": Shipping label + product details (x: 6, y: 476, w: 583, h: 360)
- * - "half": Shipping label only (x: 6, y: 531.5, w: 583, h: 304.5)
+ * Detects the Meesho delivery courier partner from extracted page text.
+ */
+export function detectCourierFromText(text: string): Exclude<MeeshoPartner, "auto"> {
+  const lower = text.toLowerCase();
+  if (lower.includes("valmo plus") || lower.includes("valmoplus") || lower.includes("valmo+")) {
+    return "valmo_plus";
+  }
+  if (lower.includes("valmo")) {
+    return "valmo";
+  }
+  if (lower.includes("shadowfax") || lower.includes("sfx")) {
+    return "shadowfax";
+  }
+  if (lower.includes("xpressbees") || lower.includes("xpress bees")) {
+    return "xpressbees";
+  }
+  if (lower.includes("delhivery")) {
+    return "delhivery";
+  }
+  return "delhivery"; // default standard
+}
+
+/**
+ * Extracts text per page using pdfjs-dist if available in client environment
+ */
+async function extractPagesText(arrayBuffer: ArrayBuffer): Promise<string[]> {
+  try {
+    if (typeof window !== "undefined") {
+      const pdfjs = await import("pdfjs-dist");
+      if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+      }
+      const dataCopy = new Uint8Array(arrayBuffer.slice(0));
+      const doc = await pdfjs.getDocument({ data: dataCopy }).promise;
+      const texts: string[] = [];
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const textContent = await page.getTextContent();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const text = textContent.items.map((it: any) => it.str || "").join(" ");
+        texts.push(text);
+      }
+      return texts;
+    }
+  } catch {
+    // Graceful fallback if text extraction encounters worker sandbox issues
+  }
+  return [];
+}
+
+/**
+ * Precision rectangle crop for Meesho Seller shipping labels with partner-specific calibration
  */
 export async function cropMeeshoPdf(
   input: File | Blob | ArrayBuffer,
   originalFileName: string = "meesho_order.pdf",
-  cropMode: MeeshoCropMode = "invoice"
+  cropMode: MeeshoCropMode = "invoice",
+  selectedPartner: MeeshoPartner = "auto"
 ): Promise<CropResult> {
   let arrayBuffer: ArrayBuffer;
   let originalSize = 0;
@@ -94,19 +343,39 @@ export async function cropMeeshoPdf(
     throw new Error("The uploaded PDF has no pages.");
   }
 
-  const option = MEESHO_CROP_OPTIONS[cropMode] || MEESHO_CROP_OPTIONS.label_sku;
+  // Extract page text for auto-detection
+  let pagesText: string[] = [];
+  if (selectedPartner === "auto") {
+    pagesText = await extractPagesText(arrayBuffer);
+  }
 
-  // Loop through all pages and apply proportional Meesho crop box
+  const detectedPartners: Record<string, number> = {};
+
+  // Loop through all pages and apply partner-specific Meesho crop box
   for (let i = 0; i < totalPages; i++) {
     const page = pdfDoc.getPage(i);
     const { width, height } = page.getSize();
+
+    let partnerKey: Exclude<MeeshoPartner, "auto">;
+    if (selectedPartner !== "auto") {
+      partnerKey = selectedPartner;
+    } else if (pagesText[i]) {
+      partnerKey = detectCourierFromText(pagesText[i]);
+    } else {
+      partnerKey = "delhivery";
+    }
+
+    const partnerInfo = MEESHO_PARTNERS[partnerKey] || MEESHO_PARTNERS.delhivery;
+    detectedPartners[partnerInfo.name] = (detectedPartners[partnerInfo.name] || 0) + 1;
+
+    const option = partnerInfo.options[cropMode] || partnerInfo.options.label_sku;
 
     const cropX = (option.x / 595) * width;
     const cropY = (option.y / 842) * height;
     const cropW = (option.w / 595) * width;
     const cropH = (option.h / 842) * height;
 
-    // Apply to all standard PDF boxes to ensure universal compatibility
+    // Apply to all standard PDF boxes
     page.setCropBox(cropX, cropY, cropW, cropH);
     page.setMediaBox(cropX, cropY, cropW, cropH);
     page.setBleedBox(cropX, cropY, cropW, cropH);
@@ -119,7 +388,8 @@ export async function cropMeeshoPdf(
   const blobUrl = URL.createObjectURL(croppedBlob);
 
   const baseName = originalFileName.replace(/^labelcroponline_/i, "").replace(/\.pdf$/i, "");
-  const outputFileName = `labelcroponline_${baseName}_${option.suffix}.pdf`;
+  const partnerSuffix = selectedPartner === "auto" ? "meesho" : selectedPartner;
+  const outputFileName = `labelcroponline_${baseName}_${partnerSuffix}_${cropMode}.pdf`;
 
   return {
     blobUrl,
@@ -129,6 +399,8 @@ export async function cropMeeshoPdf(
     originalSize,
     croppedSize: pdfBytes.byteLength,
     cropMode,
+    selectedPartner,
+    detectedPartners,
   };
 }
 

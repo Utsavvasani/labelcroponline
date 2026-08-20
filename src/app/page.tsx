@@ -54,7 +54,7 @@ const heroPlatforms = [
     logo: "/merge_icon.svg",
     href: "/merge-pdf",
     logoH: "h-12",
-    lightBg: "#FEF2F2",
+    lightBg: "#fef7f7ff",
     tagText: "Merge PDFs",
   },
 ];
@@ -87,7 +87,7 @@ const cardPlatforms = [
     logo: "/merge_icon.svg",
     href: "/merge-pdf",
     color: "#B42024",
-    lightBg: "#FEF2F2",
+    lightBg: "#fef5f5ff",
     logoClass: "h-14 w-auto",
     desc: "Combine multiple shipping labels, packing slips, or document PDFs into one single file. Easily reorder files by position number and download immediately.",
     tag: "PDF Merge Tool",
