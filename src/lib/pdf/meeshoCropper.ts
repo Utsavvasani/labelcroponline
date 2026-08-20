@@ -41,6 +41,14 @@ export const MEESHO_PARTNER_LIST: Array<{ id: MeeshoPartner; name: string; short
   { id: "xpressbees", name: "Xpressbees", shortName: "Xpressbees" },
 ];
 
+export const PARTNER_SORT_PRIORITY: Record<Exclude<MeeshoPartner, "auto">, number> = {
+  delhivery: 1,
+  shadowfax: 2,
+  valmo: 3,
+  valmo_plus: 4,
+  xpressbees: 5,
+};
+
 export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartnerInfo> = {
   delhivery: {
     id: "delhivery",
@@ -207,6 +215,7 @@ export interface CropResult {
   cropMode: MeeshoCropMode;
   selectedPartner: MeeshoPartner;
   detectedPartners: Record<string, number>;
+  partnerSummaryText: string;
 }
 
 /**
@@ -262,6 +271,7 @@ async function extractPagesText(arrayBuffer: ArrayBuffer): Promise<string[]> {
 
 /**
  * Precision rectangle crop for Meesho Seller shipping labels with partner-specific calibration
+ * and automatic sorting by delivery partner order (Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees)
  */
 export async function cropMeeshoPdf(
   input: File | Blob | ArrayBuffer,
@@ -280,27 +290,30 @@ export async function cropMeeshoPdf(
     arrayBuffer = input;
   }
 
-  // Load PDF with pdf-lib
-  const pdfDoc = await PDFDocument.load(arrayBuffer);
-  const totalPages = pdfDoc.getPageCount();
+  // Load source PDF with pdf-lib
+  const srcPdfDoc = await PDFDocument.load(arrayBuffer);
+  const totalPages = srcPdfDoc.getPageCount();
 
   if (totalPages === 0) {
     throw new Error("The uploaded PDF has no pages.");
   }
 
-  // Extract page text for auto-detection
+  // Extract page text for courier partner auto-detection
   let pagesText: string[] = [];
   if (selectedPartner === "auto") {
     pagesText = await extractPagesText(arrayBuffer);
   }
 
   const detectedPartners: Record<string, number> = {};
+  const pageEntries: Array<{
+    pageIndex: number;
+    partnerKey: Exclude<MeeshoPartner, "auto">;
+    partnerName: string;
+    priority: number;
+  }> = [];
 
-  // Loop through all pages and apply partner-specific Meesho crop box
+  // Identify courier partner for each page
   for (let i = 0; i < totalPages; i++) {
-    const page = pdfDoc.getPage(i);
-    const { width, height } = page.getSize();
-
     let partnerKey: Exclude<MeeshoPartner, "auto">;
     if (selectedPartner !== "auto") {
       partnerKey = selectedPartner;
@@ -313,6 +326,31 @@ export async function cropMeeshoPdf(
     const partnerInfo = MEESHO_PARTNERS[partnerKey] || MEESHO_PARTNERS.delhivery;
     detectedPartners[partnerInfo.name] = (detectedPartners[partnerInfo.name] || 0) + 1;
 
+    pageEntries.push({
+      pageIndex: i,
+      partnerKey,
+      partnerName: partnerInfo.name,
+      priority: PARTNER_SORT_PRIORITY[partnerKey] ?? 99,
+    });
+  }
+
+  // Sort pages by delivery partner order: Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees
+  pageEntries.sort((a, b) => {
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+    return a.pageIndex - b.pageIndex;
+  });
+
+  // Create new sorted output document
+  const outputDoc = await PDFDocument.create();
+
+  // Copy and crop pages in the sorted order
+  for (const entry of pageEntries) {
+    const [copiedPage] = await outputDoc.copyPages(srcPdfDoc, [entry.pageIndex]);
+    const { width, height } = copiedPage.getSize();
+
+    const partnerInfo = MEESHO_PARTNERS[entry.partnerKey] || MEESHO_PARTNERS.delhivery;
     const option = partnerInfo.options[cropMode] || partnerInfo.options.label_sku;
 
     const cropX = (option.x / 595) * width;
@@ -321,20 +359,26 @@ export async function cropMeeshoPdf(
     const cropH = (option.h / 842) * height;
 
     // Apply to all standard PDF boxes
-    page.setCropBox(cropX, cropY, cropW, cropH);
-    page.setMediaBox(cropX, cropY, cropW, cropH);
-    page.setBleedBox(cropX, cropY, cropW, cropH);
-    page.setTrimBox(cropX, cropY, cropW, cropH);
+    copiedPage.setCropBox(cropX, cropY, cropW, cropH);
+    copiedPage.setMediaBox(cropX, cropY, cropW, cropH);
+    copiedPage.setBleedBox(cropX, cropY, cropW, cropH);
+    copiedPage.setTrimBox(cropX, cropY, cropW, cropH);
+
+    outputDoc.addPage(copiedPage);
   }
 
-  // Save the cropped PDF (vector content preserved)
-  const pdfBytes = await pdfDoc.save();
+  // Save the cropped, courier-sorted PDF
+  const pdfBytes = await outputDoc.save();
   const croppedBlob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(croppedBlob);
 
   const baseName = originalFileName.replace(/^labelcroponline_/i, "").replace(/\.pdf$/i, "");
-  const partnerSuffix = selectedPartner === "auto" ? "meesho" : selectedPartner;
-  const outputFileName = `labelcroponline_${baseName}_${partnerSuffix}_${cropMode}.pdf`;
+  const outputFileName = `labelcroponline_${baseName}_${cropMode}.pdf`;
+
+  const partnerSummaryList = Object.entries(detectedPartners).map(
+    ([name, count]) => `${name} (${count})`
+  );
+  const partnerSummaryText = partnerSummaryList.join(" • ");
 
   return {
     blobUrl,
@@ -346,6 +390,7 @@ export async function cropMeeshoPdf(
     cropMode,
     selectedPartner,
     detectedPartners,
+    partnerSummaryText,
   };
 }
 

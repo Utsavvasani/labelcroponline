@@ -424,6 +424,11 @@ export default function MeeshoLabelCropPage() {
                 <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex flex-wrap items-center justify-between gap-1">
                   <span>
                     Ready: <strong className="text-black uppercase">{MEESHO_CROP_OPTIONS[cropResult.cropMode].name}</strong>
+                    {cropResult.partnerSummaryText && (
+                      <span className="text-black/60 ml-1.5 hidden sm:inline">
+                        • Sorted by Partner: {cropResult.partnerSummaryText}
+                      </span>
+                    )}
                   </span>
                   <span className="font-semibold text-black">
                     {cropResult.pageCount} Page(s) • {formatFileSize(cropResult.croppedSize)}
@@ -448,7 +453,7 @@ export default function MeeshoLabelCropPage() {
                   Meesho ({MEESHO_CROP_OPTIONS[cropResult.cropMode].shortLabel})
                 </span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
-                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by Courier
                 </span>
               </div>
 
@@ -512,6 +517,12 @@ export default function MeeshoLabelCropPage() {
                 <span className="text-black/60">Crop Option:</span>
                 <span className="font-semibold capitalize">{MEESHO_CROP_OPTIONS[cropResult.cropMode].name}</span>
               </div>
+              {cropResult.partnerSummaryText && (
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-black/60">Sorted Order:</span>
+                  <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.partnerSummaryText}</span>
+                </div>
+              )}
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Total Pages:</span>
                 <span className="font-semibold">{cropResult.pageCount} page(s)</span>
