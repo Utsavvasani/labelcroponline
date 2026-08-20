@@ -234,7 +234,7 @@ export default function MeeshoLabelCropPage() {
               </div>
 
               <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
-                Crop Meesho shipping labels with clean border margins. Choose Full with Tax, Label + SKU, or Half Crop.
+                Crop Meesho shipping labels with clean border margins. Choose Full with Tax or Label + SKU.
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export default function MeeshoLabelCropPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
 
                   {/* Option 1: Full with Tax Invoice */}
                   <button
@@ -314,37 +314,6 @@ export default function MeeshoLabelCropPage() {
                         }`}
                       >
                         Label + SKU Details
-                      </div>
-                    </div>
-                  </button>
-
-                  {/* Option 3: Half Crop */}
-                  <button
-                    type="button"
-                    onClick={() => handleModeChange("half")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
-                      cropMode === "half"
-                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
-                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
-                    }`}
-                  >
-                    <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
-                        cropMode === "half"
-                          ? "border-white bg-white text-[#051448]"
-                          : "border-black/40 bg-white"
-                      }`}
-                    >
-                      {cropMode === "half" && <Check size={9} strokeWidth={3} />}
-                    </div>
-                    <div>
-                      <div className="text-[11px] sm:text-xs font-bold leading-tight">Half Crop</div>
-                      <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
-                          cropMode === "half" ? "text-white/80" : "text-black/60"
-                        }`}
-                      >
-                        Label Only (Compact)
                       </div>
                     </div>
                   </button>

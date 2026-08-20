@@ -8,7 +8,7 @@ export type MeeshoPartner =
   | "valmo_plus"
   | "xpressbees";
 
-export type MeeshoCropMode = "half" | "label_sku" | "invoice";
+export type MeeshoCropMode = "label_sku" | "invoice";
 
 export interface MeeshoCropOption {
   id: MeeshoCropMode;
@@ -30,7 +30,7 @@ export interface MeeshoPartnerInfo {
   options: Record<MeeshoCropMode, MeeshoCropOption>;
 }
 
-export const MEESHO_CROP_ORDER: MeeshoCropMode[] = ["invoice", "label_sku", "half"];
+export const MEESHO_CROP_ORDER: MeeshoCropMode[] = ["invoice", "label_sku"];
 
 export const MEESHO_PARTNER_LIST: Array<{ id: MeeshoPartner; name: string; shortName: string }> = [
   { id: "auto", name: "Auto-Detect Courier", shortName: "Auto Detect" },
@@ -70,17 +70,6 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
         w: 583,
         h: 360,
       },
-      half: {
-        id: "half",
-        name: "Half Crop (Label Only)",
-        shortLabel: "Half Crop",
-        desc: "Delhivery address & barcode label only",
-        suffix: "delhivery_half",
-        x: 6,
-        y: 531.5,
-        w: 583,
-        h: 304.5,
-      },
     },
   },
   shadowfax: {
@@ -110,17 +99,6 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
         y: 466,
         w: 583,
         h: 370,
-      },
-      half: {
-        id: "half",
-        name: "Half Crop (Label Only)",
-        shortLabel: "Half Crop",
-        desc: "Shadowfax barcode & routing label only",
-        suffix: "shadowfax_half",
-        x: 6,
-        y: 526,
-        w: 583,
-        h: 310,
       },
     },
   },
@@ -152,17 +130,6 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
         w: 583,
         h: 351,
       },
-      half: {
-        id: "half",
-        name: "Half Crop (Label Only)",
-        shortLabel: "Half Crop",
-        desc: "Valmo barcode & address label",
-        suffix: "valmo_half",
-        x: 6,
-        y: 538,
-        w: 583,
-        h: 298,
-      },
     },
   },
   valmo_plus: {
@@ -193,17 +160,6 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
         w: 583,
         h: 364,
       },
-      half: {
-        id: "half",
-        name: "Half Crop (Label Only)",
-        shortLabel: "Half Crop",
-        desc: "Valmo Plus barcode & priority badge",
-        suffix: "valmoplus_half",
-        x: 6,
-        y: 529,
-        w: 583,
-        h: 307,
-      },
     },
   },
   xpressbees: {
@@ -233,17 +189,6 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
         y: 462,
         w: 583,
         h: 374,
-      },
-      half: {
-        id: "half",
-        name: "Half Crop (Label Only)",
-        shortLabel: "Half Crop",
-        desc: "Xpressbees barcode & address label",
-        suffix: "xpressbees_half",
-        x: 6,
-        y: 522,
-        w: 583,
-        h: 314,
       },
     },
   },

@@ -23,7 +23,7 @@ export default function ContactUs() {
     return (
         <>
             {/* ── Hero ── */}
-            <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
+            {/* <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
                 <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12">
                     <p className="text-sm font-semibold tracking-widest uppercase text-black mb-3">
                         Get in Touch
@@ -36,10 +36,10 @@ export default function ContactUs() {
                         you. Our team usually responds within 24 hours.
                     </p>
                 </div>
-            </div>
+            </div> */}
 
             {/* ── Content ── */}
-            <div className="max-w-[1200px] mx-auto px-6 py-10">
+            <div className="max-w-[1200px] mx-auto px-6 py-10 ">
                 <div className="grid lg:grid-cols-3 gap-8 items-start">
 
                     {/* ── Form — Left (2/3) ── */}
