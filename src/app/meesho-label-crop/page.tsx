@@ -526,7 +526,7 @@ export default function MeeshoLabelCropPage() {
               {cropResult && (
                 <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex flex-wrap items-center justify-between gap-1">
                   <span>
-                    Ready: <strong className="text-black uppercase">{MEESHO_CROP_OPTIONS[cropResult.cropMode].name}</strong>
+                    Ready: <strong className="text-black uppercase">{getActiveModeName()}</strong>
                     {cropResult.partnerSummaryText && (
                       <span className="text-black/60 ml-1.5 hidden sm:inline">
                         • Sorted by Partner: {cropResult.partnerSummaryText}
