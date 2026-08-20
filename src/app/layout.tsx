@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.labelcroponline.com"),
   icons: {
     icon: [
-      { url: "/tab_logo.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/tab_logo.png", type: "image/png", sizes: "512x512" },
       { url: "/tab_logo.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico" },
     ],
-    shortcut: "/tab_logo.png",
+    shortcut: "/favicon.ico",
     apple: [
       { url: "/tab_logo.png", sizes: "180x180", type: "image/png" },
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
