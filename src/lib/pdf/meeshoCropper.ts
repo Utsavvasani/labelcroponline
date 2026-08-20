@@ -207,6 +207,7 @@ export interface CropResult {
   cropMode: MeeshoCropMode;
   selectedPartner: MeeshoPartner;
   detectedPartners: Record<string, number>;
+  partnerSummaryText?: string;
 }
 
 /**
@@ -336,6 +337,11 @@ export async function cropMeeshoPdf(
   const partnerSuffix = selectedPartner === "auto" ? "meesho" : selectedPartner;
   const outputFileName = `labelcroponline_${baseName}_${partnerSuffix}_${cropMode}.pdf`;
 
+  const partnerSummaryList = Object.entries(detectedPartners).map(
+    ([name, count]) => `${name} (${count})`
+  );
+  const partnerSummaryText = partnerSummaryList.join(" • ");
+
   return {
     blobUrl,
     pdfBytes,
@@ -346,6 +352,7 @@ export async function cropMeeshoPdf(
     cropMode,
     selectedPartner,
     detectedPartners,
+    partnerSummaryText,
   };
 }
 
