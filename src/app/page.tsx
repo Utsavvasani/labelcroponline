@@ -67,7 +67,7 @@ const cardPlatforms = [
     color: "#580a46",
     lightBg: "#F7EEFE",
     logoClass: "h-9 w-auto",
-    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel with clean border margins for fast dispatching.",
+    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel with clean border margins and automated Courier & SKU sorting for fast dispatching.",
     tag: "Meesho Label Crop",
     cta: "Crop Meesho Labels →",
   },
@@ -78,7 +78,7 @@ const cardPlatforms = [
     color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
-    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the middle shipping label cleanly, strip extra margins, and download print-ready files instantly.",
+    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the shipping label cleanly, strip extra margins, and download 4x6 print-ready files instantly with 100% vector barcode fidelity.",
     tag: "Flipkart Label Crop",
     cta: "Crop Flipkart Labels →",
   },
@@ -89,7 +89,7 @@ const cardPlatforms = [
     color: "#B42024",
     lightBg: "#fef5f5ff",
     logoClass: "h-14 w-auto",
-    desc: "Combine multiple shipping labels, packing slips, or document PDFs into one single file. Easily reorder files by position number and download immediately.",
+    desc: "Combine multiple shipping labels, packing slips, or document PDFs into one single file. Easily reorder files by position number and download immediately with zero quality loss.",
     tag: "PDF Merge Tool",
     cta: "Merge PDF Files →",
   },
@@ -105,16 +105,14 @@ export default function Home() {
 
             {/* ── Left: Text + Platform Banners ── */}
             <div>
-
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4 leading-tight">
                 Crop Shipping Labels
                 <br />
                 <span className="text-[#051448]">in Seconds</span>
               </h1>
 
-              <p className="text-black text-sm sm:text-base leading-relaxed mb-8 max-w-md">
-                Upload your PDF shipping labels, crop, resize, or merge
-                instantly — built for ecommerce sellers and warehouse dispatchers.
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-8 max-w-md text-justify">
+                Upload your PDF shipping labels, crop, resize, or merge instantly — built specifically for eCommerce sellers and warehouse dispatchers to eliminate manual cutting and paper waste.
               </p>
 
               {/* Mobile: stacked horizontal cards */}
@@ -195,8 +193,8 @@ export default function Home() {
             <h2 className="text-3xl font-bold text-black">
               Pick your tool, process your files
             </h2>
-            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed text-center">
-              Whether you sell on Meesho or Flipkart, or need to merge multiple PDF documents — our tools are built for speed and precision.
+            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed text-justify">
+              Whether you sell on Meesho or Flipkart, or need to merge multiple PDF documents — our tools are built for speed and precision. Crop unwanted margins, organize dispatches, and print directly on 4x6 thermal paper.
             </p>
           </div>
 
@@ -242,6 +240,204 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ─── Detailed Home Information & SEO Guide Blog Section ─── */}
+      <div className="bg-slate-50/70 border-b border-slate-200">
+        <div className="max-w-[1200px] mx-auto px-6 py-16 space-y-12 text-black">
+
+          {/* Guide Header Banner */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-6 sm:p-8 shadow-xs">
+            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs font-bold px-3 py-1 rounded-full mb-3">
+              <span>Ultimate Shipping Label Cropper &amp; Printing Guide</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#051448] mb-4">
+              Complete Guide to Online Shipping Label Cropping &amp; Thermal Printing for eCommerce
+            </h2>
+            <p className="text-xs sm:text-sm text-black/80 leading-relaxed mb-4 text-justify">
+              In the competitive world of Indian eCommerce, operational speed and cost efficiency are critical. When fulfilling customer orders on major marketplaces like <strong>Meesho Supplier Panel</strong> and <strong>Flipkart Seller Hub</strong>, sellers receive shipping labels generated as standard A4 PDFs. However, standard A4 invoices are not designed for modern 4×6 inch (100×150 mm) direct thermal roll printers.
+            </p>
+            <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
+              <strong>LabelCropOnline</strong> bridges this gap by providing an intelligent, vector-lossless PDF cropping platform. Our technology strips away unnecessary page borders, formats labels precisely for 4×6 thermal rolls, and automatically reorders multi-page batch labels by <strong>Delivery Partner and Product SKU</strong> so warehouse teams can pack and dispatch orders faster than ever.
+            </p>
+          </div>
+
+          {/* Key Advantages Grid */}
+          <div>
+            <div className="text-center sm:text-left mb-6">
+              <h3 className="text-xl font-bold text-[#051448]">
+                Why eCommerce Sellers &amp; Warehouses Use LabelCropOnline
+              </h3>
+              <p className="text-xs text-black/70 mt-1 text-justify sm:text-left">
+                Built specifically to solve real packing bottleneck problems for online merchants across India.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  1
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Save Up to 70% Paper Cost</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Stop printing full A4 pages where only 30% of the space contains the shipping label. Cropping directly to 4×6 thermal rolls eliminates wasted margins and saves thousands in monthly stationary expenses.
+                </p>
+              </div>
+
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  2
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Zero Barcode Scanning Failures</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Unlike basic screenshot tools or image croppers that blur text and barcodes, LabelCropOnline retains 100% pure vector PDF geometry. Barcodes scan instantly with 100% first-pass accuracy at courier transit hubs.
+                </p>
+              </div>
+
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  3
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Batch Sort by Courier &amp; SKU</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  For Meesho dispatches, our engine automatically groups orders by delivery partner (Delhivery, Shadowfax, Valmo, Valmo Plus, Xpressbees) and sub-sorts by product SKU, slashing batch picking time by up to 50%.
+                </p>
+              </div>
+
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  4
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Eliminate Manual Scissor Cutting</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Say goodbye to tedious manual cutting of paper sheets with scissors or craft knives. Print directly on self-adhesive peel-and-stick thermal stickers and apply straight to packages.
+                </p>
+              </div>
+
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  5
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Interactive Custom Area Studio</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Need non-standard crop coordinates? Use our visual canvas crop studio with 8-directional drag handles to customize your crop boundary on any PDF and apply it across all pages instantly.
+                </p>
+              </div>
+
+              <div className="p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  6
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">100% Client-Side Privacy</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Your business data and customer addresses are strictly private. All PDF parsing and cropping operations execute directly in your browser sandbox without ever uploading files to external servers.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Thermal Printer Compatibility Guide */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-6 sm:p-8 shadow-xs">
+            <h3 className="text-lg sm:text-xl font-bold text-[#051448] mb-3">
+              Universal Thermal Printer Compatibility
+            </h3>
+            <p className="text-xs sm:text-sm text-black/80 leading-relaxed mb-4 text-justify">
+              Cropped shipping labels generated by LabelCropOnline adhere to standard 4×6 inch (100×150 mm) dimensions and are universally compatible with all popular barcode thermal printers used in India, including:
+            </p>
+            <div className="grid sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded">
+                <strong className="block text-black mb-1">TSC Printers</strong>
+                <p className="text-black/75 text-justify">TSC DA210, DA220, TE244, TDP-244, TE210, TE344</p>
+              </div>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded">
+                <strong className="block text-black mb-1">Zebra &amp; TVS Printers</strong>
+                <p className="text-black/75 text-justify">Zebra ZD220, ZD230, GT800, TVS LP 46 Neo, LP 46 Plus</p>
+              </div>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded">
+                <strong className="block text-black mb-1">Rollo &amp; Xprinter</strong>
+                <p className="text-black/75 text-justify">Rollo Commercial, Xprinter XP-420B, XP-470B, Everycom</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Step-by-Step Workflow */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-6 sm:p-8 shadow-xs">
+            <h3 className="text-lg sm:text-xl font-bold text-[#051448] mb-4">
+              How to Crop &amp; Print Shipping Labels in 4 Simple Steps
+            </h3>
+            <ol className="space-y-4 text-xs sm:text-sm text-black/80">
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">1.</span>
+                <p className="text-justify">
+                  <strong>Download Invoices:</strong> Download pending order labels or invoices in PDF format from your seller portal (Meesho Supplier Panel, Flipkart Seller Hub, etc.).
+                </p>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">2.</span>
+                <p className="text-justify">
+                  <strong>Select Tool &amp; Upload:</strong> Choose the dedicated marketplace tool above (Meesho, Flipkart, or Merge PDF) and upload your file into the drag-and-drop zone.
+                </p>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">3.</span>
+                <p className="text-justify">
+                  <strong>Select Crop Mode:</strong> Pick your required format (Full with Tax Invoice, Label + SKU, or Custom Crop Area). Multi-page files are processed and sorted automatically.
+                </p>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">4.</span>
+                <p className="text-justify">
+                  <strong>Preview &amp; Print:</strong> Inspect your cropped file in the interactive zoomable preview modal and click Download to print directly on your 4×6 thermal rolls.
+                </p>
+              </li>
+            </ol>
+          </div>
+
+          {/* Homepage FAQs */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-6 sm:p-8 shadow-xs">
+            <h3 className="text-lg sm:text-xl font-bold text-[#051448] mb-4">
+              Frequently Asked Questions
+            </h3>
+            <div className="space-y-4 text-xs sm:text-sm">
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Is LabelCropOnline free to use?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Yes, LabelCropOnline is 100% free with no hidden charges, watermarks, or daily file restrictions.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  How does cropping save money on thermal printing?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Standard A4 PDFs contain large empty white margins and unneeded footer space. By cropping only the relevant shipping label and tax details to 4×6 inches, you print 1 label per thermal sticker rather than wasting full A4 adhesive sheets.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Can I crop multi-page bulk orders at once?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Yes. Whether you have 5 orders or a bulk PDF with 500+ order pages, our engine processes the entire file in seconds while keeping the pages organized and cleanly aligned.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-black mb-1">
+                  Are my customer details and order files kept private?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Yes, completely. All PDF parsing, coordinate cropping, reordering, and previews run 100% inside your browser using client-side WebAssembly and JavaScript. No files or personal data are ever uploaded to any server.
+                </p>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </>

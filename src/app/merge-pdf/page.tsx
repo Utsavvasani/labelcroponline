@@ -45,6 +45,7 @@ const PdfPreviewViewer = dynamic(
 
 export default function MergePdfPage() {
   const [items, setItems] = useState<MergeItem[]>([]);
+  const [customFileName, setCustomFileName] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
   const [dragOverItemIndex, setDragOverItemIndex] = useState<number | null>(null);
@@ -55,6 +56,14 @@ export default function MergePdfPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getFinalFileName = (fallbackName?: string) => {
+    if (customFileName.trim()) {
+      const clean = customFileName.trim().replace(/\.pdf$/i, "");
+      return `${clean}.pdf`;
+    }
+    return fallbackName || mergeResult?.fileName || "labelcroponline_merged.pdf";
+  };
 
   // Clean up object URLs on unmount
   useEffect(() => {
@@ -218,6 +227,7 @@ export default function MergePdfPage() {
       URL.revokeObjectURL(mergeResult.blobUrl);
     }
     setMergeResult(null);
+    setCustomFileName("");
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
@@ -483,6 +493,37 @@ export default function MergePdfPage() {
                 </div>
               )}
 
+              {/* Optional Custom File Name Input */}
+              {items.length > 0 && (
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 bg-slate-50 p-2.5 rounded border border-[#051448]/20">
+                  <label htmlFor="merge-filename" className="text-xs font-bold text-black shrink-0">
+                    File Name:
+                  </label>
+                  <div className="relative flex-1 max-w-md flex items-center">
+                    <input
+                      id="merge-filename"
+                      type="text"
+                      value={customFileName}
+                      onChange={(e) => setCustomFileName(e.target.value)}
+                      placeholder={mergeResult ? mergeResult.fileName.replace(/\.pdf$/i, "") : "labelcroponline_merged"}
+                      className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2.5 py-1.5 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium"
+                    />
+                    <span className="absolute right-2.5 text-[11px] text-black/50 font-mono pointer-events-none select-none">
+                      .pdf
+                    </span>
+                  </div>
+                  {customFileName && (
+                    <button
+                      type="button"
+                      onClick={() => setCustomFileName("")}
+                      className="text-[11px] text-[#051448] hover:underline cursor-pointer font-semibold"
+                    >
+                      Reset Name
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Action Buttons & Status Row */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
 
@@ -490,7 +531,7 @@ export default function MergePdfPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={mergeResult ? () => triggerDownload(mergeResult.blobUrl, mergeResult.fileName) : handleMergePdf}
+                    onClick={mergeResult ? () => triggerDownload(mergeResult.blobUrl, getFinalFileName(mergeResult.fileName)) : handleMergePdf}
                     disabled={isProcessing || items.length < 2}
                     className="flex items-center justify-center gap-1.5 bg-[#051448] text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded hover:bg-[#071a5e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
@@ -587,7 +628,7 @@ export default function MergePdfPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => triggerDownload(mergeResult.blobUrl, mergeResult.fileName)}
+                  onClick={() => triggerDownload(mergeResult.blobUrl, getFinalFileName(mergeResult.fileName))}
                   className="flex items-center gap-1 text-xs font-bold text-white bg-[#051448] hover:bg-[#071a5e] px-2.5 sm:px-3 py-1.5 rounded transition-colors cursor-pointer"
                 >
                   <Download size={13} />
@@ -638,7 +679,7 @@ export default function MergePdfPage() {
             <div className="space-y-3 text-sm text-black">
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Output File:</span>
-                <span className="font-semibold text-xs truncate max-w-[200px]">{mergeResult.fileName}</span>
+                <span className="font-semibold text-xs truncate max-w-[200px]">{getFinalFileName(mergeResult.fileName)}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Merged Files:</span>

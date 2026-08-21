@@ -52,6 +52,7 @@ export default function MeeshoLabelCropPage() {
   const [file, setFile] = useState<File | null>(null);
   const [cropMode, setCropMode] = useState<ExtendedMeeshoCropMode>("invoice");
   const [customCropBox, setCustomCropBox] = useState<CustomCropBox | null>(null);
+  const [customFileName, setCustomFileName] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cropResult, setCropResult] = useState<CropResult | CustomCropResult | null>(null);
@@ -61,6 +62,14 @@ export default function MeeshoLabelCropPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getFinalFileName = (fallbackName?: string) => {
+    if (customFileName.trim()) {
+      const clean = customFileName.trim().replace(/\.pdf$/i, "");
+      return `${clean}.pdf`;
+    }
+    return fallbackName || cropResult?.fileName || "meesho_cropped_label.pdf";
+  };
 
   // Clean up object URLs on unmount
   useEffect(() => {
@@ -104,7 +113,7 @@ export default function MeeshoLabelCropPage() {
       setCropResult(result);
 
       if (shouldDownload) {
-        triggerDownload(result.blobUrl, result.fileName);
+        triggerDownload(result.blobUrl, getFinalFileName(result.fileName));
       }
     } catch (err: unknown) {
       console.error("Error cropping Meesho PDF:", err);
@@ -200,7 +209,7 @@ export default function MeeshoLabelCropPage() {
 
   const handleCropAndDownloadClick = () => {
     if (cropResult) {
-      triggerDownload(cropResult.blobUrl, cropResult.fileName);
+      triggerDownload(cropResult.blobUrl, getFinalFileName(cropResult.fileName));
     } else if (file) {
       if (cropMode === "custom" && !customCropBox) {
         setShowCustomCropModal(true);
@@ -219,6 +228,7 @@ export default function MeeshoLabelCropPage() {
     }
     setCropResult(null);
     setCustomCropBox(null);
+    setCustomFileName("");
     setCropMode("invoice");
     setErrorMsg(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -429,6 +439,37 @@ export default function MeeshoLabelCropPage() {
                 </p>
               </div>
 
+              {/* Optional Custom File Name Input */}
+              {file && (
+                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 bg-slate-50 p-2.5 rounded border border-[#051448]/20">
+                  <label htmlFor="meesho-filename" className="text-xs font-bold text-black shrink-0">
+                    File Name:
+                  </label>
+                  <div className="relative flex-1 max-w-md flex items-center">
+                    <input
+                      id="meesho-filename"
+                      type="text"
+                      value={customFileName}
+                      onChange={(e) => setCustomFileName(e.target.value)}
+                      placeholder={cropResult ? cropResult.fileName.replace(/\.pdf$/i, "") : "custom_filename"}
+                      className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2.5 py-1.5 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium"
+                    />
+                    <span className="absolute right-2.5 text-[11px] text-black/50 font-mono pointer-events-none select-none">
+                      .pdf
+                    </span>
+                  </div>
+                  {customFileName && (
+                    <button
+                      type="button"
+                      onClick={() => setCustomFileName("")}
+                      className="text-[11px] text-[#051448] hover:underline cursor-pointer font-semibold"
+                    >
+                      Reset Name
+                    </button>
+                  )}
+                </div>
+              )}
+
               {/* Action Buttons & Status Row */}
               <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5">
 
@@ -532,6 +573,229 @@ export default function MeeshoLabelCropPage() {
             </div>
           </div>
         </div>
+
+        {/* ── SEO & User Information Blog / Guide Section ── */}
+        <div className="mt-10 sm:mt-14 space-y-8 sm:space-y-12 text-black">
+
+          {/* Section 1: Overview & Value Proposition */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-5 sm:p-8 shadow-xs">
+            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs font-bold px-3 py-1 rounded-full mb-3">
+              <span>Free Meesho Shipping Label Cropping Tool</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#051448] mb-3">
+              How to Crop Meesho Shipping Labels for 4×6 Thermal Printing Online
+            </h2>
+            <p className="text-xs sm:text-sm text-black/80 leading-relaxed mb-4 text-justify">
+              When you download order invoices from the <strong>Meesho Supplier Panel</strong>, they come formatted as standard full-page A4 PDFs containing the shipping label at the top and the tax invoice at the bottom. Printing full A4 sheets wastes expensive thermal roll paper, slows down order packing, and requires manual scissor cutting.
+            </p>
+            <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
+              <strong>LabelCropOnline</strong> automatically detects each delivery courier partner (Delhivery, Shadowfax, Valmo, Valmo Plus, Xpressbees), crops the exact shipping label and tax invoice area with vector precision, and sorts your bulk PDF by <strong>Delivery Partner and Product SKU</strong> for seamless batch fulfillment.
+            </p>
+          </div>
+
+          {/* Section 2: Key Features Grid */}
+          <div>
+            <div className="text-center sm:text-left mb-6">
+              <h3 className="text-lg sm:text-xl font-bold text-[#051448]">
+                Why Sellers Choose LabelCropOnline for Meesho Label Cropping
+              </h3>
+              <p className="text-xs text-black/70 mt-1 text-justify sm:text-left">
+                Engineered specifically for high-volume eCommerce sellers and warehouse dispatch teams.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {/* Feature 1 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  1
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Courier-Wise Calibration</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Different logistics partners on Meesho have slightly different label positions. Our intelligent engine detects the courier for every page and applies precise crop margins.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  2
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Auto Sort by Courier &amp; SKU</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Automatically sorts all labels by courier (Delhivery → Shadowfax → Valmo → Valmo Plus → Xpressbees) and product SKU, cutting packing time by up to 50%.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  3
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">100% Vector Barcode Quality</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  No bitmap rasterization or image blur. Barcodes, AWB numbers, and QR codes remain crisp vector elements that scan instantly at courier hubs.
+                </p>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  4
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Saves 70% Thermal Paper</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Converts full A4 invoice PDFs into 4×6 inch (100×150 mm) standard thermal format without white waste borders.
+                </p>
+              </div>
+
+              {/* Feature 5 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  5
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">Interactive Custom Crop Studio</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Need a custom cutoff? Drag any boundary using our 8-handle visual crop box to crop exactly the section you need across all pages.
+                </p>
+              </div>
+
+              {/* Feature 6 */}
+              <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
+                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                  6
+                </div>
+                <h4 className="font-bold text-sm text-black mb-1.5">100% Private &amp; Secure</h4>
+                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                  Processing happens entirely inside your web browser. Your customer data, addresses, and invoice details never leave your computer.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Meesho Crop Modes Comparison */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-5 sm:p-8 shadow-xs">
+            <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
+              Comparing Meesho Crop Modes: Which One Should You Use?
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 border-b border-[#051448]/20 text-[#051448] font-bold">
+                    <th className="p-3">Crop Option</th>
+                    <th className="p-3">Included Content</th>
+                    <th className="p-3">Recommended Paper</th>
+                    <th className="p-3">Best Used For</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 text-black/80">
+                  <tr>
+                    <td className="p-3 font-bold text-black">Full with Tax Invoice</td>
+                    <td className="p-3">Shipping Label + SKU Table + Complete GST Tax Invoice</td>
+                    <td className="p-3">4×6&quot; Thermal Roll or A4 Sticker</td>
+                    <td className="p-3">Standard orders requiring physical tax invoice attached to parcel</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold text-black">Label + SKU Details</td>
+                    <td className="p-3">Shipping Barcode Label + Product SKU Summary Table</td>
+                    <td className="p-3">4×4&quot; or 4×6&quot; Thermal Roll</td>
+                    <td className="p-3">Quick warehouse packing where invoice is sent electronically</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3 font-bold text-black">Custom Crop Area</td>
+                    <td className="p-3">User-defined rectangular area on canvas</td>
+                    <td className="p-3">Any custom label size</td>
+                    <td className="p-3">Specialized printers or unique packing slips</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Section 4: Step-by-Step Guide */}
+          <div className="bg-slate-50 border border-[#051448]/20 rounded-md p-5 sm:p-8">
+            <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
+              Step-by-Step: How to Crop &amp; Print Meesho Labels
+            </h3>
+            <ol className="space-y-3.5 text-xs sm:text-sm text-black/80">
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">Step 1:</span>
+                <span className="text-justify">
+                  Log in to your <strong>Meesho Supplier Panel</strong> and navigate to <strong>Orders → Ready for Dispatch</strong>. Select your pending orders and click <strong>Download Labels</strong>.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">Step 2:</span>
+                <span className="text-justify">
+                  Drag and drop the downloaded Meesho PDF into the upload area above or click to select the file from your computer.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">Step 3:</span>
+                <span className="text-justify">
+                  Choose your preferred crop mode: <strong>Full with Tax</strong> or <strong>Label + SKU</strong>. The tool will automatically detect couriers, apply exact coordinates, and reorder pages by partner &amp; SKU.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">Step 4:</span>
+                <span className="text-justify">
+                  Click <strong>Preview</strong> to inspect the multi-page cropped document or click <strong>Crop &amp; Download</strong> to save your print-ready PDF.
+                </span>
+              </li>
+              <li className="flex gap-3">
+                <span className="font-bold text-[#051448] shrink-0">Step 5:</span>
+                <span className="text-justify">
+                  Open the cropped PDF in your thermal printer dialog. Select <strong>Paper Size: 4×6 inches (100×150 mm)</strong>, set <strong>Margins: None</strong>, and select <strong>Scale: Fit to Printable Area</strong>.
+                </span>
+              </li>
+            </ol>
+          </div>
+
+          {/* Section 5: FAQs */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-5 sm:p-8 shadow-xs">
+            <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
+              Frequently Asked Questions (FAQs)
+            </h3>
+            <div className="space-y-4 text-xs sm:text-sm">
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Will cropping decrease the scan quality of Meesho barcodes?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  No. LabelCropOnline performs pure vector geometry bounding on the PDF source. All barcode lines, vector fonts, and text remain 100% native vector elements without any image downsampling.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  How does the courier partner auto-detection work?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Our system scans each page of your bulk Meesho PDF to detect whether the delivery partner is Delhivery, Shadowfax, Valmo, Valmo Plus, or Xpressbees. It then applies the calibrated crop margins for that specific courier.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Can I crop bulk Meesho PDFs with 500+ order pages?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Yes! LabelCropOnline is built to process large multi-page batch label files in seconds directly inside your browser.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-black mb-1">
+                  Is my business and customer information secure?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  Yes, 100%. We do not upload or store your PDF files on any remote server. All PDF parsing, cropping, sorting, and rendering are executed client-side inside your web browser.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       {/* ── Interactive Custom Crop Area Selection Modal ── */}
@@ -565,7 +829,7 @@ export default function MeeshoLabelCropPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => triggerDownload(cropResult.blobUrl, cropResult.fileName)}
+                  onClick={() => triggerDownload(cropResult.blobUrl, getFinalFileName(cropResult.fileName))}
                   className="flex items-center gap-1 text-xs font-bold text-white bg-[#051448] hover:bg-[#071a5e] px-2.5 sm:px-3 py-1.5 rounded transition-colors cursor-pointer"
                 >
                   <Download size={13} />
@@ -616,7 +880,7 @@ export default function MeeshoLabelCropPage() {
             <div className="space-y-3 text-sm text-black">
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Output File:</span>
-                <span className="font-semibold text-xs truncate max-w-[200px]">{cropResult.fileName}</span>
+                <span className="font-semibold text-xs truncate max-w-[200px]">{getFinalFileName(cropResult.fileName)}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Crop Option:</span>
