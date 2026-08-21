@@ -78,7 +78,7 @@ const cardPlatforms = [
     color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
-    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the shipping label cleanly, strip extra margins, and download 4x6 print-ready files instantly with 100% vector barcode fidelity.",
+    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the shipping label cleanly, sort multi-page orders by SKU, and download 4x6 print-ready files instantly with 100% vector barcode fidelity.",
     tag: "Flipkart Label Crop",
     cta: "Crop Flipkart Labels →",
   },

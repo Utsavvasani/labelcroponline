@@ -520,9 +520,14 @@ export default function FlipkartLabelCropPage() {
 
               {/* Status Note */}
               {cropResult && (
-                <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex items-center justify-between">
+                <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex flex-wrap items-center justify-between gap-1">
                   <span>
                     Ready: <strong className="text-black uppercase">{cropMode === "custom" ? "Custom Selected Area" : "Standard Label Crop"}</strong>
+                    {"skuSummaryText" in cropResult && cropResult.skuSummaryText && (
+                      <span className="text-black/60 ml-1.5 hidden sm:inline">
+                        • Sorted by SKU: {cropResult.skuSummaryText}
+                      </span>
+                    )}
                   </span>
                   <span className="font-semibold text-black">
                     {cropResult.pageCount} Page(s) • {formatFileSize(cropResult.croppedSize)}
@@ -549,7 +554,7 @@ export default function FlipkartLabelCropPage() {
               When selling on <strong>Flipkart Seller Hub</strong>, order labels and invoices are generated as full A4 PDFs. While full A4 pages work for standard laser printers, eCommerce sellers using <strong>4×6 thermal barcode printers</strong> face wasted paper margins, tiny unreadable barcodes, or tedious manual scissor cutting.
             </p>
             <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
-              <strong>LabelCropOnline</strong> automatically crops your Flipkart order PDFs into standard <strong>4×6 inch (100×150 mm) thermal labels</strong>. With 100% vector barcode fidelity, your Ekart, Shadowfax, and Delhivery barcodes will scan with lightning speed at courier pickup hubs.
+              <strong>LabelCropOnline</strong> automatically crops your Flipkart order PDFs into standard <strong>4×6 inch (100×150 mm) thermal labels</strong> and sorts multi-page labels by <strong>Product SKU</strong> for rapid warehouse picking and packaging. With 100% vector barcode fidelity, your Ekart, Shadowfax, and Delhivery barcodes will scan with lightning speed at courier pickup hubs.
             </p>
           </div>
 
@@ -570,9 +575,9 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   1
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">4×6&quot; Thermal Roll Ready</h4>
+                <h4 className="font-bold text-sm text-black mb-1.5">Auto Sort by Product SKU</h4>
                 <p className="text-xs text-black/75 leading-relaxed text-justify">
-                  Converts standard A4 invoices into 4×6 inch (100×150 mm) thermal labels compatible with TVS, TSC, Zebra, Rollo, and Xprinter.
+                  Automatically extracts and sorts multi-page batch labels alphabetically by SKU / FSN, reducing product picking time and packing errors.
                 </p>
               </div>
 
@@ -768,7 +773,7 @@ export default function FlipkartLabelCropPage() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-xs sm:text-sm text-black">Flipkart Labels Preview</span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
-                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by SKU
                 </span>
               </div>
 
@@ -828,6 +833,12 @@ export default function FlipkartLabelCropPage() {
                 <span className="text-black/60">Output File:</span>
                 <span className="font-semibold text-xs truncate max-w-[200px]">{getFinalFileName(cropResult.fileName)}</span>
               </div>
+              {"skuSummaryText" in cropResult && cropResult.skuSummaryText && (
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-black/60">SKUs Sorted:</span>
+                  <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.skuSummaryText}</span>
+                </div>
+              )}
               <div className="flex justify-between py-1 border-b border-slate-100">
                 <span className="text-black/60">Total Pages:</span>
                 <span className="font-semibold">{cropResult.pageCount} page(s)</span>

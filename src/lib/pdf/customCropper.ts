@@ -17,6 +17,7 @@ export interface CustomCropResult {
   fileName: string;
   cropBox: CustomCropBox;
   partnerSummaryText?: string;
+  skuSummaryText?: string;
 }
 
 /**
