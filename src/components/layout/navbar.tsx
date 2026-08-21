@@ -1,80 +1,95 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Mail,
   Phone,
   Menu,
   ChevronDown,
   X,
+  Layers,
   Crop,
-  FileText,
-  Grid,
+  Scissors,
+  Sliders,
+  Split,
+  Minimize2,
+  Sparkles,
 } from "lucide-react";
 
-
-interface SubItem {
+interface PdfToolItem {
   id: string;
   name: string;
-  desc?: string;
-}
-
-interface ToolCategory {
-  id: string;
-  name: string;
-  desc?: string;
-  icon?: React.ElementType;
-  subItems?: SubItem[];
+  desc: string;
+  href?: string;
+  icon: React.ElementType;
+  badge?: string;
+  isAvailable?: boolean;
 }
 
 export function Navbar() {
   const [hideAppbar, setHideAppbar] = useState(false);
-  const [showToolsDropdown, setShowToolsDropdown] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [pdfToolsOpen, setPdfToolsOpen] = useState(false);
+  const [mobilePdfToolsOpen, setMobilePdfToolsOpen] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const router = useRouter();
+  const pathname = usePathname();
+  const dropdownRef = useRef<HTMLElement>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const toolCategories: ToolCategory[] = [
+  const pdfToolItems: PdfToolItem[] = [
     {
-      id: "label-cropper",
-      name: "Label Cropper",
-      desc: "Crop thermal & shipping labels",
+      id: "merge-pdf",
+      name: "Merge PDF Files",
+      desc: "Combine multiple shipping labels or document PDFs into one single file",
+      href: "/merge-pdf",
+      icon: Layers,
+      isAvailable: true,
+      badge: "Popular",
+    },
+    {
+      id: "meesho-crop",
+      name: "Meesho Label Crop",
+      desc: "Auto-detect couriers & crop Meesho labels for 4×6 thermal roll printers",
+      href: "/meesho-label-crop",
+      icon: Scissors,
+      isAvailable: true,
+    },
+    {
+      id: "flipkart-crop",
+      name: "Flipkart Label Crop",
+      desc: "1-click Flipkart shipping label crop with 100% vector barcode fidelity",
+      href: "/flipkart-label-crop",
       icon: Crop,
-      subItems: [
-        { id: "meesho", name: "Meesho Shipping Labels", desc: "Clean label & slip crop" },
-        { id: "flipkart", name: "Flipkart Shipping Labels", desc: "Automatic 1-click crop" },
-        { id: "merge", name: "Merge PDF Files", desc: "Combine multiple documents" },
-        { id: "shopify", name: "Shopify Packing Slips", desc: "Custom bounding crop" },
-        { id: "custom", name: "Custom Bounding Crop", desc: "Manual marquee selection" },
-      ],
+      isAvailable: true,
     },
     {
-      id: "pdf-tools",
-      name: "PDF Utilities",
-      desc: "Split, merge & crop PDF pages",
-      icon: FileText,
-      subItems: [
-        { id: "merge", name: "Merge PDF Documents", desc: "Combine multiple files into one" },
-        { id: "batch-crop", name: "Batch Multi-Page Crop", desc: "Process all pages at once" },
-        { id: "page-split", name: "Split Multi-Label Pages", desc: "Separate 4-on-1 PDF pages" },
-        { id: "auto-detect", name: "Auto Margin Removal", desc: "Remove blank borders" },
-      ],
+      id: "custom-crop",
+      name: "Custom Crop Studio",
+      desc: "Interactive 8-handle visual crop selector for custom PDF dimensions",
+      href: "/editor",
+      icon: Sliders,
+      isAvailable: true,
     },
     {
-      id: "presets",
-      name: "Standard Presets",
-      desc: "Pre-configured label sizes",
-      icon: Grid,
-      subItems: [
-        { id: "4x6", name: "4 x 6 inch Thermal", desc: "Standard shipping size" },
-        { id: "a4-4up", name: "A4 4-Up Grid", desc: "4 labels per sheet" },
-        { id: "a4-2up", name: "A4 2-Up Sheet", desc: "2 labels per sheet" },
-      ],
+      id: "split-pdf",
+      name: "Split PDF Pages",
+      desc: "Extract or separate multi-page PDF documents into individual files",
+      icon: Split,
+      isAvailable: false,
+      badge: "Soon",
+    },
+    {
+      id: "compress-pdf",
+      name: "Compress PDF",
+      desc: "Reduce PDF document file size while preserving high-contrast vector lines",
+      icon: Minimize2,
+      isAvailable: false,
+      badge: "Soon",
     },
   ];
 
+  // Hide top announcement bar on scroll
   useEffect(() => {
     const handleScroll = () => {
       setHideAppbar(window.scrollY > 100);
@@ -84,40 +99,41 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navigateToTool = (catId: string, subId?: string) => {
-    if (subId === "flipkart") {
-      router.push("/flipkart-label-crop");
-      setShowToolsDropdown(false);
-      setSheetOpen(false);
-      return;
-    }
-    if (subId === "meesho") {
-      router.push("/meesho-label-crop");
-      setShowToolsDropdown(false);
-      setSheetOpen(false);
-      return;
-    }
-    if (subId === "merge" || catId === "merge") {
-      router.push("/merge-pdf");
-      setShowToolsDropdown(false);
-      setSheetOpen(false);
-      return;
-    }
-    let url = "/editor?category=" + catId;
-    if (subId) {
-      url += "&preset=" + subId;
-    }
-    router.push(url);
-    setShowToolsDropdown(false);
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setPdfToolsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setPdfToolsOpen(false);
     setSheetOpen(false);
+  }, [pathname]);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setPdfToolsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setPdfToolsOpen(false);
+    }, 150);
   };
 
   return (
     <div className="relative w-full">
       {/* Single fixed header wrapper — slides as one unit on scroll */}
       <div
-        className={`fixed top-0 left-0 z-50 w-full ${hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
-          }`}
+        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-200 ${
+          hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
+        }`}
       >
         {/* Blue Top Announcement Bar */}
         <div className="bg-[#051448] w-full px-4 py-3 text-white">
@@ -132,13 +148,11 @@ export function Navbar() {
                 <span className="hidden sm:inline">+91 99095 20532</span>
               </a>
               <a
-                href="mailto:labelcroponline@gmail.com
-"
+                href="mailto:labelcroponline@gmail.com"
                 className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
               >
                 <Mail size={16} />
-                <span className="hidden sm:inline">labelcroponline@gmail.com
-                </span>
+                <span className="hidden sm:inline">labelcroponline@gmail.com</span>
               </a>
             </div>
 
@@ -194,39 +208,141 @@ export function Navbar() {
 
         {/* Nav wrapper — transparent so page background shows through on both sides */}
         <div className="w-full">
-          <nav className="mx-auto flex max-w-[1200px] items-center justify-between bg-white px-6 py-2 rounded-b-2xl shadow-lg">
+          <nav
+            ref={dropdownRef}
+            className="relative mx-auto flex max-w-[1200px] h-14 sm:h-16 items-center justify-between bg-white px-4 sm:px-6 rounded-b-2xl shadow-lg"
+          >
             {/* Logo with labelcroponline.svg */}
-            <Link href="/">
+            <Link href="/" className="shrink-0 flex items-center">
               <img
                 src="/labelcroponline.svg"
                 alt="Label Crop Online Logo"
-                className="w-40 h-auto object-contain"
+                className="w-32 sm:w-40 h-auto object-contain"
               />
             </Link>
 
-            {/* Desktop Navigation Links */}
-            <ul className="text-black hidden space-x-6 text-sm font-semibold md:flex">
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/">Home</Link>
+            {/* Desktop Navigation Links — single horizontal line with vertical centering */}
+            <ul className="text-black hidden md:flex items-center space-x-3 lg:space-x-6 text-xs lg:text-sm font-semibold whitespace-nowrap h-full">
+              <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
+                <Link href="/" className="flex items-center h-full">Home</Link>
               </li>
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/meesho-label-crop">Meesho Label Crop</Link>
+              <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
+                <Link href="/meesho-label-crop" className="flex items-center h-full">Meesho Label Crop</Link>
               </li>
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/flipkart-label-crop">Flipkart Label Crop</Link>
+              <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
+                <Link href="/flipkart-label-crop" className="flex items-center h-full">Flipkart Label Crop</Link>
               </li>
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/merge-pdf">Merge PDF</Link>
+
+              {/* ── PDF Tools Dropdown Trigger ── */}
+              <li
+                className="cursor-pointer flex items-center h-full"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  onClick={() => setPdfToolsOpen((prev) => !prev)}
+                  className={`flex items-center gap-1 transition-colors cursor-pointer h-full ${
+                    pdfToolsOpen || pathname === "/merge-pdf"
+                      ? "text-[#051448] font-bold"
+                      : "hover:text-[#051448]"
+                  }`}
+                  aria-expanded={pdfToolsOpen}
+                >
+                  <span>PDF Tools</span>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${
+                      pdfToolsOpen ? "rotate-180 text-[#051448]" : "text-black/60"
+                    }`}
+                  />
+                </button>
               </li>
-              <li className="hover:text-[#051448] cursor-pointer transition-colors">
-                <Link href="/contact-us">Contact Us</Link>
+
+              <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
+                <Link href="/contact-us" className="flex items-center h-full">Contact Us</Link>
               </li>
             </ul>
+
+            {/* ── Desktop PDF Tools Dropdown Menu (Anchored flush to right edge of navbar) ── */}
+            {pdfToolsOpen && (
+              <div
+                className="hidden md:block absolute top-full right-0 mt-1.5 w-[500px] lg:w-[540px] max-h-[calc(100vh-140px)] overflow-y-auto bg-white border border-[#051448]/20 rounded-xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <div className="flex items-center justify-between px-3 py-1.5 mb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#051448] uppercase tracking-wider">
+                    <Sparkles size={13} className="text-[#051448]" />
+                    <span>All PDF &amp; Label Tools</span>
+                  </div>
+                  <span className="text-[11px] text-black/50 font-normal">
+                    100% Free &amp; Fast
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {pdfToolItems.map((item) => {
+                    const Icon = item.icon;
+                    const isClickable = item.isAvailable && item.href;
+
+                    const content = (
+                      <div
+                        className={`group flex items-start gap-3 p-2.5 rounded-lg border transition-all ${
+                          isClickable
+                            ? "border-transparent hover:border-[#051448]/20 hover:bg-slate-50 cursor-pointer"
+                            : "border-transparent opacity-60 cursor-not-allowed bg-slate-50/40"
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-md bg-[#051448]/10 text-[#051448] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#051448] group-hover:text-white transition-colors">
+                          <Icon size={16} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-black group-hover:text-[#051448] transition-colors leading-tight">
+                              {item.name}
+                            </span>
+                            {item.badge && (
+                              <span
+                                className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-tight ${
+                                  item.badge === "Popular"
+                                    ? "bg-green-100 text-green-800 border border-green-200"
+                                    : "bg-blue-50 text-[#051448] border border-blue-200"
+                                }`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-black/65 leading-snug mt-0.5 line-clamp-2">
+                            {item.desc}
+                          </p>
+                        </div>
+                      </div>
+                    );
+
+                    if (isClickable && item.href) {
+                      return (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          onClick={() => setPdfToolsOpen(false)}
+                        >
+                          {content}
+                        </Link>
+                      );
+                    }
+
+                    return <div key={item.id}>{content}</div>;
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setSheetOpen(true)}
-              className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100"
+              className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 cursor-pointer"
               aria-label="Menu"
             >
               <Menu className="h-8 w-8" />
@@ -242,7 +358,7 @@ export function Navbar() {
             className="fixed inset-0 bg-black/50 transition-opacity"
             onClick={() => setSheetOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-3/4 max-w-sm bg-white p-6 shadow-lg flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300">
+          <div className="fixed inset-y-0 left-0 z-50 w-4/5 max-w-sm bg-white p-5 shadow-lg flex flex-col justify-between overflow-y-auto animate-in slide-in-from-left duration-300">
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                 <Link href="/" onClick={() => setSheetOpen(false)}>
@@ -254,13 +370,13 @@ export function Navbar() {
                 </Link>
                 <button
                   onClick={() => setSheetOpen(false)}
-                  className="p-1 rounded-md text-gray-500 hover:bg-gray-100"
+                  className="p-1 rounded-md text-gray-500 hover:bg-gray-100 cursor-pointer"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <ul className="text-[#333333] mt-5 space-y-4 text-lg font-medium">
+              <ul className="text-black mt-4 space-y-3 text-base font-semibold">
                 <li className="hover:text-[#051448] cursor-pointer">
                   <Link href="/" onClick={() => setSheetOpen(false)}>
                     Home
@@ -276,69 +392,70 @@ export function Navbar() {
                     Flipkart Label Crop
                   </Link>
                 </li>
-                <li className="hover:text-[#051448] cursor-pointer">
-                  <Link href="/merge-pdf" onClick={() => setSheetOpen(false)}>
-                    Merge PDF
-                  </Link>
-                </li>
-                {/* <li className="hover:text-[#051448] cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <Link
-                      href="/editor"
-                      onClick={() => {
-                        router.push("/editor");
-                        setSheetOpen(false);
-                      }}
-                    >
-                      Tools & Presets
-                    </Link>
-                    <button
-                      className="p-1"
-                      onClick={() =>
-                        setShowToolsDropdown(!showToolsDropdown)
-                      }
-                    >
-                      <ChevronDown size={20} />
-                    </button>
-                  </div>
 
-                  {showToolsDropdown && (
-                    <div className="mt-2 ml-4 space-y-2">
-                      {toolCategories.map((category) => (
-                        <div key={category.id} className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div
-                              onClick={() => {
-                                navigateToTool(category.id);
-                                setSheetOpen(false);
-                              }}
-                              className="text-base font-medium cursor-pointer"
-                            >
-                              {category.name}
-                            </div>
+                {/* Mobile PDF Tools Submenu Accordion */}
+                <li className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setMobilePdfToolsOpen((prev) => !prev)}
+                    className="w-full flex items-center justify-between text-left font-bold text-black hover:text-[#051448] cursor-pointer py-1"
+                  >
+                    <span>PDF Tools</span>
+                    <ChevronDown
+                      size={18}
+                      className={`transition-transform duration-200 ${
+                        mobilePdfToolsOpen ? "rotate-180 text-[#051448]" : "text-black/60"
+                      }`}
+                    />
+                  </button>
+
+                  {mobilePdfToolsOpen && (
+                    <div className="mt-2 ml-2 pl-3 border-l-2 border-[#051448]/20 space-y-2.5">
+                      {pdfToolItems.map((item) => {
+                        const Icon = item.icon;
+                        const isClickable = item.isAvailable && item.href;
+
+                        const content = (
+                          <div
+                            className={`flex items-center gap-2.5 py-1 ${
+                              isClickable ? "text-black hover:text-[#051448]" : "text-black/40"
+                            }`}
+                          >
+                            <Icon size={15} className="shrink-0" />
+                            <span className="text-xs font-semibold">{item.name}</span>
+                            {item.badge && (
+                              <span
+                                className={`text-[8px] px-1 py-0.2 rounded font-bold uppercase ${
+                                  item.badge === "Popular"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-blue-50 text-[#051448]"
+                                }`}
+                              >
+                                {item.badge}
+                              </span>
+                            )}
                           </div>
-                          {category.subItems && (
-                            <div className="ml-4 space-y-1">
-                              {category.subItems.map((subItem) => (
-                                <div
-                                  key={subItem.id}
-                                  onClick={() => {
-                                    navigateToTool(category.id, subItem.id);
-                                    setSheetOpen(false);
-                                  }}
-                                  className="text-sm text-gray-600 hover:text-[#051448] cursor-pointer"
-                                >
-                                  {subItem.name}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                        );
+
+                        if (isClickable && item.href) {
+                          return (
+                            <Link
+                              key={item.id}
+                              href={item.href}
+                              onClick={() => setSheetOpen(false)}
+                            >
+                              {content}
+                            </Link>
+                          );
+                        }
+
+                        return <div key={item.id}>{content}</div>;
+                      })}
                     </div>
                   )}
-                </li> */}
-                <li className="hover:text-[#051448] cursor-pointer">
+                </li>
+
+                <li className="hover:text-[#051448] cursor-pointer pt-1">
                   <Link href="/contact-us" onClick={() => setSheetOpen(false)}>
                     Contact Us
                   </Link>
@@ -350,7 +467,6 @@ export function Navbar() {
       )}
     </div>
   );
-
 }
 
 export default Navbar;
