@@ -230,8 +230,6 @@ export interface CropResult {
   selectedPartner: MeeshoPartner;
   detectedPartners: Record<string, number>;
   partnerSummaryText: string;
-  detectedSkus?: Record<string, number>;
-  skuSummaryText?: string;
 }
 
 /**
@@ -286,85 +284,7 @@ export function detectCourierFromText(text: string): Exclude<MeeshoPartner, "aut
 }
 
 /**
- * Comprehensive, multi-tiered SKU extraction engine for Meesho shipping labels and invoices.
- * Handles diverse SKU patterns (alphanumeric, symbols, spaces, numeric codes, multi-word names).
- */
-export function extractMeeshoSkuFromText(text: string): string {
-  if (!text || !text.trim()) return "";
-
-  const noiseWords = /^(details|table|size|qty|quantity|description|name|code|price|gst|hsn|meesho|total|invoice|rate|item|sku|product|seller|null|gstin|amount|igst|cgst|sgst|taxable|value|prepaid|cod|ordered|through|sold|by)$/i;
-
-  const cleanSkuCandidate = (candidate: string): string => {
-    if (!candidate) return "";
-    let s = candidate.trim();
-
-    // Remove leading serial numbers like '1 ', '1. ', '01 ', '#1 ', etc.
-    s = s.replace(/^(?:#?\d+[\.\-\)]?\s+)+/, "").trim();
-
-    // Remove trailing pipes, dashes, commas, colons, or noise
-    s = s.replace(/[\|,;\:\-]+$/, "").trim();
-
-    // If candidate starts with 'SKU:' or 'SKU ID:' strip it
-    s = s.replace(/^(?:Seller\s+|Product\s+|Item\s+)?SKU(?:\s*(?:ID|Code|No|Number|Name))?[\s:\-#]+/i, "").trim();
-
-    // If candidate has pipe separating description (e.g. "SKU_CODE | Product description"), take first segment
-    if (s.includes("|")) {
-      const parts = s.split("|");
-      const first = parts[0].trim().replace(/^(?:#?\d+[\.\-\)]?\s+)+/, "").trim();
-      if (first.length >= 2 && !noiseWords.test(first)) {
-        return first;
-      }
-    }
-
-    if (s.length >= 2 && !noiseWords.test(s)) {
-      return s;
-    }
-    return "";
-  };
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Tier 1: Meesho "Product Details SKU Size Qty Color Order No. <SKU> <Size>"
-  // ─────────────────────────────────────────────────────────────────────────────
-  const m1 = text.match(/Product\s+Details\s+SKU\s+Size\s+Qty\s+Color\s+Order\s+No\.?\s+([^\t\r\n]+?)(?:\s+(?:Free\s+Size|[SMLXL\d]+|XS|XXL|XXXL|\d+XL)\s+\d+|\s+TAX\s+INVOICE)/i);
-  if (m1 && m1[1]) {
-    const res = cleanSkuCandidate(m1[1]);
-    if (res) return res;
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Tier 2: Generic Meesho Table Row "SKU Size Qty Color Order No. <SKU>"
-  // ─────────────────────────────────────────────────────────────────────────────
-  const m2 = text.match(/\bSKU\s+Size\s+Qty\s+Color\s+Order\s+No\.?\s+([^\t\r\n]+?)(?:\s+(?:Free\s+Size|[SMLXL\d]+)\s+\d+|\s+TAX)/i);
-  if (m2 && m2[1]) {
-    const res = cleanSkuCandidate(m2[1]);
-    if (res) return res;
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Tier 3: Explicit Key-Value Pairs (e.g. "SKU: <value>", "Seller SKU: <value>")
-  // ─────────────────────────────────────────────────────────────────────────────
-  const kvRegex = /(?:(?:Seller|Product|Item|Merchant)\s+)?SKU(?:\s*(?:Code|ID|Number|No|Name))?\s*[:\-#]\s*([A-Za-z0-9_\-\.\/\s\+\(\)]+?)(?:\s*[\r\n\|]|\s+Size\b|\s+Qty\b|\s+Color\b|\s+Order\b|\s+TAX\b|\s+HSN\b|$)/i;
-  const m3 = text.match(kvRegex);
-  if (m3 && m3[1]) {
-    const res = cleanSkuCandidate(m3[1]);
-    if (res) return res;
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // Tier 4: Generic SKU ID Table Cell
-  // ─────────────────────────────────────────────────────────────────────────────
-  const skuCellRegex = /SKU(?:\s*ID|\s*Code|\s*No)?\s*(?:\||:)?\s*(?:Description\s*)?(?:QTY\s*)?(?:\d+[\.\s]+)?([A-Za-z0-9_\-\.\/\s\+\(\)]+?)(?:\s*\||\s+Qty\b|\s+Quantity\b|\s+Size\b|\s+Free\s+Size|\s+TAX)/i;
-  const m4 = text.match(skuCellRegex);
-  if (m4 && m4[1]) {
-    const res = cleanSkuCandidate(m4[1]);
-    if (res) return res;
-  }
-
-  return "";
-}
-
-/**
- * Crops a Meesho PDF with courier-calibrated margins and groups/sorts multi-page orders by SKU.
+ * Crops a Meesho PDF with courier-calibrated margins in original page sequence.
  */
 export async function cropMeeshoPdf(
   input: File | Blob | ArrayBuffer | Uint8Array,
@@ -394,16 +314,9 @@ export async function cropMeeshoPdf(
     throw new Error("The uploaded PDF has no pages.");
   }
 
-  // Extract page text for courier partner auto-detection and SKU sorting
+  // Extract page text for courier partner auto-detection
   const pagesText: string[] = await extractPagesText(arrayBuffer);
   const detectedPartners: Record<string, number> = {};
-  const detectedSkus: Record<string, number> = {};
-
-  const pageEntries: Array<{
-    pageIndex: number;
-    partnerKey: Exclude<MeeshoPartner, "auto">;
-    sku: string;
-  }> = [];
 
   for (let i = 0; i < totalPages; i++) {
     const pageText = pagesText[i] || "";
@@ -420,38 +333,8 @@ export async function cropMeeshoPdf(
     const partnerInfo = MEESHO_PARTNERS[partnerKey] || MEESHO_PARTNERS.delhivery;
     detectedPartners[partnerInfo.name] = (detectedPartners[partnerInfo.name] || 0) + 1;
 
-    const sku = extractMeeshoSkuFromText(pageText);
-    if (sku) {
-      detectedSkus[sku] = (detectedSkus[sku] || 0) + 1;
-    }
-
-    pageEntries.push({
-      pageIndex: i,
-      partnerKey,
-      sku,
-    });
-  }
-
-  // Group and sort multi-page labels by Product SKU (case-insensitive natural alphabetical)
-  if (totalPages > 1) {
-    pageEntries.sort((a, b) => {
-      if (a.sku && b.sku && a.sku.toLowerCase() !== b.sku.toLowerCase()) {
-        return a.sku.localeCompare(b.sku, undefined, { numeric: true, sensitivity: "base" });
-      }
-      if (a.sku && !b.sku) return -1;
-      if (!a.sku && b.sku) return 1;
-      return a.pageIndex - b.pageIndex;
-    });
-  }
-
-  // Create new sorted output document
-  const outputDoc = await PDFDocument.create();
-
-  for (const entry of pageEntries) {
-    const [copiedPage] = await outputDoc.copyPages(srcPdfDoc, [entry.pageIndex]);
-    const { width, height } = copiedPage.getSize();
-
-    const partnerInfo = MEESHO_PARTNERS[entry.partnerKey] || MEESHO_PARTNERS.delhivery;
+    const page = srcPdfDoc.getPage(i);
+    const { width, height } = page.getSize();
     const option = partnerInfo.options[cropMode] || partnerInfo.options.label_sku;
 
     const cropX = (option.x / 595) * width;
@@ -459,15 +342,13 @@ export async function cropMeeshoPdf(
     const cropW = (option.w / 595) * width;
     const cropH = (option.h / 842) * height;
 
-    copiedPage.setCropBox(cropX, cropY, cropW, cropH);
-    copiedPage.setMediaBox(cropX, cropY, cropW, cropH);
-    copiedPage.setBleedBox(cropX, cropY, cropW, cropH);
-    copiedPage.setTrimBox(cropX, cropY, cropW, cropH);
-
-    outputDoc.addPage(copiedPage);
+    page.setCropBox(cropX, cropY, cropW, cropH);
+    page.setMediaBox(cropX, cropY, cropW, cropH);
+    page.setBleedBox(cropX, cropY, cropW, cropH);
+    page.setTrimBox(cropX, cropY, cropW, cropH);
   }
 
-  const pdfBytes = await outputDoc.save();
+  const pdfBytes = await srcPdfDoc.save();
   const croppedBlob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(croppedBlob);
 
@@ -478,9 +359,6 @@ export async function cropMeeshoPdf(
     ([name, count]) => `${name} (${count})`
   );
   const partnerSummaryText = partnerSummaryList.join(" • ");
-
-  const skuList = Object.entries(detectedSkus).map(([sku, count]) => `${sku} (${count})`);
-  const skuSummaryText = skuList.length > 0 ? skuList.join(" • ") : undefined;
 
   return {
     blobUrl,
@@ -493,8 +371,6 @@ export async function cropMeeshoPdf(
     selectedPartner,
     detectedPartners,
     partnerSummaryText,
-    detectedSkus,
-    skuSummaryText,
   };
 }
 
