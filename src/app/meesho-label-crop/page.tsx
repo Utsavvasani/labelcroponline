@@ -316,27 +316,24 @@ export default function MeeshoLabelCropPage() {
                   <button
                     type="button"
                     onClick={() => handleModeChange("invoice")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
-                      cropMode === "invoice"
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "invoice"
                         ? "border-[#051448] bg-[#051448] text-white shadow-sm"
                         : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
-                        cropMode === "invoice"
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "invoice"
                           ? "border-white bg-white text-[#051448]"
                           : "border-black/40 bg-white"
-                      }`}
+                        }`}
                     >
                       {cropMode === "invoice" && <Check size={9} strokeWidth={3} />}
                     </div>
                     <div>
                       <div className="text-[11px] sm:text-xs font-bold leading-tight">Full with Tax</div>
                       <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
-                          cropMode === "invoice" ? "text-white/80" : "text-black/60"
-                        }`}
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "invoice" ? "text-white/80" : "text-black/60"
+                          }`}
                       >
                         Label + Tax Invoice
                       </div>
@@ -347,27 +344,24 @@ export default function MeeshoLabelCropPage() {
                   <button
                     type="button"
                     onClick={() => handleModeChange("label_sku")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
-                      cropMode === "label_sku"
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "label_sku"
                         ? "border-[#051448] bg-[#051448] text-white shadow-sm"
                         : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
-                        cropMode === "label_sku"
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "label_sku"
                           ? "border-white bg-white text-[#051448]"
                           : "border-black/40 bg-white"
-                      }`}
+                        }`}
                     >
                       {cropMode === "label_sku" && <Check size={9} strokeWidth={3} />}
                     </div>
                     <div>
                       <div className="text-[11px] sm:text-xs font-bold leading-tight">Label + SKU</div>
                       <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
-                          cropMode === "label_sku" ? "text-white/80" : "text-black/60"
-                        }`}
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "label_sku" ? "text-white/80" : "text-black/60"
+                          }`}
                       >
                         Label + SKU Details
                       </div>
@@ -378,18 +372,16 @@ export default function MeeshoLabelCropPage() {
                   <button
                     type="button"
                     onClick={() => handleModeChange("custom")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${
-                      cropMode === "custom"
+                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "custom"
                         ? "border-[#051448] bg-[#051448] text-white shadow-sm"
                         : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${
-                        cropMode === "custom"
+                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "custom"
                           ? "border-white bg-white text-[#051448]"
                           : "border-black/40 bg-white"
-                      }`}
+                        }`}
                     >
                       {cropMode === "custom" && <Check size={9} strokeWidth={3} />}
                     </div>
@@ -399,9 +391,8 @@ export default function MeeshoLabelCropPage() {
                         Custom Crop
                       </div>
                       <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${
-                          cropMode === "custom" ? "text-white/80" : "text-black/60"
-                        }`}
+                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "custom" ? "text-white/80" : "text-black/60"
+                          }`}
                       >
                         {customCropBox ? "Area Selected" : "Select Area in PDF"}
                       </div>
@@ -417,9 +408,8 @@ export default function MeeshoLabelCropPage() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border border-[#051448] rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${
-                  isDragging ? "bg-blue-50/80 border-dashed" : ""
-                }`}
+                className={`border border-[#051448] rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : ""
+                  }`}
               >
                 <div className="w-9 h-9 sm:w-11 sm:h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
                   {isProcessing ? (
@@ -529,7 +519,7 @@ export default function MeeshoLabelCropPage() {
                     Ready: <strong className="text-black uppercase">{getActiveModeName()}</strong>
                     {cropResult.partnerSummaryText && (
                       <span className="text-black/60 ml-1.5 hidden sm:inline">
-                        • Sorted by Partner: {cropResult.partnerSummaryText}
+                        • Sorted by Partner &amp; SKU: {cropResult.partnerSummaryText}
                       </span>
                     )}
                   </span>
@@ -568,7 +558,7 @@ export default function MeeshoLabelCropPage() {
                   Meesho ({getActiveModeName()})
                 </span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
-                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by Courier
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by Partner &amp; SKU
                 </span>
               </div>
 

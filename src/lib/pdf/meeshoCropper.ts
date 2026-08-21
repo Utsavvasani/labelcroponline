@@ -216,6 +216,7 @@ export interface CropResult {
   selectedPartner: MeeshoPartner;
   detectedPartners: Record<string, number>;
   partnerSummaryText: string;
+  detectedSkus?: Record<string, number>;
 }
 
 /**
@@ -239,6 +240,53 @@ export function detectCourierFromText(text: string): Exclude<MeeshoPartner, "aut
     return "delhivery";
   }
   return "delhivery"; // default standard
+}
+
+/**
+ * Extracts product SKU / Style Code from extracted page text.
+ */
+export function extractSkuFromText(text: string): string {
+  if (!text) return "";
+
+  const ignoredWords = /^(details|table|size|qty|quantity|description|name|code|price|gst|hsn|meesho|total|invoice|rate|item)$/i;
+
+  // Pattern 1: Explicit labels like "SKU: ABC", "SKU Code: ABC", "Item SKU: ABC", "Product SKU: ABC"
+  const labelMatch = text.match(/(?:(?:Product|Item)\s+)?SKU(?:\s*(?:Code|ID|Number|No|Name))?\s*[:\-#]\s*([A-Za-z0-9_\-\./]+)/i);
+  if (labelMatch && labelMatch[1]) {
+    const val = labelMatch[1].trim();
+    if (val.length >= 2 && !ignoredWords.test(val)) {
+      return val;
+    }
+  }
+
+  // Pattern 2: Style ID / Style Code
+  const styleMatch = text.match(/(?:Style\s*(?:ID|Code|No))\s*[:\-#]?\s*([A-Za-z0-9_\-\./]+)/i);
+  if (styleMatch && styleMatch[1]) {
+    const val = styleMatch[1].trim();
+    if (val.length >= 2 && !ignoredWords.test(val)) {
+      return val;
+    }
+  }
+
+  // Pattern 3: SKU table rows where SKU is listed alongside Size and Qty (e.g., "SKU Size Qty ... <SKU_CODE>")
+  const tableHeaderMatch = text.match(/SKU\s+(?:Size\s+Qty\s+|Description\s+|Qty\s+Size\s+)?([A-Za-z0-9_\-\./]+)/i);
+  if (tableHeaderMatch && tableHeaderMatch[1]) {
+    const val = tableHeaderMatch[1].trim();
+    if (val.length >= 2 && !ignoredWords.test(val)) {
+      return val;
+    }
+  }
+
+  // Pattern 4: General fallback match for "SKU <value>"
+  const generalMatch = text.match(/\bSKU\s+([A-Za-z0-9_\-\./]+)/i);
+  if (generalMatch && generalMatch[1]) {
+    const val = generalMatch[1].trim();
+    if (val.length >= 2 && !ignoredWords.test(val)) {
+      return val;
+    }
+  }
+
+  return "";
 }
 
 /**
@@ -271,7 +319,9 @@ async function extractPagesText(arrayBuffer: ArrayBuffer): Promise<string[]> {
 
 /**
  * Precision rectangle crop for Meesho Seller shipping labels with partner-specific calibration
- * and automatic sorting by delivery partner order (Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees)
+ * and multi-level sorting:
+ * 1. Delivery Courier Partner (Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees)
+ * 2. Product SKU Code (Alphabetical A-Z within each delivery partner)
  */
 export async function cropMeeshoPdf(
   input: File | Blob | ArrayBuffer,
@@ -298,27 +348,28 @@ export async function cropMeeshoPdf(
     throw new Error("The uploaded PDF has no pages.");
   }
 
-  // Extract page text for courier partner auto-detection
-  let pagesText: string[] = [];
-  if (selectedPartner === "auto") {
-    pagesText = await extractPagesText(arrayBuffer);
-  }
+  // Extract page text for courier partner auto-detection and SKU extraction
+  const pagesText: string[] = await extractPagesText(arrayBuffer);
 
   const detectedPartners: Record<string, number> = {};
+  const detectedSkus: Record<string, number> = {};
   const pageEntries: Array<{
     pageIndex: number;
     partnerKey: Exclude<MeeshoPartner, "auto">;
     partnerName: string;
     priority: number;
+    sku: string;
   }> = [];
 
-  // Identify courier partner for each page
+  // Identify courier partner and SKU for each page
   for (let i = 0; i < totalPages; i++) {
+    const pageText = pagesText[i] || "";
+
     let partnerKey: Exclude<MeeshoPartner, "auto">;
     if (selectedPartner !== "auto") {
       partnerKey = selectedPartner;
-    } else if (pagesText[i]) {
-      partnerKey = detectCourierFromText(pagesText[i]);
+    } else if (pageText) {
+      partnerKey = detectCourierFromText(pageText);
     } else {
       partnerKey = "delhivery";
     }
@@ -326,19 +377,38 @@ export async function cropMeeshoPdf(
     const partnerInfo = MEESHO_PARTNERS[partnerKey] || MEESHO_PARTNERS.delhivery;
     detectedPartners[partnerInfo.name] = (detectedPartners[partnerInfo.name] || 0) + 1;
 
+    const sku = extractSkuFromText(pageText);
+    if (sku) {
+      detectedSkus[sku] = (detectedSkus[sku] || 0) + 1;
+    }
+
     pageEntries.push({
       pageIndex: i,
       partnerKey,
       partnerName: partnerInfo.name,
       priority: PARTNER_SORT_PRIORITY[partnerKey] ?? 99,
+      sku,
     });
   }
 
-  // Sort pages by delivery partner order: Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees
+  // Multi-level sort:
+  // Level 1: Delivery Partner Order (Delhivery -> Shadowfax -> Valmo -> Valmo Plus -> Xpressbees)
+  // Level 2: SKU Alphabetical (within the same delivery partner)
+  // Level 3: Original Page Index (stable tie-breaker)
   pageEntries.sort((a, b) => {
+    // 1. Primary sort: Delivery Partner priority
     if (a.priority !== b.priority) {
       return a.priority - b.priority;
     }
+
+    // 2. Secondary sort: Product SKU (case-insensitive natural alphabetical)
+    if (a.sku && b.sku && a.sku.toLowerCase() !== b.sku.toLowerCase()) {
+      return a.sku.localeCompare(b.sku, undefined, { numeric: true, sensitivity: "base" });
+    }
+    if (a.sku && !b.sku) return -1;
+    if (!a.sku && b.sku) return 1;
+
+    // 3. Stable tie-breaker: original page index
     return a.pageIndex - b.pageIndex;
   });
 
@@ -367,7 +437,7 @@ export async function cropMeeshoPdf(
     outputDoc.addPage(copiedPage);
   }
 
-  // Save the cropped, courier-sorted PDF
+  // Save the cropped, courier & SKU sorted PDF
   const pdfBytes = await outputDoc.save();
   const croppedBlob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(croppedBlob);
@@ -391,6 +461,7 @@ export async function cropMeeshoPdf(
     selectedPartner,
     detectedPartners,
     partnerSummaryText,
+    detectedSkus,
   };
 }
 
