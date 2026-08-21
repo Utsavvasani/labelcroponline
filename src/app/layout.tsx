@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | LabelCropOnline",
   },
   description:
-    "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple, browser-based label processing for ecommerce sellers and businesses.",
+    "Crop, resize, and bulk-process shipping labels and PDF documents online. Fast, simple, browser-based label processing for ecommerce sellers and businesses.",
   keywords: [
     "shipping label cropper",
     "crop shipping labels online",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     siteName: "LabelCropOnline",
     title: "LabelCropOnline – Crop & Process Shipping Labels Online",
     description:
-      "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
+      "Crop, resize, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
     images: [
       {
         url: "/og-image.png",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LabelCropOnline – Crop & Process Shipping Labels Online",
     description:
-      "Crop, resize, sort, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
+      "Crop, resize, and bulk-process shipping labels and PDF documents online. Fast, simple label processing for ecommerce sellers.",
     images: ["/og-image.png"],
     creator: "@labelcroponline",
   },

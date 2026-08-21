@@ -300,7 +300,7 @@ export default function MeeshoLabelCropPage() {
               </div>
 
               <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
-                Crop Meesho shipping labels with clean border margins, auto delivery partner sorting, or select your own custom area.
+                Crop Meesho shipping labels with clean border margins, courier auto-detection, or select your own custom area.
               </p>
             </div>
 
@@ -326,87 +326,66 @@ export default function MeeshoLabelCropPage() {
                   <button
                     type="button"
                     onClick={() => handleModeChange("invoice")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "invoice"
-                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
-                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "invoice"
+                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                      : "border-slate-300 bg-white hover:border-[#051448]/50"
                       }`}
                   >
-                    <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "invoice"
-                          ? "border-white bg-white text-[#051448]"
-                          : "border-black/40 bg-white"
-                        }`}
-                    >
-                      {cropMode === "invoice" && <Check size={9} strokeWidth={3} />}
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="font-bold text-xs text-black leading-tight">
+                        With Tax Invoice
+                      </span>
+                      {cropMode === "invoice" && (
+                        <Check size={13} className="text-[#051448] shrink-0" />
+                      )}
                     </div>
-                    <div>
-                      <div className="text-[11px] sm:text-xs font-bold leading-tight">Full with Tax</div>
-                      <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "invoice" ? "text-white/80" : "text-black/60"
-                          }`}
-                      >
-                        Label + Tax Invoice
-                      </div>
-                    </div>
+                    <p className="text-[10px] text-black/70 leading-tight">
+                      Label + SKU + GST Tax Invoice (4×6&quot;)
+                    </p>
                   </button>
 
                   {/* Option 2: Label + SKU */}
                   <button
                     type="button"
                     onClick={() => handleModeChange("label_sku")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "label_sku"
-                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
-                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "label_sku"
+                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                      : "border-slate-300 bg-white hover:border-[#051448]/50"
                       }`}
                   >
-                    <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "label_sku"
-                          ? "border-white bg-white text-[#051448]"
-                          : "border-black/40 bg-white"
-                        }`}
-                    >
-                      {cropMode === "label_sku" && <Check size={9} strokeWidth={3} />}
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="font-bold text-xs text-black leading-tight">
+                        Label + SKU
+                      </span>
+                      {cropMode === "label_sku" && (
+                        <Check size={13} className="text-[#051448] shrink-0" />
+                      )}
                     </div>
-                    <div>
-                      <div className="text-[11px] sm:text-xs font-bold leading-tight">Label + SKU</div>
-                      <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "label_sku" ? "text-white/80" : "text-black/60"
-                          }`}
-                      >
-                        Label + SKU Details
-                      </div>
-                    </div>
+                    <p className="text-[10px] text-black/70 leading-tight">
+                      Shipping Label + SKU Table (4×4&quot;)
+                    </p>
                   </button>
 
                   {/* Option 3: Custom Area Crop */}
                   <button
                     type="button"
                     onClick={() => handleModeChange("custom")}
-                    className={`flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-2 p-2 sm:p-2.5 rounded-md border text-center sm:text-left transition-all cursor-pointer ${cropMode === "custom"
-                        ? "border-[#051448] bg-[#051448] text-white shadow-sm"
-                        : "border-[#051448]/30 bg-white text-black hover:border-[#051448]"
+                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "custom"
+                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                      : "border-slate-300 bg-white hover:border-[#051448]/50"
                       }`}
                   >
-                    <div
-                      className={`hidden sm:flex mt-0.5 w-3.5 h-3.5 rounded-full border items-center justify-center shrink-0 ${cropMode === "custom"
-                          ? "border-white bg-white text-[#051448]"
-                          : "border-black/40 bg-white"
-                        }`}
-                    >
-                      {cropMode === "custom" && <Check size={9} strokeWidth={3} />}
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="font-bold text-xs text-black leading-tight">
+                        Custom Area
+                      </span>
+                      {cropMode === "custom" && (
+                        <Check size={13} className="text-[#051448] shrink-0" />
+                      )}
                     </div>
-                    <div>
-                      <div className="text-[11px] sm:text-xs font-bold leading-tight flex items-center gap-1">
-                        <Crop size={11} />
-                        Custom Crop
-                      </div>
-                      <div
-                        className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 hidden sm:block ${cropMode === "custom" ? "text-white/80" : "text-black/60"
-                          }`}
-                      >
-                        {customCropBox ? "Area Selected" : "Select Area in PDF"}
-                      </div>
-                    </div>
+                    <p className="text-[10px] text-black/70 leading-tight">
+                      {customCropBox ? "Custom Area Active" : "Select box on PDF"}
+                    </p>
                   </button>
 
                 </div>
@@ -418,7 +397,7 @@ export default function MeeshoLabelCropPage() {
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border border-[#051448] rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : ""
+                className={`border-2 border-dashed rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : "border-[#051448]"
                   }`}
               >
                 <div className="w-9 h-9 sm:w-11 sm:h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
@@ -560,7 +539,7 @@ export default function MeeshoLabelCropPage() {
                     Ready: <strong className="text-black uppercase">{getActiveModeName()}</strong>
                     {cropResult.partnerSummaryText && (
                       <span className="text-black/60 ml-1.5 hidden sm:inline">
-                        • Sorted by Partner &amp; SKU: {cropResult.partnerSummaryText}
+                        • Couriers: {cropResult.partnerSummaryText}
                       </span>
                     )}
                   </span>
@@ -589,7 +568,7 @@ export default function MeeshoLabelCropPage() {
               When you download order invoices from the <strong>Meesho Supplier Panel</strong>, they come formatted as standard full-page A4 PDFs containing the shipping label at the top and the tax invoice at the bottom. Printing full A4 sheets wastes expensive thermal roll paper, slows down order packing, and requires manual scissor cutting.
             </p>
             <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
-              <strong>LabelCropOnline</strong> automatically detects each delivery courier partner (Delhivery, Shadowfax, Valmo, Valmo Plus, Xpressbees), crops the exact shipping label and tax invoice area with vector precision, and sorts your bulk PDF by <strong>Delivery Partner and Product SKU</strong> for seamless batch fulfillment.
+              <strong>LabelCropOnline</strong> automatically detects each delivery courier partner (Delhivery, Shadowfax, Valmo, Valmo Plus, Xpressbees), crops the exact shipping label and tax invoice area with vector precision, and optimizes your bulk PDF for seamless batch thermal printing.
             </p>
           </div>
 
@@ -621,9 +600,9 @@ export default function MeeshoLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   2
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Auto Sort by Courier &amp; SKU</h4>
+                <h4 className="font-bold text-sm text-black mb-1.5">Universal Logistics Support</h4>
                 <p className="text-xs text-black/75 leading-relaxed text-justify">
-                  Automatically sorts all labels by courier (Delhivery → Shadowfax → Valmo → Valmo Plus → Xpressbees) and product SKU, cutting packing time by up to 50%.
+                  Accurately identifies Delhivery, Shadowfax, Valmo, Valmo Plus, and Xpressbees labels across all pages in multi-order PDFs.
                 </p>
               </div>
 
@@ -789,7 +768,7 @@ export default function MeeshoLabelCropPage() {
                   Is my business and customer information secure?
                 </h4>
                 <p className="text-black/75 leading-relaxed text-justify">
-                  Yes, 100%. We do not upload or store your PDF files on any remote server. All PDF parsing, cropping, sorting, and rendering are executed client-side inside your web browser.
+                  Yes, 100%. We do not upload or store your PDF files on any remote server. All PDF parsing, cropping, and rendering are executed client-side inside your web browser.
                 </p>
               </div>
             </div>
@@ -822,7 +801,7 @@ export default function MeeshoLabelCropPage() {
                   Meesho ({getActiveModeName()})
                 </span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
-                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by Partner &amp; SKU
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
                 </span>
               </div>
 
@@ -888,7 +867,7 @@ export default function MeeshoLabelCropPage() {
               </div>
               {cropResult.partnerSummaryText && (
                 <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-black/60">Sorted Order:</span>
+                  <span className="text-black/60">Couriers Detected:</span>
                   <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.partnerSummaryText}</span>
                 </div>
               )}
