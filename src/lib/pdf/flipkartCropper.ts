@@ -16,6 +16,7 @@ export interface CropResult {
   fileName: string;
   detectedSkus?: Record<string, number>;
   skuSummaryText?: string;
+  soldBy?: string;
 }
 
 /**
@@ -44,6 +45,42 @@ async function extractPagesText(arrayBuffer: ArrayBuffer): Promise<string[]> {
     // Graceful fallback if text extraction fails in worker
   }
   return [];
+}
+
+/**
+ * Extracts "Sold By" seller/brand name from Flipkart shipping label/invoice text.
+ */
+export function extractFlipkartSoldByFromText(text: string): string {
+  if (!text) return "";
+
+  // Pattern 1: "Sold By:" or "Sold By :" or "Sold By |"
+  const m1 = text.match(/Sold\s+By\s*[:\|\-]?\s*([^,\r\n\|]+)/i);
+  if (m1 && m1[1]) {
+    let name = m1[1].trim();
+    name = name.replace(/[^A-Za-z0-9_\- ]/g, "").trim().replace(/\s+/g, "_");
+    if (name.length >= 2) return name;
+  }
+
+  // Pattern 2: "Seller Registered Address:" or "Seller:"
+  const m2 = text.match(/Seller(?:\s+Registered\s+Address)?\s*[:\|\-]?\s*([^,\r\n\|]+)/i);
+  if (m2 && m2[1]) {
+    let name = m2[1].trim();
+    name = name.replace(/[^A-Za-z0-9_\- ]/g, "").trim().replace(/\s+/g, "_");
+    if (name.length >= 2) return name;
+  }
+
+  return "";
+}
+
+/**
+ * Returns today's date formatted as DD_MM_YYYY (e.g., 21_08_2026)
+ */
+export function getFormattedTodayDate(): string {
+  const d = new Date();
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}_${month}_${year}`;
 }
 
 /**
@@ -144,10 +181,11 @@ export function extractFlipkartSkuFromText(text: string): string {
  * Crops Flipkart shipping labels matching the exact cut specifications of cropped_label.pdf:
  * CropBox / MediaBox = { x: 165, y: 460, width: 265, height: 360 } (on standard A4 595 x 842 pt).
  * Automatically groups and sorts multi-page labels by Product SKU.
+ * Generates default file name format: Flipkart_<Sold_By>_<date>_Labelcroponline.pdf
  */
 export async function cropFlipkartPdf(
   input: File | Blob | ArrayBuffer | Uint8Array,
-  fileName: string = "Flipkart.pdf",
+  _fileName: string = "Flipkart.pdf",
   _options?: FlipkartCropOptions
 ): Promise<CropResult> {
   let arrayBuffer: ArrayBuffer;
@@ -171,9 +209,11 @@ export async function cropFlipkartPdf(
     throw new Error("The uploaded PDF has no pages.");
   }
 
-  // Extract page text for SKU sorting
+  // Extract page text for SKU sorting and Sold By detection
   const pagesText = await extractPagesText(arrayBuffer);
   const detectedSkus: Record<string, number> = {};
+  let soldByName = "";
+
   const pageEntries: Array<{
     pageIndex: number;
     sku: string;
@@ -182,6 +222,10 @@ export async function cropFlipkartPdf(
   for (let i = 0; i < totalPages; i++) {
     const pageText = pagesText[i] || "";
     const sku = extractFlipkartSkuFromText(pageText);
+
+    if (!soldByName) {
+      soldByName = extractFlipkartSoldByFromText(pageText);
+    }
 
     if (sku) {
       detectedSkus[sku] = (detectedSkus[sku] || 0) + 1;
@@ -231,12 +275,11 @@ export async function cropFlipkartPdf(
   const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(blob);
 
-  // Generate friendly output name
-  const cleanBaseName = fileName
-    .replace(/^labelcroponline_/i, "")
-    .replace(/\.[^/.]+$/, "")
-    .replace(/_cropped/g, "");
-  const outputFileName = `labelcroponline_${cleanBaseName}_cropped.pdf`;
+  // Generate default file name format: Flipkart_<Sold_By>_<date>_Labelcroponline.pdf
+  const todayDateStr = getFormattedTodayDate();
+  const outputFileName = soldByName
+    ? `Flipkart_${soldByName}_${todayDateStr}_Labelcroponline.pdf`
+    : `Flipkart_${todayDateStr}_Labelcroponline.pdf`;
 
   const skuList = Object.entries(detectedSkus).map(([sku, count]) => `${sku} (${count})`);
   const skuSummaryText = skuList.length > 0 ? skuList.join(" • ") : undefined;
@@ -251,6 +294,7 @@ export async function cropFlipkartPdf(
     fileName: outputFileName,
     detectedSkus,
     skuSummaryText,
+    soldBy: soldByName || undefined,
   };
 }
 

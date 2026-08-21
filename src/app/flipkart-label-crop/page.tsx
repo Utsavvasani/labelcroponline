@@ -833,6 +833,12 @@ export default function FlipkartLabelCropPage() {
                 <span className="text-black/60">Output File:</span>
                 <span className="font-semibold text-xs truncate max-w-[200px]">{getFinalFileName(cropResult.fileName)}</span>
               </div>
+              {"soldBy" in cropResult && cropResult.soldBy && (
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-black/60">Sold By:</span>
+                  <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.soldBy.replace(/_/g, " ")}</span>
+                </div>
+              )}
               {"skuSummaryText" in cropResult && cropResult.skuSummaryText && (
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-black/60">SKUs Sorted:</span>
