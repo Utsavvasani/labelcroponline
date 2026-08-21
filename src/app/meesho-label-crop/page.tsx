@@ -537,8 +537,13 @@ export default function MeeshoLabelCropPage() {
                 <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex flex-wrap items-center justify-between gap-1">
                   <span>
                     Ready: <strong className="text-black uppercase">{getActiveModeName()}</strong>
-                    {cropResult.partnerSummaryText && (
+                    {cropResult.skuSummaryText && (
                       <span className="text-black/60 ml-1.5 hidden sm:inline">
+                        • Sorted by SKU: {cropResult.skuSummaryText}
+                      </span>
+                    )}
+                    {cropResult.partnerSummaryText && (
+                      <span className="text-black/60 ml-1.5 hidden md:inline">
                         • Couriers: {cropResult.partnerSummaryText}
                       </span>
                     )}
@@ -718,16 +723,43 @@ export default function MeeshoLabelCropPage() {
               <li className="flex gap-3">
                 <span className="font-bold text-[#051448] shrink-0">Step 4:</span>
                 <span className="text-justify">
-                  Click <strong>Preview</strong> to inspect the multi-page cropped document or click <strong>Crop &amp; Download</strong> to save your print-ready PDF.
+                  Click <strong>Preview</strong> to inspect the multi-page cropped document or click <strong>Crop the Label &amp; Download</strong> to save your print-ready PDF.
                 </span>
               </li>
               <li className="flex gap-3">
                 <span className="font-bold text-[#051448] shrink-0">Step 5:</span>
                 <span className="text-justify">
-                  Open the cropped PDF in your thermal printer dialog. Select <strong>Paper Size: 4×6 inches (100×150 mm)</strong>, set <strong>Margins: None</strong>, and select <strong>Scale: Fit to Printable Area</strong>.
+                  Open the cropped PDF in your print dialog, set <strong>Page Size: 4×6 in (100×150 mm)</strong>, <strong>Scale: Fit to Page</strong>, and print on your thermal sticker roll.
                 </span>
               </li>
             </ol>
+          </div>
+
+          {/* Section 4: Thermal Printer Settings & Tips */}
+          <div className="bg-white border border-[#051448]/20 rounded-md p-5 sm:p-8 shadow-xs">
+            <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
+              Recommended Thermal Printer Settings for Meesho Labels
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded">
+                <h4 className="font-bold text-black mb-1">Print Dialog Settings</h4>
+                <ul className="space-y-1.5 text-black/75 list-disc list-inside">
+                  <li><strong>Destination:</strong> Select your 4×6 Thermal Printer (e.g. TSC, Zebra, TVS, Rollo, Xprinter)</li>
+                  <li><strong>Paper Size:</strong> 4×6 inches / 100×150 mm</li>
+                  <li><strong>Scale:</strong> Fit to Printable Area or 100%</li>
+                  <li><strong>Margins:</strong> None</li>
+                </ul>
+              </div>
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded">
+                <h4 className="font-bold text-black mb-1">Printer Driver Calibration</h4>
+                <ul className="space-y-1.5 text-black/75 list-disc list-inside">
+                  <li><strong>Print Speed:</strong> 4 inches/second (ips) for crisp barcodes</li>
+                  <li><strong>Darkness / Density:</strong> Level 10-12 for high-contrast scan readability</li>
+                  <li><strong>Media Type:</strong> Direct Thermal / Label with Gaps</li>
+                  <li><strong>Sensor:</strong> Gap / Notch Sensor</li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Section 5: FAQs */}
@@ -738,28 +770,28 @@ export default function MeeshoLabelCropPage() {
             <div className="space-y-4 text-xs sm:text-sm">
               <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
-                  Will cropping decrease the scan quality of Meesho barcodes?
+                  Which Meesho delivery partners are supported?
                 </h4>
                 <p className="text-black/75 leading-relaxed text-justify">
-                  No. LabelCropOnline performs pure vector geometry bounding on the PDF source. All barcode lines, vector fonts, and text remain 100% native vector elements without any image downsampling.
+                  All major delivery partners used by Meesho are supported with auto-detection: <strong>Delhivery</strong>, <strong>Shadowfax</strong>, <strong>Valmo</strong>, <strong>Valmo Plus</strong>, and <strong>Xpressbees</strong>.
                 </p>
               </div>
 
               <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
-                  How does the courier partner auto-detection work?
+                  Which crop mode should I choose: With Tax Invoice or Label + SKU?
                 </h4>
                 <p className="text-black/75 leading-relaxed text-justify">
-                  Our system scans each page of your bulk Meesho PDF to detect whether the delivery partner is Delhivery, Shadowfax, Valmo, Valmo Plus, or Xpressbees. It then applies the calibrated crop margins for that specific courier.
+                  If you are shipping interstate or required to attach the GST Tax Invoice to the parcel, choose <strong>Full with Tax Invoice</strong>. If you only need the shipping address and SKU table on a smaller sticker, choose <strong>Label + SKU Details</strong>.
                 </p>
               </div>
 
               <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
-                  Can I crop bulk Meesho PDFs with 500+ order pages?
+                  Can I crop multi-page batch PDFs from Meesho?
                 </h4>
                 <p className="text-black/75 leading-relaxed text-justify">
-                  Yes! LabelCropOnline is built to process large multi-page batch label files in seconds directly inside your browser.
+                  Yes. You can upload multi-page PDFs with 10, 50, 100, or more labels. The cropper processes all pages simultaneously in seconds and auto-calibrates courier crop margins page by page.
                 </p>
               </div>
 
@@ -801,7 +833,7 @@ export default function MeeshoLabelCropPage() {
                   Meesho ({getActiveModeName()})
                 </span>
                 <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
-                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
+                  {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} • Sorted by SKU
                 </span>
               </div>
 
@@ -865,6 +897,12 @@ export default function MeeshoLabelCropPage() {
                 <span className="text-black/60">Crop Option:</span>
                 <span className="font-semibold capitalize">{getActiveModeName()}</span>
               </div>
+              {cropResult.skuSummaryText && (
+                <div className="flex justify-between py-1 border-b border-slate-100">
+                  <span className="text-black/60">SKUs Sorted:</span>
+                  <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.skuSummaryText}</span>
+                </div>
+              )}
               {cropResult.partnerSummaryText && (
                 <div className="flex justify-between py-1 border-b border-slate-100">
                   <span className="text-black/60">Couriers Detected:</span>

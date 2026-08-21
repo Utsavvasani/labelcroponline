@@ -67,7 +67,7 @@ const cardPlatforms = [
     color: "#580a46",
     lightBg: "#F7EEFE",
     logoClass: "h-9 w-auto",
-    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and organise labels from your supplier panel with clean border margins and courier auto-detection for fast dispatching.",
+    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and group multi-page labels by product SKU with clean border margins and courier auto-detection for fast dispatching.",
     tag: "Meesho Label Crop",
     cta: "Crop Meesho Labels →",
   },
