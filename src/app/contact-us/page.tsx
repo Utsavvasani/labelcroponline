@@ -21,40 +21,38 @@ export default function ContactUs() {
     };
 
     return (
-        <>
-            {/* ── Hero ── */}
-            {/* <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
-                <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12">
-                    <p className="text-sm font-semibold tracking-widest uppercase text-black mb-3">
+        <div className="min-h-[85vh] bg-white text-black pt-28 sm:pt-32 pb-16 px-4 sm:px-6">
+            <div className="max-w-[1200px] mx-auto">
+
+                {/* ── Page Header ── */}
+                {/* <div className="mb-8 sm:mb-10">
+                    <p className="text-xs font-bold tracking-widest uppercase text-[#051448] mb-1.5">
                         Get in Touch
                     </p>
-                    <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black mb-4">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black tracking-tight">
                         Contact Us
                     </h1>
-                    <p className="text-black text-base max-w-xl leading-relaxed">
-                        Have a question, feedback, or need support? We'd love to hear from
-                        you. Our team usually responds within 24 hours.
+                    <p className="text-black/75 text-sm sm:text-base mt-2 max-w-xl leading-relaxed">
+                        Have a question, feedback, or need support with label cropping? We&apos;d love to hear from you. Our team usually responds within 24 hours.
                     </p>
-                </div>
-            </div> */}
+                </div> */}
 
-            {/* ── Content ── */}
-            <div className="max-w-[1200px] mx-auto px-6 py-10 ">
+                {/* ── Content Grid ── */}
                 <div className="grid lg:grid-cols-3 gap-8 items-start">
 
                     {/* ── Form — Left (2/3) ── */}
                     <main className="lg:col-span-2">
                         {submitted ? (
-                            <div className="flex flex-col items-center justify-center text-center border border-[#051448] rounded-md p-10">
+                            <div className="flex flex-col items-center justify-center text-center border border-[#051448] rounded-md p-10 bg-slate-50/50">
                                 <CheckCircle size={40} className="text-green-600 mb-3" />
                                 <h2 className="text-lg font-bold text-black mb-2">Message Sent!</h2>
                                 <p className="text-black text-sm max-w-sm leading-relaxed">
-                                    Thank you for reaching out. We'll get back to you at{" "}
+                                    Thank you for reaching out. We&apos;ll get back to you at{" "}
                                     <span className="font-semibold text-black">{formData.email}</span> within 24 hours.
                                 </p>
                                 <button
                                     onClick={() => { setSubmitted(false); setFormData({ name: "", email: "", subject: "", message: "" }); }}
-                                    className="mt-5 text-sm text-[#051448] border border-[#051448] px-5 py-2 rounded hover:bg-blue-50 transition-colors font-medium"
+                                    className="mt-5 text-sm text-[#051448] border border-[#051448] px-5 py-2 rounded hover:bg-blue-50 transition-colors font-medium cursor-pointer"
                                 >
                                     Send another message
                                 </button>
@@ -62,11 +60,11 @@ export default function ContactUs() {
                         ) : (
                             <form
                                 onSubmit={handleSubmit}
-                                className="border border-[#051448] rounded-md p-6 space-y-4"
+                                className="border border-[#051448] rounded-md p-6 sm:p-8 space-y-4 bg-white shadow-xs"
                             >
                                 <div>
                                     <h2 className="text-lg font-bold text-black mb-0.5">Send us a message</h2>
-                                    <p className="text-black text-sm">Fill out the form and we'll get back to you shortly.</p>
+                                    <p className="text-black/70 text-sm">Fill out the form and we&apos;ll get back to you shortly.</p>
                                 </div>
 
                                 {/* Name + Email */}
@@ -82,7 +80,7 @@ export default function ContactUs() {
                                             onChange={handleChange}
                                             required
                                             placeholder="Your full name"
-                                            className="w-full border border-[#051448] rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-[#051448]/30 transition-all bg-white"
+                                            className="w-full border border-[#051448]/30 rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/40 focus:outline-none focus:border-[#051448] transition-all bg-white"
                                         />
                                     </div>
                                     <div>
@@ -96,7 +94,7 @@ export default function ContactUs() {
                                             onChange={handleChange}
                                             required
                                             placeholder="you@example.com"
-                                            className="w-full border border-[#051448] rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-[#051448]/30 transition-all bg-white"
+                                            className="w-full border border-[#051448]/30 rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/40 focus:outline-none focus:border-[#051448] transition-all bg-white"
                                         />
                                     </div>
                                 </div>
@@ -112,7 +110,7 @@ export default function ContactUs() {
                                         value={formData.subject}
                                         onChange={handleChange}
                                         placeholder="What is this about?"
-                                        className="w-full border border-[#051448] rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-[#051448]/30 transition-all bg-white"
+                                        className="w-full border border-[#051448]/30 rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/40 focus:outline-none focus:border-[#051448] transition-all bg-white"
                                     />
                                 </div>
 
@@ -128,7 +126,7 @@ export default function ContactUs() {
                                         required
                                         rows={5}
                                         placeholder="Tell us how we can help you..."
-                                        className="w-full border border-[#051448] rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/50 placeholder:font-normal focus:outline-none focus:ring-1 focus:ring-[#051448]/30 transition-all resize-none bg-white"
+                                        className="w-full border border-[#051448]/30 rounded px-3 py-2 text-sm text-black font-medium placeholder:text-black/40 focus:outline-none focus:border-[#051448] transition-all resize-none bg-white"
                                     />
                                 </div>
 
@@ -136,7 +134,7 @@ export default function ContactUs() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex items-center justify-center gap-2 bg-[#051448] text-white text-sm font-bold px-6 py-2.5 rounded hover:bg-[#071a5e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                    className="flex items-center justify-center gap-2 bg-[#051448] text-white text-sm font-bold px-6 py-2.5 rounded hover:bg-[#071a5e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                                 >
                                     {loading ? (
                                         <>
@@ -156,31 +154,33 @@ export default function ContactUs() {
 
                     {/* ── Contact Info — Right (1/3) ── */}
                     <aside className="lg:col-span-1 flex flex-col gap-5 pt-1">
-                        <h2 className="text-base font-bold text-black">Contact Information</h2>
-                        <div className="space-y-4">
-                            <a href="tel:+919909520532" className="flex items-start gap-3 group">
-                                <Phone size={16} className="text-[#051448] mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Phone</p>
-                                    <p className="text-black font-semibold text-sm group-hover:opacity-70 transition-opacity">
-                                        +91 99095 20532
-                                    </p>
-                                </div>
-                            </a>
-                            <a href="mailto:labelcroponline@gmail.com" className="flex items-start gap-3 group">
-                                <Mail size={16} className="text-[#051448] mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Email</p>
-                                    <p className="text-black font-semibold text-sm group-hover:opacity-70 transition-opacity break-all">
-                                        labelcroponline@gmail.com
-                                    </p>
-                                </div>
-                            </a>
-                            <div className="flex items-start gap-3">
-                                <MapPin size={16} className="text-[#051448] mt-0.5 flex-shrink-0" />
-                                <div>
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Location</p>
-                                    <p className="text-black font-semibold text-sm">India</p>
+                        <div className="bg-slate-50 border border-[#051448]/20 rounded-md p-6">
+                            <h2 className="text-base font-bold text-black mb-4">Contact Information</h2>
+                            <div className="space-y-4">
+                                <a href="tel:+919909520532" className="flex items-start gap-3 group">
+                                    <Phone size={16} className="text-[#051448] mt-0.5 shrink-0" />
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Phone</p>
+                                        <p className="text-black font-semibold text-sm group-hover:opacity-70 transition-opacity">
+                                            +91 99095 20532
+                                        </p>
+                                    </div>
+                                </a>
+                                <a href="mailto:labelcroponline@gmail.com" className="flex items-start gap-3 group">
+                                    <Mail size={16} className="text-[#051448] mt-0.5 shrink-0" />
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Email</p>
+                                        <p className="text-black font-semibold text-sm group-hover:opacity-70 transition-opacity break-all">
+                                            labelcroponline@gmail.com
+                                        </p>
+                                    </div>
+                                </a>
+                                <div className="flex items-start gap-3">
+                                    <MapPin size={16} className="text-[#051448] mt-0.5 shrink-0" />
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-black mb-0.5">Location</p>
+                                        <p className="text-black font-semibold text-sm">India</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -188,6 +188,6 @@ export default function ContactUs() {
 
                 </div>
             </div>
-        </>
+        </div>
     );
 }
