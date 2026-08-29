@@ -1,4 +1,5 @@
 import { PDFDocument } from "pdf-lib";
+import { getFormattedDateTime } from "@/utils/file";
 
 export interface CustomCropBox {
   leftPct: number;   // 0 to 1 (distance from left edge)
@@ -75,11 +76,15 @@ export async function cropPdfCustomArea(
   const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(blob);
 
+  const dateTimeStr = getFormattedDateTime();
   const cleanBaseName = originalFileName
     .replace(/^labelcroponline_/i, "")
     .replace(/\.[^/.]+$/, "")
-    .replace(/_cropped/g, "");
-  const outputFileName = `labelcroponline_${cleanBaseName}_custom_crop.pdf`;
+    .replace(/_cropped/g, "")
+    .replace(/[^A-Za-z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const outputFileName = `labelcroponline_${cleanBaseName || "document"}_custom_crop_${dateTimeStr}.pdf`;
 
   return {
     pdfBytes,

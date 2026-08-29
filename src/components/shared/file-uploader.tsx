@@ -40,9 +40,9 @@ export function FileUploader({ onFileSelect }: FileUploaderProps) {
         </span>
       </label>
       {selectedFile && (
-        <div className="mt-4 p-3 bg-zinc-200 dark:bg-zinc-800 rounded-md w-full text-xs text-zinc-700 dark:text-zinc-300 flex justify-between items-center">
-          <span className="truncate max-w-[200px]">{selectedFile.name}</span>
-          <span>{formatBytes(selectedFile.size)}</span>
+        <div className="mt-4 p-3 bg-zinc-200 dark:bg-zinc-800 rounded-md w-full text-xs text-zinc-700 dark:text-zinc-300 flex justify-between items-center gap-2 min-w-0">
+          <span className="truncate max-w-[200px] break-all" title={selectedFile.name}>{selectedFile.name}</span>
+          <span className="shrink-0">{formatBytes(selectedFile.size)}</span>
         </div>
       )}
     </div>

@@ -84,6 +84,28 @@ export default function MeeshoThermalLabelCropPage() {
     };
   }, [cropResult]);
 
+  const handleReset = () => {
+    setFile(null);
+    if (cropResult?.blobUrl) {
+      const urlToRevoke = cropResult.blobUrl;
+      setTimeout(() => URL.revokeObjectURL(urlToRevoke), 1000);
+    }
+    setCropResult(null);
+    setCustomCropBox(null);
+    setCustomFileName("");
+    setCropMode("label_sku");
+    setErrorMsg(null);
+    setShowPreviewModal(false);
+    setShowMetaModal(false);
+    setShowCustomCropModal(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const executeDownloadAndReset = (blobUrl: string, fileName: string) => {
+    triggerDownload(blobUrl, fileName);
+    handleReset();
+  };
+
   const handleProcessPdf = async (
     inputFile?: File | Blob,
     customName?: string,
@@ -120,7 +142,7 @@ export default function MeeshoThermalLabelCropPage() {
       setCropResult(result);
 
       if (shouldDownload) {
-        triggerDownload(result.blobUrl, getFinalFileName(result.fileName));
+        executeDownloadAndReset(result.blobUrl, getFinalFileName(result.fileName));
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to process Meesho PDF. Please ensure it is a valid PDF.";
@@ -177,7 +199,7 @@ export default function MeeshoThermalLabelCropPage() {
       return;
     }
     if (cropResult) {
-      triggerDownload(cropResult.blobUrl, getFinalFileName(cropResult.fileName));
+      executeDownloadAndReset(cropResult.blobUrl, getFinalFileName(cropResult.fileName));
     } else {
       await handleProcessPdf(file, file.name, cropMode, selectedPartner, customCropBox, true);
     }
@@ -239,10 +261,13 @@ export default function MeeshoThermalLabelCropPage() {
                 <div className="w-12 h-12 mx-auto rounded-full bg-[#051448]/10 text-[#051448] flex items-center justify-center mb-3">
                   <Upload size={22} />
                 </div>
-                <h3 className="font-bold text-sm sm:text-base text-black mb-1">
+                <h3
+                  className="font-bold text-xs sm:text-base text-black mb-1 break-all line-clamp-2 max-w-full px-2 mx-auto"
+                  title={file ? file.name : undefined}
+                >
                   {file ? file.name : "Select or Drop Meesho PDF Here"}
                 </h3>
-                <p className="text-xs text-black/60 mb-3">
+                <p className="text-xs text-black/60 mb-3 truncate max-w-full">
                   {file
                     ? `${formatFileSize(file.size)} • Click or drop another PDF to replace`
                     : "Supports all Meesho single & multi-page bulk supplier invoices"}
@@ -264,13 +289,13 @@ export default function MeeshoThermalLabelCropPage() {
               {errorMsg && (
                 <div className="mt-3 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-md flex items-start gap-2">
                   <X size={15} className="shrink-0 mt-0.5" />
-                  <span>{errorMsg}</span>
+                  <span className="break-all">{errorMsg}</span>
                 </div>
               )}
             </div>
 
             {/* Right Crop Options & Partner Selection (5 Cols) */}
-            <div className="lg:col-span-5 space-y-4">
+            <div className="lg:col-span-5 space-y-4 min-w-0">
 
               {/* Partner Auto-Detect Selector */}
               <div>
@@ -330,18 +355,18 @@ export default function MeeshoThermalLabelCropPage() {
 
               {/* Custom File Name Input */}
               {file && (
-                <div className="pt-2 border-t border-[#051448]/15 flex flex-wrap items-center gap-2">
+                <div className="pt-2 border-t border-[#051448]/15 flex flex-wrap sm:flex-nowrap items-center gap-2 min-w-0">
                   <label htmlFor="filename-input" className="text-xs font-bold text-black shrink-0">
                     File Name:
                   </label>
-                  <div className="relative flex-1 max-w-md flex items-center">
+                  <div className="relative flex-1 min-w-0 max-w-md flex items-center">
                     <input
                       id="filename-input"
                       type="text"
                       value={customFileName}
                       onChange={(e) => setCustomFileName(e.target.value)}
                       placeholder={cropResult ? cropResult.fileName.replace(/\.pdf$/i, "") : "meesho_4x6_label"}
-                      className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2.5 py-1.5 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium"
+                      className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2.5 py-1.5 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium truncate"
                     />
                     <span className="absolute right-2.5 text-[11px] text-black/50 font-mono pointer-events-none select-none">
                       .pdf
@@ -351,7 +376,7 @@ export default function MeeshoThermalLabelCropPage() {
                     <button
                       type="button"
                       onClick={() => setCustomFileName("")}
-                      className="text-[11px] text-[#051448] hover:underline cursor-pointer font-semibold"
+                      className="text-[11px] text-[#051448] hover:underline cursor-pointer font-semibold shrink-0"
                     >
                       Reset
                     </button>
@@ -550,17 +575,17 @@ export default function MeeshoThermalLabelCropPage() {
       {showPreviewModal && cropResult && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
           <div className="bg-white border border-[#051448] rounded-md w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3 border-b border-[#051448] bg-slate-50">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-xs sm:text-sm text-black">Meesho 4×6 Preview</span>
-                <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold">
+            <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 px-3 sm:px-5 py-2.5 sm:py-3 border-b border-[#051448] bg-slate-50">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="font-bold text-xs sm:text-sm text-black truncate">Meesho 4×6 Preview</span>
+                <span className="text-[10px] sm:text-xs bg-blue-100 text-[#051448] border border-[#051448]/20 px-2 py-0.5 rounded font-semibold shrink-0">
                   {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
-                  onClick={() => triggerDownload(cropResult.blobUrl, getFinalFileName(cropResult.fileName))}
+                  onClick={() => executeDownloadAndReset(cropResult.blobUrl, getFinalFileName(cropResult.fileName))}
                   className="flex items-center gap-1 text-xs font-bold text-white bg-[#051448] hover:bg-[#071a5e] px-2.5 sm:px-3 py-1.5 rounded transition-colors cursor-pointer"
                 >
                   <Download size={13} />
@@ -605,14 +630,14 @@ export default function MeeshoThermalLabelCropPage() {
               </button>
             </div>
             <div className="space-y-3 text-sm text-black">
-              <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-black/60">Output File:</span>
-                <span className="font-semibold text-xs truncate max-w-[200px]">{getFinalFileName(cropResult.fileName)}</span>
+              <div className="flex justify-between items-start gap-2 py-1 border-b border-slate-100 min-w-0">
+                <span className="text-black/60 shrink-0">Output File:</span>
+                <span className="font-semibold text-xs break-all text-right max-w-[200px] sm:max-w-[260px]">{getFinalFileName(cropResult.fileName)}</span>
               </div>
               {"partnerSummaryText" in cropResult && cropResult.partnerSummaryText && (
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-black/60">Couriers Detected:</span>
-                  <span className="font-semibold text-xs text-right max-w-[220px]">{cropResult.partnerSummaryText}</span>
+                <div className="flex justify-between items-start gap-2 py-1 border-b border-slate-100 min-w-0">
+                  <span className="text-black/60 shrink-0">Couriers Detected:</span>
+                  <span className="font-semibold text-xs text-right max-w-[200px] sm:max-w-[220px] break-all">{cropResult.partnerSummaryText}</span>
                 </div>
               )}
               <div className="flex justify-between py-1 border-b border-slate-100">

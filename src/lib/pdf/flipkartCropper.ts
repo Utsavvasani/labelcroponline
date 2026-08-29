@@ -70,22 +70,20 @@ export function extractFlipkartSoldByFromText(text: string): string {
   return "";
 }
 
+import { getFormattedDateTime } from "@/utils/file";
+
 /**
  * Returns today's date formatted as DD_MM_YYYY (e.g., 21_08_2026)
  */
 export function getFormattedTodayDate(): string {
-  const d = new Date();
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}_${month}_${year}`;
+  return getFormattedDateTime();
 }
 
 /**
  * Crops Flipkart shipping labels matching the exact cut specifications:
  * CropBox / MediaBox = { x: 165, y: 460, width: 265, height: 360 } (on standard A4 595 x 842 pt).
  * Preserves exact original page sequence without sorting.
- * Generates default file name format: Flipkart_<Sold_By>_<date>_Labelcroponline.pdf
+ * Generates default file name format: Flipkart_<Sold_By>_<date_time>_Labelcroponline.pdf
  */
 export async function cropFlipkartPdf(
   input: File | Blob | ArrayBuffer | Uint8Array,
@@ -144,8 +142,8 @@ export async function cropFlipkartPdf(
   const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(blob);
 
-  // Generate default file name format: Flipkart_<Sold_By>_<date>_Labelcroponline.pdf
-  const todayDateStr = getFormattedTodayDate();
+  // Generate default file name format: Flipkart_<Sold_By>_<date_time>_Labelcroponline.pdf
+  const todayDateStr = getFormattedDateTime();
   const outputFileName = soldByName
     ? `Flipkart_${soldByName}_${todayDateStr}_Labelcroponline.pdf`
     : `Flipkart_${todayDateStr}_Labelcroponline.pdf`;

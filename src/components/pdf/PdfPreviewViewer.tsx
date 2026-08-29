@@ -11,6 +11,7 @@ import {
   X,
   Layers,
   FileCheck,
+  Maximize2,
 } from "lucide-react";
 
 interface PdfPreviewViewerProps {
@@ -33,8 +34,11 @@ interface SearchMatch {
 
 export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewViewerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const pagesWrapperRef = useRef<HTMLDivElement | null>(null);
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const canvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderTasksRef = useRef<Map<number, any>>(new Map());
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pdfDoc, setPdfDoc] = useState<any>(null);
@@ -47,6 +51,21 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [pagesText, setPagesText] = useState<PageTextData[]>([]);
   const [activeMatchIndex, setActiveMatchIndex] = useState<number>(0);
+
+  // Pinch-to-zoom state ref
+  const pinchStateRef = useRef<{
+    isPinching: boolean;
+    initialDistance: number;
+    initialScale: number;
+    midpointX: number;
+    midpointY: number;
+  }>({
+    isPinching: false,
+    initialDistance: 0,
+    initialScale: initialScale,
+    midpointX: 0,
+    midpointY: 0,
+  });
 
   // 1. Load document dynamically on client side
   useEffect(() => {
@@ -127,11 +146,11 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
     };
   }, [url, bytes]);
 
-  // 2. Render all pages vertically on canvas
+  // 2. Render all pages vertically on canvas safely cancelling in-flight renders
   const renderAllPages = useCallback(async () => {
     if (!pdfDoc) return;
 
-    const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+    const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2.5) : 1;
 
     for (let p = 1; p <= numPages; p++) {
       try {
@@ -141,6 +160,17 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
         const page = await pdfDoc.getPage(p);
         const ctx = canvas.getContext("2d");
         if (!ctx) continue;
+
+        // Cancel previous in-flight render task on this canvas if any
+        const prevTask = renderTasksRef.current.get(p);
+        if (prevTask) {
+          try {
+            prevTask.cancel();
+          } catch {
+            // Ignored
+          }
+          renderTasksRef.current.delete(p);
+        }
 
         const viewport = page.getViewport({ scale: scale * dpr });
 
@@ -155,18 +185,133 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
           canvas: canvas,
         };
 
-        await page.render(renderContext).promise;
+        const renderTask = page.render(renderContext);
+        renderTasksRef.current.set(p, renderTask);
+
+        try {
+          await renderTask.promise;
+        } catch (err: unknown) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const e = err as any;
+          if (e?.name !== "RenderingCancelledException" && !e?.message?.includes("cancelled")) {
+            console.error(`Error rendering page ${p}:`, err);
+          }
+        } finally {
+          if (renderTasksRef.current.get(p) === renderTask) {
+            renderTasksRef.current.delete(p);
+          }
+        }
       } catch (err: unknown) {
-        console.error(`Error rendering page ${p}:`, err);
+        console.error(`Error processing page ${p}:`, err);
       }
     }
   }, [pdfDoc, numPages, scale]);
 
   useEffect(() => {
     renderAllPages();
+    return () => {
+      renderTasksRef.current.forEach((task) => {
+        try {
+          task.cancel();
+        } catch {
+          // Ignored
+        }
+      });
+      renderTasksRef.current.clear();
+    };
   }, [renderAllPages]);
 
-  // 3. Compute search matches across all pages
+  // 3. Two-Finger Pinch-To-Zoom and Wheel Zoom Event Listeners
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        pinchStateRef.current = {
+          isPinching: true,
+          initialDistance: dist > 0 ? dist : 1,
+          initialScale: scale,
+          midpointX: (t1.clientX + t2.clientX) / 2,
+          midpointY: (t1.clientY + t2.clientY) / 2,
+        };
+        if (pagesWrapperRef.current) {
+          pagesWrapperRef.current.style.transition = "none";
+        }
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchStateRef.current.isPinching) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const ratio = dist / pinchStateRef.current.initialDistance;
+
+        const targetScale = Math.min(
+          Math.max(pinchStateRef.current.initialScale * ratio, 0.4),
+          3.5
+        );
+
+        if (pagesWrapperRef.current) {
+          const visualRatio = targetScale / scale;
+          pagesWrapperRef.current.style.transform = `scale(${visualRatio})`;
+          pagesWrapperRef.current.style.transformOrigin = "center top";
+        }
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (pinchStateRef.current.isPinching && e.touches.length < 2) {
+        pinchStateRef.current.isPinching = false;
+        if (pagesWrapperRef.current) {
+          const currentTransform = pagesWrapperRef.current.style.transform;
+          const match = currentTransform.match(/scale\(([^)]+)\)/);
+          const visualRatio = match ? parseFloat(match[1]) : 1;
+
+          pagesWrapperRef.current.style.transform = "none";
+          pagesWrapperRef.current.style.transition = "";
+
+          if (!isNaN(visualRatio) && visualRatio !== 1) {
+            const finalScale = Math.min(Math.max(scale * visualRatio, 0.4), 3.5);
+            setScale(Math.round(finalScale * 100) / 100);
+          }
+        }
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const zoomDelta = -e.deltaY * 0.005;
+        setScale((prev) => {
+          const next = Math.min(Math.max(prev + zoomDelta, 0.4), 3.5);
+          return Math.round(next * 100) / 100;
+        });
+      }
+    };
+
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd, { passive: false });
+    container.addEventListener("touchcancel", handleTouchEnd, { passive: false });
+    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchEnd);
+      container.removeEventListener("wheel", handleWheel);
+    };
+  }, [scale]);
+
+  // 4. Compute search matches across all pages
   const searchMatches = useMemo<SearchMatch[]>(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q || pagesText.length === 0) return [];
@@ -225,11 +370,11 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
 
   // Zoom controls
   const handleZoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.2, 2.5));
+    setScale((prev) => Math.min(Math.round((prev + 0.2) * 10) / 10, 3.5));
   };
 
   const handleZoomOut = () => {
-    setScale((prev) => Math.max(prev - 0.2, 0.6));
+    setScale((prev) => Math.max(Math.round((prev - 0.2) * 10) / 10, 0.4));
   };
 
   const handleResetZoom = () => {
@@ -245,10 +390,10 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
     <div className="flex flex-col h-full w-full bg-[#F8FAFC] select-none overflow-hidden rounded">
       
       {/* ── Top Control & Search Bar ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-white border-b border-[#051448]/20 text-xs font-semibold text-black">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-3 sm:px-4 py-2 bg-white border-b border-[#051448]/20 text-xs font-semibold text-black">
         
         {/* Search Bar for Order ID, SKU, and details */}
-        <div className="flex items-center gap-2 flex-1 max-w-md">
+        <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-md">
           <div className="relative flex-1">
             <Search
               size={14}
@@ -263,7 +408,7 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
               }}
               onKeyDown={handleSearchKeyDown}
               placeholder="Search Order ID, SKU, Tracking..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs text-black border border-[#051448]/30 rounded focus:outline-none focus:ring-1 focus:ring-[#051448] bg-white font-medium placeholder:font-normal placeholder:text-black/40"
+              className="w-full pl-8 pr-7 py-1 text-xs text-black border border-[#051448]/30 rounded focus:outline-hidden focus:ring-1 focus:ring-[#051448] bg-white font-medium placeholder:font-normal placeholder:text-black/40"
             />
             {searchQuery && (
               <button
@@ -279,11 +424,11 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
 
           {/* Search match navigation */}
           {searchQuery && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-black/70">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-black/70 shrink-0">
               <span className="whitespace-nowrap">
                 {searchMatches.length > 0
                   ? `${activeMatchIndex + 1}/${searchMatches.length}`
-                  : "0 matches"}
+                  : "0"}
               </span>
 
               <button
@@ -293,7 +438,7 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
                 className="p-1 rounded border border-[#051448]/30 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Previous match (Shift + Enter)"
               >
-                <ChevronUp size={14} />
+                <ChevronUp size={13} />
               </button>
 
               <button
@@ -303,27 +448,27 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
                 className="p-1 rounded border border-[#051448]/30 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                 title="Next match (Enter)"
               >
-                <ChevronDown size={14} />
+                <ChevronDown size={13} />
               </button>
             </div>
           )}
         </div>
 
         {/* Zoom & Page Count Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {numPages > 0 && (
             <span className="inline-flex items-center gap-1 text-black/60 font-medium text-xs">
               <Layers size={13} className="text-[#051448]" />
-              {numPages} Label{numPages > 1 ? "s" : ""}
+              {numPages} <span className="hidden sm:inline">Label{numPages > 1 ? "s" : ""}</span>
             </span>
           )}
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 bg-slate-50 border border-[#051448]/20 rounded p-0.5">
             <button
               type="button"
               onClick={handleZoomOut}
-              className="p-1 rounded border border-[#051448]/30 hover:bg-slate-100 cursor-pointer transition-colors"
-              title="Zoom Out"
+              className="p-1 rounded hover:bg-slate-200 cursor-pointer transition-colors text-[#051448]"
+              title="Zoom Out (or pinch with two fingers)"
             >
               <ZoomOut size={14} />
             </button>
@@ -331,17 +476,18 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
             <button
               type="button"
               onClick={handleResetZoom}
-              className="px-2 py-0.5 rounded border border-[#051448]/30 hover:bg-slate-100 cursor-pointer text-[11px] font-bold"
-              title="Reset Zoom"
+              className="px-1.5 py-0.5 rounded hover:bg-slate-200 cursor-pointer text-[11px] font-bold text-[#051448] flex items-center gap-0.5"
+              title="Reset Zoom / Fit"
             >
+              <Maximize2 size={11} className="opacity-70" />
               {Math.round(scale * 100)}%
             </button>
 
             <button
               type="button"
               onClick={handleZoomIn}
-              className="p-1 rounded border border-[#051448]/30 hover:bg-slate-100 cursor-pointer transition-colors"
-              title="Zoom In"
+              className="p-1 rounded hover:bg-slate-200 cursor-pointer transition-colors text-[#051448]"
+              title="Zoom In (or spread with two fingers)"
             >
               <ZoomIn size={14} />
             </button>
@@ -349,10 +495,14 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
         </div>
       </div>
 
-      {/* ── Continuous Scrollable Canvas Container ── */}
+      {/* ── Continuous Scrollable Canvas Container with Full 2D Panning & Pinch-Zoom ── */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center gap-6 min-h-[500px]"
+        className="flex-1 overflow-auto p-3 sm:p-6 min-h-[400px] w-full overscroll-contain"
+        style={{
+          touchAction: "pan-x pan-y",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         {loading && (
           <div className="flex flex-col items-center justify-center gap-2 py-20 text-black/70">
@@ -368,7 +518,10 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
         )}
 
         {!loading && !error && numPages > 0 && (
-          <>
+          <div
+            ref={pagesWrapperRef}
+            className="min-w-full inline-flex flex-col items-center gap-6 pb-6"
+          >
             {Array.from({ length: numPages }, (_, i) => i + 1).map((p) => {
               const isMatched = matchedPagesSet.has(p);
               const isActiveMatchPage =
@@ -382,7 +535,7 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
                     if (el) pageRefs.current.set(p, el);
                     else pageRefs.current.delete(p);
                   }}
-                  className={`flex flex-col items-center transition-all duration-200 ${
+                  className={`flex flex-col items-center transition-shadow duration-200 max-w-full ${
                     isActiveMatchPage
                       ? "ring-4 ring-amber-400 rounded-md p-1 bg-amber-50/50"
                       : isMatched
@@ -404,8 +557,8 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
                     )}
                   </div>
 
-                  {/* Rendered Page Canvas */}
-                  <div className="shadow-md bg-white border border-[#051448]/20 rounded overflow-hidden">
+                  {/* Rendered Page Canvas with responsive shadow card */}
+                  <div className="shadow-md bg-white border border-[#051448]/20 rounded overflow-hidden max-w-none">
                     <canvas
                       ref={(el) => {
                         if (el) canvasRefs.current.set(p, el);
@@ -417,9 +570,10 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
                 </div>
               );
             })}
-          </>
+          </div>
         )}
       </div>
     </div>
   );
 }
+

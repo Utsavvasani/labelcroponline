@@ -1,4 +1,5 @@
 import { PDFDocument } from "pdf-lib";
+import { getFormattedDateTime } from "@/utils/file";
 
 export type MeeshoPartner =
   | "auto"
@@ -352,8 +353,17 @@ export async function cropMeeshoPdf(
   const croppedBlob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(croppedBlob);
 
-  const baseName = originalFileName.replace(/^labelcroponline_/i, "").replace(/\.pdf$/i, "");
-  const outputFileName = `labelcroponline_${baseName}_${cropMode}.pdf`;
+  const dateTimeStr = getFormattedDateTime();
+  const baseName = originalFileName
+    .replace(/^labelcroponline_/i, "")
+    .replace(/\.pdf$/i, "")
+    .replace(/[^A-Za-z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  
+  const outputFileName = baseName && !["meesho_order", "meesho_invoice", "meesho", "document"].includes(baseName.toLowerCase())
+    ? `Meesho_${baseName}_${cropMode}_${dateTimeStr}_Labelcroponline.pdf`
+    : `Meesho_${cropMode}_${dateTimeStr}_Labelcroponline.pdf`;
 
   const partnerSummaryList = Object.entries(detectedPartners).map(
     ([name, count]) => `${name} (${count})`

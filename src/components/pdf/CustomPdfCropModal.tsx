@@ -195,6 +195,70 @@ export function CustomPdfCropModal({
     };
   }, [file, isOpen, renderCurrentPage]);
 
+  // Pinch-to-zoom and wheel zoom on container
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !isOpen) return;
+
+    let initialDist = 0;
+    let initialZoom = 1;
+    let isPinching = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        initialDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        initialZoom = zoomScale;
+        isPinching = true;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && isPinching && initialDist > 0) {
+        e.preventDefault();
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const currentDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+        const ratio = currentDist / initialDist;
+        const newZoom = Math.min(Math.max(initialZoom * ratio, 0.5), 3.0);
+        setZoomScale(Math.round(newZoom * 100) / 100);
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isPinching && e.touches.length < 2) {
+        isPinching = false;
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = -e.deltaY * 0.005;
+        setZoomScale((prev) => {
+          const next = Math.min(Math.max(prev + delta, 0.5), 3.0);
+          return Math.round(next * 100) / 100;
+        });
+      }
+    };
+
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd, { passive: false });
+    container.addEventListener("touchcancel", handleTouchEnd, { passive: false });
+    container.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchEnd);
+      container.removeEventListener("wheel", handleWheel);
+    };
+  }, [isOpen, zoomScale]);
+
   // Re-render when page or zoom changes
   useEffect(() => {
     if (pdfDocRef.current && isOpen && !isLoading) {

@@ -1,4 +1,5 @@
 import { PDFDocument } from "pdf-lib";
+import { getFormattedDateTime } from "@/utils/file";
 
 export interface MergeItem {
   id: string;
@@ -64,8 +65,14 @@ export async function mergePdfFiles(
   const blob = new Blob([pdfBytes as unknown as BlobPart], { type: "application/pdf" });
   const blobUrl = URL.createObjectURL(blob);
 
-  const baseName = customOutputName || "merged_document";
-  const outputFileName = `labelcroponline_${baseName}.pdf`;
+  const dateTimeStr = getFormattedDateTime();
+  const baseName = (customOutputName || "merged_document")
+    .replace(/^labelcroponline_/i, "")
+    .replace(/\.pdf$/i, "")
+    .replace(/[^A-Za-z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const outputFileName = `labelcroponline_${baseName || "merged_document"}_${dateTimeStr}.pdf`;
 
   return {
     blobUrl,
