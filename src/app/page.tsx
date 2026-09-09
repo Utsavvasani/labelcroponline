@@ -93,6 +93,72 @@ const cardPlatforms = [
     tag: "PDF Merge Tool",
     cta: "Merge PDF Files →",
   },
+  {
+    name: "Sort Labels",
+    logo: "/merge_icon.svg",
+    href: "/sort-labels",
+    color: "#051448",
+    lightBg: "#eef2ff",
+    logoClass: "h-14 w-auto",
+    desc: "Sort multi-page label PDFs by courier, SKU, order number, pincode, or quantity with checkbox-based multi-level priority sorting and instant live table preview.",
+    tag: "Sort Labels Tool",
+    cta: "Sort PDF Labels →",
+  },
+  {
+    name: "Split PDF",
+    logo: "/merge_icon.svg",
+    href: "/split-pdf",
+    color: "#166534",
+    lightBg: "#f0fff4",
+    logoClass: "h-14 w-auto",
+    desc: "Split any PDF into individual pages, custom page ranges, or groups of N pages. Download all output files at once in a single ZIP — runs entirely in your browser.",
+    tag: "Split PDF Tool",
+    cta: "Split PDF Pages →",
+  },
+  {
+    name: "Compress PDF",
+    logo: "/merge_icon.svg",
+    href: "/compress-pdf",
+    color: "#065f46",
+    lightBg: "#ecfdf5",
+    logoClass: "h-14 w-auto",
+    desc: "Reduce PDF file size by stripping metadata, flattening forms, and rebuilding structure with lossless quality preservation and transparent reduction stats.",
+    tag: "Compress PDF Tool",
+    cta: "Compress PDF →",
+  },
+  {
+    name: "PDF to Images",
+    logo: "/merge_icon.svg",
+    href: "/pdf-to-images",
+    color: "#9d174d",
+    lightBg: "#fdf2f8",
+    logoClass: "h-14 w-auto",
+    desc: "Render every PDF page as a high-quality PNG or JPEG image. Choose 72, 150, or 300 DPI resolution, select specific pages, and download everything in one ZIP file.",
+    tag: "PDF to Images Tool",
+    cta: "Convert to Images →",
+  },
+  {
+    name: "Rotate PDF",
+    logo: "/merge_icon.svg",
+    href: "/rotate-pdf",
+    color: "#1e40af",
+    lightBg: "#eff6ff",
+    logoClass: "h-14 w-auto",
+    desc: "Rotate all pages or specific pages in any PDF by 90°, 180°, or 270°. Visual page picker lets you select individual pages. Preview the result before downloading.",
+    tag: "Rotate PDF Tool",
+    cta: "Rotate PDF Pages →",
+  },
+  {
+    name: "Custom Crop Studio",
+    logo: "/merge_icon.svg",
+    href: "/editor",
+    color: "#4338ca",
+    lightBg: "#eef2ff",
+    logoClass: "h-14 w-auto",
+    desc: "Interactive visual crop selector with 8 drag handles to define custom dimensions, cut custom boxes, and preview labels on real canvas.",
+    tag: "Custom Editor Tool",
+    cta: "Open Custom Studio →",
+  },
 ];
 
 export default function Home() {
@@ -198,14 +264,14 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {cardPlatforms.map((p) => (
               <Link
                 key={p.name}
                 href={p.href}
                 className="group block border border-[#051448] rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
               >
-                {/* Logo area — fixed h-32 so all 3 cards are identical */}
+                {/* Logo area — fixed h-32 so all cards are identical */}
                 <div
                   className="flex items-center justify-center h-32"
                   style={{ backgroundColor: p.lightBg }}
