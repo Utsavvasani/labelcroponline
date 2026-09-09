@@ -586,7 +586,7 @@ export default function MeeshoLabelCropPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {/* Feature 1 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   1
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Courier-Wise Calibration</h4>
@@ -597,7 +597,7 @@ export default function MeeshoLabelCropPage() {
 
               {/* Feature 2 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   2
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Full Invoice &amp; Label+SKU Modes</h4>
@@ -608,7 +608,7 @@ export default function MeeshoLabelCropPage() {
 
               {/* Feature 3 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   3
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">100% Barcode Quality</h4>
@@ -619,7 +619,7 @@ export default function MeeshoLabelCropPage() {
 
               {/* Feature 4 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   4
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Custom Area Crop Studio</h4>
@@ -630,7 +630,7 @@ export default function MeeshoLabelCropPage() {
 
               {/* Feature 5 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   5
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Eliminate Scissor Cutting</h4>
@@ -641,7 +641,7 @@ export default function MeeshoLabelCropPage() {
 
               {/* Feature 6 */}
               <div className="p-4 sm:p-5 bg-white border border-[#051448]/20 rounded-md shadow-xs">
-                <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
+                <div className="w-8 h-8 rounded-md border border-[#051448] bg-white text-[#051448] flex items-center justify-center font-bold text-sm mb-3 shadow-2xs">
                   6
                 </div>
                 <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">100% Private &amp; Secure</h4>
