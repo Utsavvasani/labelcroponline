@@ -322,20 +322,13 @@ export function Navbar() {
             {/* ── Desktop PDF Tools Dropdown Menu Container (Two Parts / 2 Columns) ── */}
             {pdfDropdownOpen && (
               <div
-                className="hidden md:block absolute top-full right-0 mt-1 w-[620px] lg:w-[680px] max-h-[calc(100vh-140px)] overflow-y-auto bg-white border border-[#051448]/20 rounded-xl shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                className="hidden md:block absolute top-full right-0 mt-1.5 w-[620px] lg:w-[680px] max-h-[calc(100vh-140px)] overflow-y-auto bg-white border border-[#051448]/20 rounded-2xl shadow-xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                 onMouseEnter={() => {
                   if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
                 }}
                 onMouseLeave={handleMouseLeave}
               >
-                <div className="flex items-center justify-between px-3 py-1.5 mb-2.5 border-b border-slate-100">
-                  <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#051448]">
-                    <Sparkles size={14} className="text-[#051448]" />
-                    <span>All PDF Utilities &amp; Processing Tools</span>
-                  </div>
-                  <span className="text-xs text-black/50 font-medium">100% Free &amp; Fast</span>
-                </div>
-
+                
                 <div className="grid grid-cols-2 gap-2">
                   {pdfToolItems.map((item) => {
                     const Icon = item.icon;
@@ -344,23 +337,28 @@ export function Navbar() {
                         key={item.id}
                         href={item.href || "#"}
                         onClick={() => setPdfDropdownOpen(false)}
-                        className="group flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-100 hover:border-[#051448]/30 hover:bg-blue-50/40 bg-white transition-all cursor-pointer"
+                        className="group flex items-start gap-3 p-3 rounded-xl border border-slate-200/70 hover:border-[#051448] bg-white hover:bg-slate-50/80 hover:shadow-xs transition-all duration-150 cursor-pointer"
                       >
-                        <div className="w-8 h-8 rounded-md bg-[#051448]/10 text-[#051448] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#051448] group-hover:text-white transition-colors">
-                          <Icon size={17} />
+                        <div className="w-9 h-9 rounded-lg bg-slate-100 text-[#051448] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#051448] group-hover:text-white transition-all duration-150 shadow-2xs">
+                          <Icon size={18} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center justify-between gap-1.5">
                             <span className="text-sm font-bold text-black group-hover:text-[#051448] transition-colors leading-tight truncate">
                               {item.name}
                             </span>
-                            {item.badge && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-tight bg-green-100 text-green-800 border border-green-200 shrink-0">
-                                {item.badge}
+                            <div className="flex items-center gap-1 shrink-0">
+                              {item.badge && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-tight bg-green-100 text-green-800 border border-green-200">
+                                  {item.badge}
+                                </span>
+                              )}
+                              <span className="text-[#051448] text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                →
                               </span>
-                            )}
+                            </div>
                           </div>
-                          <p className="text-xs text-black/70 leading-snug mt-1 line-clamp-2">
+                          <p className="text-xs text-black/60 group-hover:text-black/80 transition-colors leading-snug mt-1 line-clamp-2">
                             {item.desc}
                           </p>
                         </div>
