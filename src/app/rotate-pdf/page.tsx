@@ -481,7 +481,7 @@ export default function RotatePdfPage() {
 
               {/* Action Buttons & Status Row */}
               {file && (
-                <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"

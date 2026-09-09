@@ -276,7 +276,7 @@ export default function MeeshoLabelCropPage() {
 
         {/* ── Main Single Card Form matching Contact Us Style ── */}
         <div className="border border-[#051448] rounded-md p-4 sm:p-7 bg-white shadow-sm">
-          <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-center">
+          <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-start">
 
             {/* ── Left Column: Compact on Mobile, Detailed on Desktop ── */}
             <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-4 md:pb-0 md:pr-6">
@@ -296,9 +296,35 @@ export default function MeeshoLabelCropPage() {
                 </h1>
               </div>
 
-              <p className="text-black text-sm sm:text-base leading-relaxed mb-1">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Crop Meesho shipping labels with clean border margins, courier auto-detection, or select your own custom area.
               </p>
+
+              {file && (
+                <div className="w-full bg-slate-50 border border-[#051448]/20 rounded-md p-3 mb-3 text-xs text-black/80 space-y-1 hidden sm:block">
+                  <div className="flex justify-between">
+                    <span>File:</span>
+                    <strong className="truncate max-w-[130px]">{file.name}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Labels:</span>
+                    <strong>{cropResult?.pageCount ? `${cropResult.pageCount} Pages` : "Loaded"}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Mode:</span>
+                    <strong className="text-[#051448]">{getActiveModeName()}</strong>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-3.5 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
+              >
+                <UploadCloud size={14} />
+                {file ? "Change PDF" : "Choose PDF"}
+              </button>
             </div>
 
             {/* ── Right Column: Mode Selector, Upload & Actions ── */}
@@ -450,7 +476,7 @@ export default function MeeshoLabelCropPage() {
               )}
 
               {/* Action Buttons & Status Row */}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
 
                 {/* Left side actions: Crop / Download button */}
                 <div className="flex flex-wrap items-center gap-2">

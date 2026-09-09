@@ -320,15 +320,10 @@ export default function MergePdfPage() {
 
               {/* Logo & Title */}
               <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-2 md:mb-3">
-                <Image
-                  src="/merge_icon.svg"
-                  alt="Merge PDF"
-                  width={250}
-                  height={60}
-                  className="h-20 sm:h-24 w-auto object-contain"
-                  priority
-                />
-                <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 border border-[#051448]/20 flex items-center justify-center text-[#051448] shadow-xs">
+                  <Layers size={34} />
+                </div>
+                <h1 className="text-base sm:text-lg font-bold text-black md:mt-3">
                   Merge PDF Files
                 </h1>
               </div>
@@ -370,16 +365,16 @@ export default function MergePdfPage() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`border border-[#051448] rounded-md p-6 sm:p-10 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : ""
+                  className={`border-2 border-dashed rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : "border-[#051448]"
                     }`}
                 >
-                  <div className="w-11 h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2.5">
-                    <UploadCloud size={24} />
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
+                    <UploadCloud size={20} />
                   </div>
-                  <p className="text-sm font-bold text-black mb-1">
+                  <p className="text-xs sm:text-sm font-bold text-black mb-0.5">
                     Click to select or drop multiple PDF files
                   </p>
-                  <p className="text-xs text-black/60">
+                  <p className="text-[10px] sm:text-xs text-black/60 truncate">
                     Upload 2 or more PDF documents to merge into one
                   </p>
                 </div>
