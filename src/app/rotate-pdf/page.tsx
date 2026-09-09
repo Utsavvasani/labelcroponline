@@ -320,7 +320,7 @@ export default function RotatePdfPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Upload your PDF to see a live real-time interactive preview. Rotate all pages together or click individual page cards to rotate specific pages.
               </p>
 

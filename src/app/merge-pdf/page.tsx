@@ -333,7 +333,7 @@ export default function MergePdfPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Combine multiple shipping labels, packing slips, or document PDFs into one single file. Rearrange order easily by dragging or changing the position number.
               </p>
 

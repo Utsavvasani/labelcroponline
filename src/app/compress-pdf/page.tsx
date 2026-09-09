@@ -224,7 +224,7 @@ export default function CompressPdfPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Reduce document file size with lossless structure &amp; metadata cleanup. No image quality loss — runs safely in your browser.
               </p>
 

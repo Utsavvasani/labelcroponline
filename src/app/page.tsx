@@ -315,16 +315,16 @@ export default function Home() {
 
           {/* Guide Header Banner */}
           <div className="bg-white border border-[#051448]/20 rounded-md p-6 sm:p-8 shadow-xs">
-            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs font-bold px-3 py-1 rounded-full mb-3">
+            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
               <span>Ultimate Shipping Label Cropper &amp; Printing Guide</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#051448] mb-4">
               Complete Guide to Online Shipping Label Cropping &amp; Thermal Printing for eCommerce
             </h2>
-            <p className="text-xs sm:text-sm text-black/80 leading-relaxed mb-4 text-justify">
+            <p className="text-sm sm:text-base text-black/80 leading-relaxed mb-4 text-justify">
               In the fast-paced world of Indian eCommerce, operational speed and cost efficiency are critical. When fulfilling customer orders on major marketplaces like <strong>Meesho Supplier Panel</strong> and <strong>Flipkart Seller Hub</strong>, sellers receive shipping labels generated as standard A4 PDFs. However, standard A4 invoices are not designed for modern 4×6 inch (100×150 mm) direct thermal roll printers.
             </p>
-            <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
+            <p className="text-sm sm:text-base text-black/80 leading-relaxed text-justify">
               <strong>LabelCropOnline</strong> bridges this gap by providing an intelligent, vector-lossless PDF cropping platform. Our technology strips away unnecessary page borders, formats labels precisely for 4×6 thermal rolls, and preserves 100% vector barcode clarity so warehouse teams can pack and dispatch orders faster than ever.
             </p>
           </div>
@@ -335,7 +335,7 @@ export default function Home() {
               <h2 className="text-xl sm:text-2xl font-bold text-[#051448]">
                 Why Online Sellers Rely on LabelCropOnline
               </h2>
-              <p className="text-xs text-black/70 mt-1 text-justify sm:text-left">
+              <p className="text-sm sm:text-base text-black/70 mt-1 text-justify sm:text-left">
                 Purpose-built to streamline warehouse order dispatching and eliminate paper wastage.
               </p>
             </div>
@@ -345,8 +345,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   1
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Saves up to 70% Paper Costs</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Saves up to 70% Paper Costs</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Converts standard full-page A4 PDFs into standard 4×6 inch (100×150 mm) labels, fitting perfectly on direct thermal rolls without expensive white waste margins.
                 </p>
               </div>
@@ -355,8 +355,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   2
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Zero Barcode Scanning Failures</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Zero Barcode Scanning Failures</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Unlike basic screenshot tools, LabelCropOnline retains 100% pure vector PDF geometry. Barcodes scan instantly with 100% first-pass accuracy at courier hubs.
                 </p>
               </div>
@@ -365,8 +365,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   3
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Universal Courier Calibration</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Universal Courier Calibration</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Intelligently detects logistics partners including Delhivery, Shadowfax, Valmo, Valmo Plus, and Xpressbees, applying precise crop margins for every label in multi-page PDFs.
                 </p>
               </div>
@@ -375,8 +375,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   4
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Eliminate Manual Cutting</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Eliminate Manual Cutting</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Say goodbye to scissors and knives. Print directly on self-adhesive thermal stickers and apply straight to your packages.
                 </p>
               </div>
@@ -385,8 +385,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   5
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Interactive Crop Studio</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Interactive Crop Studio</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Need specific adjustments? Use our visual canvas with 8-directional drag handles to define custom crop boundaries that apply instantly across all pages.
                 </p>
               </div>
@@ -395,8 +395,8 @@ export default function Home() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   6
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">100% Privacy Guaranteed</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">100% Privacy Guaranteed</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   All PDF parsing and cropping operations execute directly in your browser. No files are ever uploaded or stored on our servers.
                 </p>
               </div>
@@ -408,7 +408,7 @@ export default function Home() {
             <h3 className="text-lg sm:text-xl font-bold text-[#051448] mb-4">
               How to Crop &amp; Print Labels in 4 Simple Steps
             </h3>
-            <ol className="space-y-4 text-xs sm:text-sm text-black/80">
+            <ol className="space-y-4 text-sm sm:text-base text-black/80">
               <li className="flex gap-3">
                 <span className="font-bold text-[#051448] shrink-0">1.</span>
                 <p className="text-justify">
@@ -441,7 +441,7 @@ export default function Home() {
             <h3 className="text-lg sm:text-xl font-bold text-[#051448] mb-4">
               Frequently Asked Questions
             </h3>
-            <div className="space-y-4 text-xs sm:text-sm">
+            <div className="space-y-4 text-sm sm:text-base">
               <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
                   Is LabelCropOnline free to use?

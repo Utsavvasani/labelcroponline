@@ -176,10 +176,10 @@ export default function TermsAndConditions() {
                     <main className="flex-1 min-w-0">
                         {/* Intro box */}
                         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 mb-10">
-                            <p className="text-sm font-semibold text-amber-700 mb-1">
+                            <p className="text-sm sm:text-base font-semibold text-amber-700 mb-1">
                                 ⚠ Important Notice
                             </p>
-                            <p className="text-sm text-black leading-relaxed">
+                            <p className="text-sm sm:text-base text-black leading-relaxed">
                                 By accessing, registering for, purchasing, uploading files to,
                                 or otherwise using the Service, you confirm that you have read
                                 and agree to these Terms. If you do not agree, you must not use
@@ -201,7 +201,7 @@ export default function TermsAndConditions() {
                                             <h2 className="text-lg font-semibold text-black mb-3">
                                                 {section.title}
                                             </h2>
-                                            <p className="text-black text-sm leading-relaxed  text-justify">
+                                            <p className="text-black text-sm sm:text-base leading-relaxed text-justify">
                                                 {section.content}
                                             </p>
                                         </div>

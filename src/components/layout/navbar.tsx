@@ -243,7 +243,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <ul className="text-black hidden md:flex items-center space-x-3 lg:space-x-6 text-xs lg:text-sm font-semibold whitespace-nowrap h-full">
+            <ul className="text-black hidden md:flex items-center space-x-3 lg:space-x-7 text-sm md:text-base lg:text-lg font-medium whitespace-nowrap h-full">
               <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
                 <Link
                   href="/"
@@ -292,14 +292,14 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setPdfDropdownOpen((prev) => !prev)}
-                  className={`flex items-center gap-1 transition-colors cursor-pointer h-full ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer h-full ${
                     pdfDropdownOpen || isPdfRoute ? "text-[#051448] font-bold" : "hover:text-[#051448]"
                   }`}
                   aria-expanded={pdfDropdownOpen}
                 >
                   <span>PDF Tools</span>
                   <ChevronDown
-                    size={14}
+                    size={17}
                     className={`transition-transform duration-200 ${
                       pdfDropdownOpen ? "rotate-180 text-[#051448]" : "text-black/60"
                     }`}
@@ -319,24 +319,24 @@ export function Navbar() {
               </li>
             </ul>
 
-            {/* ── Desktop PDF Tools Dropdown Menu Container ── */}
+            {/* ── Desktop PDF Tools Dropdown Menu Container (Two Parts / 2 Columns) ── */}
             {pdfDropdownOpen && (
               <div
-                className="hidden md:block absolute top-full right-0 mt-1 w-[500px] lg:w-[540px] max-h-[calc(100vh-140px)] overflow-y-auto bg-white border border-[#051448]/20 rounded-xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150"
+                className="hidden md:block absolute top-full right-0 mt-1 w-[620px] lg:w-[680px] max-h-[calc(100vh-140px)] overflow-y-auto bg-white border border-[#051448]/20 rounded-xl shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                 onMouseEnter={() => {
                   if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
                 }}
                 onMouseLeave={handleMouseLeave}
               >
-                <div className="flex items-center justify-between px-3 py-1.5 mb-2 border-b border-slate-100">
-                  <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#051448]">
-                    <Sparkles size={13} className="text-[#051448]" />
+                <div className="flex items-center justify-between px-3 py-1.5 mb-2.5 border-b border-slate-100">
+                  <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#051448]">
+                    <Sparkles size={14} className="text-[#051448]" />
                     <span>All PDF Utilities &amp; Processing Tools</span>
                   </div>
-                  <span className="text-[11px] text-black/50 font-normal">100% Free &amp; Fast</span>
+                  <span className="text-xs text-black/50 font-medium">100% Free &amp; Fast</span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   {pdfToolItems.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -344,23 +344,23 @@ export function Navbar() {
                         key={item.id}
                         href={item.href || "#"}
                         onClick={() => setPdfDropdownOpen(false)}
-                        className="group flex items-start gap-3 p-2.5 rounded-lg border border-transparent hover:border-[#051448]/20 hover:bg-slate-50 transition-all cursor-pointer"
+                        className="group flex items-start gap-2.5 p-2.5 rounded-lg border border-slate-100 hover:border-[#051448]/30 hover:bg-blue-50/40 bg-white transition-all cursor-pointer"
                       >
                         <div className="w-8 h-8 rounded-md bg-[#051448]/10 text-[#051448] flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#051448] group-hover:text-white transition-colors">
-                          <Icon size={16} />
+                          <Icon size={17} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-black group-hover:text-[#051448] transition-colors leading-tight">
+                            <span className="text-sm font-bold text-black group-hover:text-[#051448] transition-colors leading-tight truncate">
                               {item.name}
                             </span>
                             {item.badge && (
-                              <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-tight bg-green-100 text-green-800 border border-green-200">
+                              <span className="text-[10px] px-1.5 py-0.2 rounded font-bold uppercase tracking-tight bg-green-100 text-green-800 border border-green-200 shrink-0">
                                 {item.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-[11px] text-black/65 leading-snug mt-0.5">
+                          <p className="text-xs text-black/70 leading-snug mt-1 line-clamp-2">
                             {item.desc}
                           </p>
                         </div>
@@ -408,7 +408,7 @@ export function Navbar() {
                 </button>
               </div>
 
-              <ul className="text-black mt-4 space-y-3 text-base font-semibold">
+              <ul className="text-black mt-4 space-y-4 text-lg font-bold">
                 <li className="hover:text-[#051448] cursor-pointer">
                   <Link href="/" onClick={() => setSheetOpen(false)}>
                     Home
@@ -442,11 +442,11 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={() => setMobilePdfOpen((prev) => !prev)}
-                    className="w-full flex items-center justify-between text-left font-bold text-black hover:text-[#051448] cursor-pointer py-1"
+                    className="w-full flex items-center justify-between text-left font-bold text-black hover:text-[#051448] cursor-pointer py-1 text-lg"
                   >
                     <span>PDF Tools</span>
                     <ChevronDown
-                      size={18}
+                      size={20}
                       className={`transition-transform duration-200 ${
                         mobilePdfOpen ? "rotate-180 text-[#051448]" : "text-black/60"
                       }`}
@@ -454,7 +454,7 @@ export function Navbar() {
                   </button>
 
                   {mobilePdfOpen && (
-                    <div className="mt-1.5 ml-2 pl-3 border-l-2 border-[#051448]/20 space-y-2">
+                    <div className="mt-2 ml-2 pl-3 border-l-2 border-[#051448]/20 space-y-2.5">
                       {pdfToolItems.map((item) => {
                         const Icon = item.icon;
                         return (
@@ -462,9 +462,9 @@ export function Navbar() {
                             key={item.id}
                             href={item.href || "#"}
                             onClick={() => setSheetOpen(false)}
-                            className="flex items-center gap-2 py-0.5 text-xs text-black hover:text-[#051448]"
+                            className="flex items-center gap-2.5 py-1 text-sm font-semibold text-black hover:text-[#051448]"
                           >
-                            <Icon size={14} className="shrink-0 text-[#051448]" />
+                            <Icon size={16} className="shrink-0 text-[#051448]" />
                             <span>{item.name}</span>
                           </Link>
                         );

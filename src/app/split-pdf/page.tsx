@@ -248,7 +248,7 @@ export default function SplitPdfPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Extract single pages, custom ranges, or divide multi-page documents into equal parts. Download all resulting files cleanly as a ZIP package.
               </p>
 

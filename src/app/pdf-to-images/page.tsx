@@ -207,7 +207,7 @@ export default function PdfToImagesPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Render every PDF page into sharp PNG or JPEG files. Choose resolution up to 300 DPI and download all images in one ZIP archive.
               </p>
 

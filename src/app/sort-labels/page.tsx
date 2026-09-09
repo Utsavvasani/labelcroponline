@@ -306,7 +306,7 @@ export default function SortLabelsPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-4 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
                 Organize multi-page shipping labels by courier partner, SKU product code, order ID, or destination pincode. Check multiple criteria for multi-level priority sorting.
               </p>
 

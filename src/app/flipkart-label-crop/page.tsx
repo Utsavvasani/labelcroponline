@@ -286,7 +286,7 @@ export default function FlipkartLabelCropPage() {
                 </h1>
               </div>
 
-              <p className="text-black/75 text-xs leading-relaxed mb-1 hidden sm:block">
+              <p className="text-black text-sm sm:text-base leading-relaxed mb-1">
                 Crop Flipkart shipping labels automatically or select your own custom crop area interactively.
               </p>
             </div>
@@ -541,16 +541,16 @@ export default function FlipkartLabelCropPage() {
 
           {/* Section 1: Overview & Value Proposition */}
           <div className="bg-white border border-[#051448]/20 rounded-md p-5 sm:p-8 shadow-xs">
-            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs font-bold px-3 py-1 rounded-full mb-3">
+            <div className="inline-flex items-center gap-2 bg-[#051448]/10 text-[#051448] text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
               <span>Free Flipkart Shipping Label Cropping Tool</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-[#051448] mb-3">
               How to Crop Flipkart Shipping Labels for 4×6 Thermal Printing Online
             </h2>
-            <p className="text-xs sm:text-sm text-black/80 leading-relaxed mb-4 text-justify">
+            <p className="text-sm sm:text-base text-black/80 leading-relaxed mb-4 text-justify">
               When selling on <strong>Flipkart Seller Hub</strong>, order labels and invoices are generated as full A4 PDFs. While full A4 pages work for standard laser printers, eCommerce sellers using <strong>4×6 thermal barcode printers</strong> face wasted paper margins, tiny unreadable barcodes, or tedious manual scissor cutting.
             </p>
-            <p className="text-xs sm:text-sm text-black/80 leading-relaxed text-justify">
+            <p className="text-sm sm:text-base text-black/80 leading-relaxed text-justify">
               <strong>LabelCropOnline</strong> automatically crops your Flipkart order PDFs into standard <strong>4×6 inch (100×150 mm) thermal labels</strong> for rapid warehouse picking and packaging. With 100% vector barcode fidelity, your Ekart, Shadowfax, and Delhivery barcodes will scan with lightning speed at courier pickup hubs.
             </p>
           </div>
@@ -561,7 +561,7 @@ export default function FlipkartLabelCropPage() {
               <h3 className="text-lg sm:text-xl font-bold text-[#051448]">
                 Key Benefits of Using LabelCropOnline for Flipkart Sellers
               </h3>
-              <p className="text-xs text-black/70 mt-1 text-justify sm:text-left">
+              <p className="text-sm sm:text-base text-black/70 mt-1 text-justify sm:text-left">
                 Optimized for fast order processing, high barcode accuracy, and zero paper wastage.
               </p>
             </div>
@@ -572,8 +572,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   1
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">4×6&quot; Thermal Roll Ready</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">4×6&quot; Thermal Roll Ready</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Converts standard A4 invoices into standard 4×6 inch (100×150 mm) thermal labels compatible with TVS, TSC, Zebra, Rollo, and Xprinter.
                 </p>
               </div>
@@ -583,8 +583,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   2
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">100% Vector Barcode Clarity</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">100% Vector Barcode Clarity</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Unlike screenshot or image-based tools, vector-level PDF cropping preserves crisp barcode lines and text for 100% first-pass scan rates.
                 </p>
               </div>
@@ -594,8 +594,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   3
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Fast Batch Processing</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Fast Batch Processing</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Crop bulk Flipkart multi-page PDFs with 10, 50, or 200+ labels simultaneously in just a couple of seconds.
                 </p>
               </div>
@@ -605,8 +605,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   4
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Custom Area Crop Studio</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Custom Area Crop Studio</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Want to adjust margins or crop a specific sub-area? Use our visual 8-handle box selector to crop any custom dimensions freely.
                 </p>
               </div>
@@ -616,8 +616,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   5
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Eliminate Scissor Cutting</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Eliminate Scissor Cutting</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Stop manually cutting A4 printouts. Print directly on peel-and-stick thermal labels and apply straight to your dispatch boxes.
                 </p>
               </div>
@@ -627,8 +627,8 @@ export default function FlipkartLabelCropPage() {
                 <div className="w-8 h-8 rounded bg-[#051448] text-white flex items-center justify-center font-bold text-sm mb-3">
                   6
                 </div>
-                <h4 className="font-bold text-sm text-black mb-1.5">Private &amp; Secure In-Browser Processing</h4>
-                <p className="text-xs text-black/75 leading-relaxed text-justify">
+                <h4 className="font-bold text-sm sm:text-base text-black mb-1.5">Private &amp; Secure In-Browser Processing</h4>
+                <p className="text-xs sm:text-sm text-black/75 leading-relaxed text-justify">
                   Your PDF stays strictly on your computer. All rendering and cropping happen in your browser without cloud storage.
                 </p>
               </div>
@@ -640,7 +640,7 @@ export default function FlipkartLabelCropPage() {
             <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
               Step-by-Step: How to Crop &amp; Print Flipkart Labels on Thermal Printers
             </h3>
-            <ol className="space-y-3.5 text-xs sm:text-sm text-black/80">
+            <ol className="space-y-3.5 text-sm sm:text-base text-black/80">
               <li className="flex gap-3">
                 <span className="font-bold text-[#051448] shrink-0">Step 1:</span>
                 <span className="text-justify">
@@ -679,10 +679,10 @@ export default function FlipkartLabelCropPage() {
             <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
               Recommended Thermal Printer Settings for Flipkart Labels
             </h3>
-            <div className="grid sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+            <div className="grid sm:grid-cols-2 gap-4 text-sm sm:text-base">
               <div className="p-4 bg-slate-50 border border-slate-200 rounded">
                 <h4 className="font-bold text-black mb-1">Print Dialog Settings</h4>
-                <ul className="space-y-1.5 text-black/75 list-disc list-inside">
+                <ul className="space-y-1.5 text-black/75 list-disc list-inside text-xs sm:text-sm">
                   <li><strong>Destination:</strong> Select your Thermal Printer (e.g. TSC DA210, Zebra ZD220, TVS LP 46 Neo)</li>
                   <li><strong>Paper Size:</strong> 4×6 inches / 100×150 mm / User Defined (4×6)</li>
                   <li><strong>Scale:</strong> Fit to Printable Area or 100%</li>
@@ -691,7 +691,7 @@ export default function FlipkartLabelCropPage() {
               </div>
               <div className="p-4 bg-slate-50 border border-slate-200 rounded">
                 <h4 className="font-bold text-black mb-1">Printer Driver Calibration</h4>
-                <ul className="space-y-1.5 text-black/75 list-disc list-inside">
+                <ul className="space-y-1.5 text-black/75 list-disc list-inside text-xs sm:text-sm">
                   <li><strong>Print Speed:</strong> 4 to 5 inches/second (ips) for sharp barcodes</li>
                   <li><strong>Darkness / Density:</strong> Level 10-14 for high-contrast scan readability</li>
                   <li><strong>Media Type:</strong> Direct Thermal / Label with Gaps</li>
@@ -706,7 +706,7 @@ export default function FlipkartLabelCropPage() {
             <h3 className="text-base sm:text-lg font-bold text-[#051448] mb-4">
               Frequently Asked Questions (FAQs)
             </h3>
-            <div className="space-y-4 text-xs sm:text-sm">
+            <div className="space-y-4 text-sm sm:text-base">
               <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
                   Does this tool support Flipkart Smart and Flipkart Assured labels?
