@@ -27,7 +27,7 @@ export function Footer() {
             <h4 className="font-semibold text-base tracking-wide">Quick Links</h4>
             <ul className="space-y-2 text-sm text-white/70">
               <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
-              <li><Link href="/editor" className="hover:text-white transition-colors">Editor / Tool</Link></li>
+              <li><Link href="/custom-crop" className="hover:text-white transition-colors">Custom Crop Studio</Link></li>
               <li><Link href="/about-us" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/contact-us" className="hover:text-white transition-colors">Contact Us</Link></li>
             </ul>

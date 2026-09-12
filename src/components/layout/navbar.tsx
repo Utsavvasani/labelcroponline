@@ -95,7 +95,7 @@ export function Navbar() {
       id: "custom-crop",
       name: "Custom Crop Studio",
       desc: "Interactive visual crop selector for custom PDF dimensions & boxes",
-      href: "/editor",
+      href: "/custom-crop",
       icon: Sliders,
       isAvailable: true,
     },
@@ -146,6 +146,7 @@ export function Navbar() {
     pathname === "/compress-pdf" ||
     pathname === "/pdf-to-images" ||
     pathname === "/rotate-pdf" ||
+    pathname === "/custom-crop" ||
     pathname === "/editor";
 
   return (
