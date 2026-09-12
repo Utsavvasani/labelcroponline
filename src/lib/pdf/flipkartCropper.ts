@@ -79,6 +79,16 @@ export function getFormattedTodayDate(): string {
   return getFormattedDateTime();
 }
 
+/** Flipkart label crop region in A4 points (595.28 x 841.89 pt baseline). */
+export const FLIPKART_CROP_CONSTANTS = {
+  x: 165,
+  y: 459.5,
+  w: 265,
+  h: 361.5,
+  baseW: 595.28,
+  baseH: 841.89,
+} as const;
+
 /**
  * Crops Flipkart shipping labels matching the exact cut specifications:
  * CropBox / MediaBox = { x: 165, y: 460, width: 265, height: 360 } (on standard A4 595 x 842 pt).
@@ -127,10 +137,10 @@ export async function cropFlipkartPdf(
 
     // Exact symmetrical crop with equal spacing on all sides (3.5 pt margins around border):
     // x: 165 pt, y: 459.5 pt, width: 265 pt, height: 361.5 pt
-    const cropX = (165 / 595.28) * width;
-    const cropY = (459.5 / 841.89) * height;
-    const cropW = (265 / 595.28) * width;
-    const cropH = (361.5 / 841.89) * height;
+    const cropX = (FLIPKART_CROP_CONSTANTS.x / FLIPKART_CROP_CONSTANTS.baseW) * width;
+    const cropY = (FLIPKART_CROP_CONSTANTS.y / FLIPKART_CROP_CONSTANTS.baseH) * height;
+    const cropW = (FLIPKART_CROP_CONSTANTS.w / FLIPKART_CROP_CONSTANTS.baseW) * width;
+    const cropH = (FLIPKART_CROP_CONSTANTS.h / FLIPKART_CROP_CONSTANTS.baseH) * height;
 
     page.setCropBox(cropX, cropY, cropW, cropH);
     page.setMediaBox(cropX, cropY, cropW, cropH);

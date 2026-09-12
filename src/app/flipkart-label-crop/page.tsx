@@ -19,6 +19,14 @@ import {
 import dynamic from "next/dynamic";
 import { cropFlipkartPdf, triggerDownload, CropResult } from "@/lib/pdf/flipkartCropper";
 import { cropPdfCustomArea, CustomCropBox, CustomCropResult } from "@/lib/pdf/customCropper";
+import {
+  extractSkusFromFlipkartPdf,
+  getUniqueSku,
+  UNKNOWN_SKU,
+  type PageSkuMap,
+} from "@/lib/pdf/flipkartSkuExtractor";
+import { getStoredSkuOrder } from "@/lib/flipkartSkuStorage";
+import { FlipkartSkuSorterPanel } from "@/components/pdf/FlipkartSkuSorterPanel";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -54,6 +62,11 @@ export default function FlipkartLabelCropPage() {
   const [showMetaModal, setShowMetaModal] = useState(false);
   const [showCustomCropModal, setShowCustomCropModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // ── SKU Sorting State ──
+  const [pageSkuMap, setPageSkuMap] = useState<PageSkuMap>({});
+  const [skuOrder, setSkuOrder] = useState<string[]>([]);
+  const [isExtractingSku, setIsExtractingSku] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -120,6 +133,32 @@ export default function FlipkartLabelCropPage() {
     }
   };
 
+  // ── Non-blocking SKU extraction, runs after file is loaded ──
+  const triggerSkuExtraction = async (inputFile: File) => {
+    setIsExtractingSku(true);
+    setPageSkuMap({});
+    setSkuOrder([]);
+    try {
+      const map = await extractSkusFromFlipkartPdf(inputFile);
+      const unique = getUniqueSku(map);
+      setPageSkuMap(map);
+
+      // Apply saved order if it matches current SKUs, otherwise use extracted order
+      if (unique.length >= 1 && unique[0] !== UNKNOWN_SKU) {
+        const saved = getStoredSkuOrder();
+        const savedFiltered = saved.filter((s) => unique.includes(s));
+        const missing = unique.filter((s) => !savedFiltered.includes(s));
+        setSkuOrder(savedFiltered.length > 0 ? [...savedFiltered, ...missing] : unique);
+      } else if (unique.length >= 2) {
+        setSkuOrder(unique);
+      }
+    } catch (err) {
+      console.warn("SKU extraction error:", err);
+    } finally {
+      setIsExtractingSku(false);
+    }
+  };
+
   const handleReset = () => {
     setFile(null);
     if (cropResult?.blobUrl) {
@@ -134,6 +173,10 @@ export default function FlipkartLabelCropPage() {
     setShowPreviewModal(false);
     setShowMetaModal(false);
     setShowCustomCropModal(false);
+    // Reset SKU state
+    setPageSkuMap({});
+    setSkuOrder([]);
+    setIsExtractingSku(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -180,6 +223,8 @@ export default function FlipkartLabelCropPage() {
       setCustomCropBox(null);
       setCropMode("auto");
       handleProcessPdf(selectedFile, selectedFile.name, "auto", null, false);
+      // Trigger SKU extraction in background (non-blocking)
+      triggerSkuExtraction(selectedFile);
     }
   };
 
@@ -209,6 +254,8 @@ export default function FlipkartLabelCropPage() {
       setCustomCropBox(null);
       setCropMode("auto");
       handleProcessPdf(droppedFile, droppedFile.name, "auto", null, false);
+      // Trigger SKU extraction in background (non-blocking)
+      triggerSkuExtraction(droppedFile);
     }
   };
 
@@ -542,6 +589,48 @@ export default function FlipkartLabelCropPage() {
             </div>
           </div>
         </div>
+
+        {/* ── SKU Sorter Panel (shown when 2+ unique SKUs extracted) ── */}
+        {file && skuOrder.length >= 2 && (
+          <FlipkartSkuSorterPanel
+            file={file}
+            pageSkuMap={pageSkuMap}
+            skuOrder={skuOrder}
+            onSkuOrderChange={(newOrder) => {
+              setSkuOrder(newOrder);
+            }}
+            soldByName={
+              cropResult && "soldBy" in cropResult && cropResult.soldBy
+                ? cropResult.soldBy
+                : undefined
+            }
+          />
+        )}
+
+        {/* ── Single SKU Notice (shown when all labels belong to 1 SKU) ── */}
+        {file && !isExtractingSku && skuOrder.length === 1 && skuOrder[0] !== UNKNOWN_SKU && (
+          <div className="mt-6 border border-[#051448]/20 rounded-md bg-white p-4 flex items-center justify-between gap-3 text-xs text-black shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+              <div>
+                <p className="font-bold text-black">
+                  SKU Detected: <code className="bg-[#051448]/5 px-1.5 py-0.5 rounded border border-[#051448]/20 font-mono text-[#051448]">{skuOrder[0]}</code>
+                </p>
+                <p className="text-[11px] text-black/60">
+                  All {Object.keys(pageSkuMap).length} labels belong to this SKU. (Multi-SKU arrangement activates when 2+ unique SKUs are in the PDF).
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── SKU Extraction Loading Indicator ── */}
+        {file && isExtractingSku && skuOrder.length === 0 && (
+          <div className="mt-4 flex items-center gap-2 text-xs text-black/60 px-1">
+            <Loader2 size={13} className="animate-spin text-[#051448]" />
+            <span>Detecting SKUs from PDF...</span>
+          </div>
+        )}
 
         {/* ── SEO & User Information Blog / Guide Section ── */}
         <div className="mt-10 sm:mt-14 space-y-8 sm:space-y-12 text-black">
