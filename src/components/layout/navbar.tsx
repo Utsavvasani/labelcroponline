@@ -16,7 +16,6 @@ import {
   Split,
   Minimize2,
   Sparkles,
-  ArrowUpDown,
   Image as ImageIcon,
   RotateCw,
 } from "lucide-react";
@@ -50,14 +49,6 @@ export function Navbar() {
       icon: Layers,
       isAvailable: true,
       badge: "Popular",
-    },
-    {
-      id: "sort-labels",
-      name: "Sort Labels",
-      desc: "Sort multi-page label PDFs by courier, SKU, order number, pincode and more",
-      href: "/sort-labels",
-      icon: ArrowUpDown,
-      isAvailable: true,
     },
     {
       id: "split-pdf",
@@ -141,7 +132,6 @@ export function Navbar() {
 
   const isPdfRoute =
     pathname === "/merge-pdf" ||
-    pathname === "/sort-labels" ||
     pathname === "/split-pdf" ||
     pathname === "/compress-pdf" ||
     pathname === "/pdf-to-images" ||
