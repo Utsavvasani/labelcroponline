@@ -375,7 +375,7 @@ export default function FlipkartLabelCropPage() {
         )}
 
         {/* ── Main Workspace Card ── */}
-        <div className="border border-[#051448] rounded-md bg-white shadow-sm">
+        <div className="border border-[#051448] rounded-md bg-white shadow-sm overflow-hidden">
           {!file ? (
             /* ── Initial Upload View: 2-Column Clean Card ── */
             <div className="p-4 sm:p-7">
@@ -435,7 +435,7 @@ export default function FlipkartLabelCropPage() {
                           )}
                         </div>
                         <p className="text-[10px] text-black/70 leading-tight">
-                          Auto Flipkart 4×6 Label Box
+                          Standard Flipkart Label Crop
                         </p>
                       </button>
 
@@ -490,7 +490,7 @@ export default function FlipkartLabelCropPage() {
             /* ── Active Workspace View: Compact, Scroll-Free with Menubar ── */
             <div className="flex flex-col">
               {/* 1. Sleek Top Toolbar / Menubar */}
-              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-[#051448]/15 flex flex-wrap items-center justify-between gap-2">
+              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-[#051448]/15 rounded-t-md flex flex-wrap items-center justify-between gap-2">
                 {/* Left: Maximize Logo + File Name + Deduplicated Count Badge (No size showcase) */}
                 <div className="flex items-center gap-3 min-w-0">
                   <Image
@@ -535,7 +535,7 @@ export default function FlipkartLabelCropPage() {
                             : "text-black/60 hover:text-black"
                         }`}
                       >
-                        Auto 4×6
+                        Standard Crop
                       </button>
                       <button
                         type="button"
@@ -553,7 +553,7 @@ export default function FlipkartLabelCropPage() {
                     <div className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-center">
                       <div className="w-2 h-2 bg-white border-t border-l border-slate-300 rotate-45 -mb-1 z-10" />
                       <div className="bg-white text-[#051448] border border-slate-300 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
-                        Crop Mode: {cropMode === "auto" ? "Standard 4×6" : "Custom Box"}
+                        Crop Mode: {cropMode === "auto" ? "Standard Crop" : "Custom Box"}
                       </div>
                     </div>
                   </div>
@@ -708,7 +708,7 @@ export default function FlipkartLabelCropPage() {
                 <div className="py-6 flex flex-col items-center justify-center gap-2 text-center p-4">
                   <p className="font-bold text-xs text-black">Labels Ready for Standard Crop</p>
                   <p className="text-[11px] text-black/60 max-w-sm">
-                    Labels are ready to crop and download according to the selected mode ({cropMode === "custom" ? "Custom Box" : "Auto 4×6"}).
+                    Labels are ready to crop and download according to the selected mode ({cropMode === "custom" ? "Custom Box" : "Standard Crop"}).
                   </p>
                   <button
                     type="button"

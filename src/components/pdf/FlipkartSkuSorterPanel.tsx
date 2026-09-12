@@ -11,7 +11,6 @@ import {
   GripVertical,
   CheckCircle,
   Trash2,
-  ListOrdered,
 } from "lucide-react";
 import type { PageSkuMap } from "@/lib/pdf/flipkartSkuExtractor";
 import {
@@ -145,9 +144,6 @@ export function FlipkartSkuSorterPanel({
       {/* ── Compact Header & Quick Tools ── */}
       <div className="flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border-b border-[#051448]/15 gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-6 h-6 rounded-md bg-[#051448] text-white flex items-center justify-center shrink-0 shadow-2xs">
-            <ListOrdered size={14} />
-          </div>
           <span className="font-bold text-sm text-black truncate">
             Arrange SKU Order
           </span>
@@ -275,7 +271,7 @@ export function FlipkartSkuSorterPanel({
       </div>
 
       {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3.5 sm:px-4 py-2.5 border-t border-[#051448]/15 bg-white flex items-center justify-end gap-2">
+      <div className="px-3.5 sm:px-4 py-2.5 border-t border-[#051448]/15 bg-white rounded-b-md flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={handleConfirmAndDownload}
@@ -304,14 +300,6 @@ export function FlipkartSkuSorterPanel({
           )}
         </button>
       </div>
-
-      {/* ── Success confirmation message ── */}
-      {confirmed && !isBuilding && (
-        <div className="px-3.5 sm:px-4 pb-2.5 flex items-center justify-end gap-1.5 text-xs text-emerald-700 font-medium">
-          <CheckCircle size={12} />
-          <span>PDF downloaded successfully!</span>
-        </div>
-      )}
     </div>
   );
 }
