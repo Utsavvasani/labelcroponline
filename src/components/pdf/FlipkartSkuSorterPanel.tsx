@@ -651,17 +651,17 @@ export function FlipkartSkuSorterPanel({
   return (
     <div className="w-full flex flex-col bg-white">
       {/* ── Top Bar: Title + Batch Summary + Smart Bulk Actions ── */}
-      <div className="px-3 py-2 bg-white border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+      <div className="px-3 py-2 bg-white border-b border-slate-400 flex flex-wrap items-center justify-between gap-2">
         {/* Left: Title & Count Badges */}
         <div className="flex items-center gap-2 min-w-0">
           <span className="font-semibold text-sm text-slate-900 truncate">
             Arrange SKU Order
           </span>
-          <span className="text-xs font-normal text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">
+          <span className="text-xs font-normal text-slate-700 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
             {skuOrder.length} Unique SKUs
           </span>
           {totalGroupsCount > 0 && (
-            <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+            <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
               <Layers size={11} />
               {totalGroupsCount} {totalGroupsCount === 1 ? "Group" : "Groups"}
             </span>
@@ -673,7 +673,7 @@ export function FlipkartSkuSorterPanel({
           <button
             type="button"
             onClick={() => handleSortAlphabetical(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
             title="Sort A to Z"
           >
             A→Z
@@ -682,7 +682,7 @@ export function FlipkartSkuSorterPanel({
           <button
             type="button"
             onClick={() => handleSortByQuantity(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
             title="Sort by highest label quantity first"
           >
             Qty ↓
@@ -713,9 +713,9 @@ export function FlipkartSkuSorterPanel({
       {/* ── TWO-PART SPLIT: Seamless Left & Right with single vertical divider ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch bg-white">
         {/* ════════ LEFT PART: SKUs & Sequence Order (7 Cols) ════════ */}
-        <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-200">
+        <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-400">
           {/* Header with Maximized Search Bar & Quick Group Actions */}
-          <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[42px]">
+          <div className="px-3 py-2 bg-white border-b border-slate-400 flex items-center gap-2 text-xs min-h-[42px]">
             {/* Maximized Search Bar */}
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
@@ -727,7 +727,7 @@ export function FlipkartSkuSorterPanel({
                   setCurrentPage(1);
                 }}
                 placeholder="Search SKUs to sequence or group..."
-                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-200 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
+                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {searchQuery && (
                 <button
@@ -778,7 +778,7 @@ export function FlipkartSkuSorterPanel({
                   <button
                     type="button"
                     onClick={() => setShowAddToGroupMenu((prev) => !prev)}
-                    className="flex items-center gap-1 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-200 font-medium px-2 py-0.5 rounded text-[11px] cursor-pointer shrink-0"
+                    className="flex items-center gap-1 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-300 font-medium px-2 py-0.5 rounded text-[11px] cursor-pointer shrink-0"
                     title={`Add ${selectedSkus.size} selected SKU(s) to an existing group`}
                   >
                     <Layers size={11} className="text-indigo-600" />
@@ -787,8 +787,8 @@ export function FlipkartSkuSorterPanel({
                   </button>
 
                   {showAddToGroupMenu && (
-                    <div className="absolute right-0 mt-1 w-52 bg-white border border-slate-200 rounded-md shadow-lg z-50 py-1 text-xs max-h-48 overflow-y-auto">
-                      <div className="px-2.5 py-1 text-[10px] font-medium text-slate-400 border-b border-slate-100 uppercase tracking-wider">
+                    <div className="absolute right-0 mt-1 w-52 bg-white border border-slate-400 rounded-md shadow-lg z-50 py-1 text-xs max-h-48 overflow-y-auto">
+                      <div className="px-2.5 py-1 text-[10px] font-medium text-slate-500 border-b border-slate-200 uppercase tracking-wider">
                         Select Target Group:
                       </div>
                       {allGroupsWithPosition.map(({ group, position }) => (
@@ -802,7 +802,7 @@ export function FlipkartSkuSorterPanel({
                           className="w-full text-left px-2.5 py-1 hover:bg-indigo-50/70 text-slate-800 font-normal flex items-center justify-between gap-1 cursor-pointer transition-colors"
                         >
                           <span className="truncate">{group.name}</span>
-                          <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-100 px-1.5 py-0.2 rounded-full shrink-0 font-medium">
+                          <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0 font-medium">
                             Pos {position}
                           </span>
                         </button>
@@ -814,12 +814,12 @@ export function FlipkartSkuSorterPanel({
 
               {/* Pagination controls if list > 25 */}
               {filteredItems.length > 25 && (
-                <div className="flex items-center gap-0.5 border-l border-slate-200 pl-1.5 shrink-0">
+                <div className="flex items-center gap-0.5 border-l border-slate-400 pl-1.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-0.5 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="p-0.5 rounded border border-slate-400 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     title="Previous page"
                   >
                     <ChevronLeft size={12} />
@@ -831,7 +831,7 @@ export function FlipkartSkuSorterPanel({
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="p-0.5 rounded border border-slate-200 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    className="p-0.5 rounded border border-slate-400 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                     title="Next page"
                   >
                     <ChevronRight size={12} />
@@ -845,7 +845,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="divide-y divide-slate-200 max-h-[380px] overflow-y-auto bg-white border-t border-slate-200"
+            className="divide-y divide-slate-400 max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -941,7 +941,7 @@ export function FlipkartSkuSorterPanel({
                           }}
                           className={`text-xs font-semibold min-w-[26px] px-1.5 py-0.5 rounded text-center shrink-0 cursor-pointer transition-colors ${isConnected
                               ? "bg-blue-600 text-white"
-                              : "text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200"
+                              : "text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-300"
                             }`}
                           title={`Position ${globalIndex + 1}. Click to jump position`}
                         >
@@ -955,7 +955,7 @@ export function FlipkartSkuSorterPanel({
                         <span className="font-medium text-sm text-slate-900 truncate" title={group.name}>
                           Group: {group.name}
                         </span>
-                        <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0">
+                        <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0">
                           {group.skus.length} SKUs
                         </span>
                       </div>
@@ -1013,7 +1013,7 @@ export function FlipkartSkuSorterPanel({
                             return copy;
                           });
                         }}
-                        className="w-5 h-5 rounded border-2 border-slate-400 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
+                        className="w-5 h-5 rounded border-2 border-slate-500 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
                         title="Select to group with other SKUs"
                       />
                     </div>
@@ -1063,7 +1063,7 @@ export function FlipkartSkuSorterPanel({
                           setJumpItemIndex(globalIndex);
                           setJumpRankInput((globalIndex + 1).toString());
                         }}
-                        className="text-xs font-medium text-slate-700 min-w-[26px] px-1.5 py-0.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-200 text-center shrink-0 cursor-pointer transition-colors"
+                        className="text-xs font-medium text-slate-700 min-w-[26px] px-1.5 py-0.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-400 text-center shrink-0 cursor-pointer transition-colors"
                         title={`Position ${globalIndex + 1}. Click to jump position`}
                       >
                         {globalIndex + 1}
@@ -1081,8 +1081,8 @@ export function FlipkartSkuSorterPanel({
                     {/* Count Badge */}
                     <span
                       className={`text-[11px] font-normal px-2 py-0.5 rounded-full border shrink-0 ${isUnknown
-                          ? "text-amber-800 bg-amber-50 border-amber-200"
-                          : "text-slate-600 bg-slate-50 border-slate-200"
+                          ? "text-amber-800 bg-amber-50 border-amber-300"
+                          : "text-slate-600 bg-slate-50 border-slate-400"
                         }`}
                     >
                       {count} {count === 1 ? "label" : "labels"}
@@ -1097,7 +1097,7 @@ export function FlipkartSkuSorterPanel({
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
         <div className="lg:col-span-5 flex flex-col">
           {/* Header with Maximized Search Bar for Product Groups */}
-          <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[42px]">
+          <div className="px-3 py-2 bg-white border-b border-slate-400 flex items-center gap-2 text-xs min-h-[42px]">
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input
@@ -1105,7 +1105,7 @@ export function FlipkartSkuSorterPanel({
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
                 placeholder="Search Product Groups..."
-                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-200 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
+                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {groupSearchQuery && (
                 <button
@@ -1121,7 +1121,7 @@ export function FlipkartSkuSorterPanel({
 
             {/* Total groups count badge */}
             {allGroupsWithPosition.length > 0 && (
-              <span className="text-[11px] font-medium text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">
+              <span className="text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
                 {filteredGroupsWithPosition.length}/{allGroupsWithPosition.length}
               </span>
             )}
@@ -1131,11 +1131,11 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={rightListRef}
             onScroll={handleRightScroll}
-            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white border-t border-slate-200"
+            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
           >
             {allGroupsWithPosition.length === 0 ? (
               /* Helpful Empty State */
-              <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-200 rounded-md bg-white">
+              <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-400 rounded-md bg-white">
                 <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
                   <Sparkles size={16} />
                 </div>
@@ -1146,7 +1146,7 @@ export function FlipkartSkuSorterPanel({
               </div>
             ) : filteredGroupsWithPosition.length === 0 ? (
               /* Search Empty State */
-              <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-200 rounded-md bg-white">
+              <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-400 rounded-md bg-white">
                 <p className="font-medium text-xs text-slate-800">No groups matched &quot;{groupSearchQuery}&quot;</p>
                 <button
                   type="button"
@@ -1182,11 +1182,11 @@ export function FlipkartSkuSorterPanel({
                     }}
                     className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer ${isConnected
                         ? "border-blue-600"
-                        : "border-slate-200 hover:border-slate-300"
+                        : "border-slate-400 hover:border-slate-500"
                       }`}
                   >
                     {/* Clean Compact Group Header */}
-                    <div className="px-3 py-1.5 flex items-center justify-between gap-2 bg-white border-b border-slate-200">
+                    <div className="px-3 py-1.5 flex items-center justify-between gap-2 bg-white border-b border-slate-400">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {/* Position Jump */}
                         {isEditingJump ? (
@@ -1227,7 +1227,7 @@ export function FlipkartSkuSorterPanel({
                               setJumpItemIndex(globalIndex);
                               setJumpRankInput(position.toString());
                             }}
-                            className="text-xs font-semibold text-indigo-950 px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-center shrink-0 cursor-pointer transition-colors"
+                            className="text-xs font-semibold text-indigo-950 px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 border border-indigo-300 text-center shrink-0 cursor-pointer transition-colors"
                             title={`Position ${position}. Click to change position`}
                           >
                             {position}
@@ -1296,7 +1296,7 @@ export function FlipkartSkuSorterPanel({
                           </div>
                         )}
 
-                        <span className="text-xs font-normal text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full shrink-0">
+                        <span className="text-xs font-normal text-slate-600 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
                           {group.skus.length} SKUs
                         </span>
                       </div>
@@ -1315,7 +1315,7 @@ export function FlipkartSkuSorterPanel({
                     </div>
 
                     {/* Member SKUs list */}
-                    <div className="divide-y divide-slate-200 bg-white">
+                    <div className="divide-y divide-slate-400 bg-white">
                       {group.skus.map((sku, subIdx) => {
                         return (
                           <div
@@ -1354,7 +1354,7 @@ export function FlipkartSkuSorterPanel({
       </div>
 
       {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3 py-2 border-t border-slate-200 bg-white flex items-center justify-end gap-2">
+      <div className="px-3 py-2 border-t border-slate-400 bg-white flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={handleConfirmAndDownload}

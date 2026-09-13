@@ -76,7 +76,7 @@ function TooltipButton({
         className={`p-2.5 sm:p-2.5 rounded-md border transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-2xs ${
           active
             ? "border-[#051448] bg-[#051448] text-white shadow-xs"
-            : "border-slate-300 bg-white hover:bg-blue-50 text-[#051448] hover:border-[#051448]/60 hover:text-[#051448]"
+            : "border-slate-400 bg-white hover:bg-blue-50 text-[#051448] hover:border-[#051448]/60 hover:text-[#051448]"
         } disabled:opacity-40 disabled:cursor-not-allowed`}
         aria-label={label}
       >
@@ -97,11 +97,11 @@ function TooltipButton({
         }`}
       >
         <div
-          className={`w-2 h-2 bg-white border-t border-l border-slate-300 rotate-45 -mb-1 z-10 ${
+          className={`w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 -mb-1 z-10 ${
             alignRight ? "mr-3.5" : ""
           }`}
         />
-        <div className="bg-white text-[#051448] border border-slate-300 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
+        <div className="bg-white text-[#051448] border border-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
           {label}
         </div>
       </div>
@@ -488,7 +488,7 @@ export default function FlipkartLabelCropPage() {
             /* ── Active Workspace View: Compact, Scroll-Free with Menubar ── */
             <div className="flex flex-col">
               {/* 1. Sleek Top Toolbar / Menubar */}
-              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-[#051448]/15 rounded-t-md flex flex-wrap items-center justify-between gap-2">
+              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-slate-400 rounded-t-md flex flex-wrap items-center justify-between gap-2">
                 {/* Left: Maximize Logo + File Name + Deduplicated Count Badge (No size showcase) */}
                 <div className="flex items-center gap-3 min-w-0">
                   <Image
@@ -499,7 +499,7 @@ export default function FlipkartLabelCropPage() {
                     className="h-8 sm:h-9 w-auto object-contain shrink-0"
                     priority
                   />
-                  <div className="h-5 w-px bg-slate-300 shrink-0" />
+                  <div className="h-5 w-px bg-slate-400 shrink-0" />
                   <div className="flex items-center gap-2 min-w-0">
                     <span
                       className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
@@ -523,7 +523,7 @@ export default function FlipkartLabelCropPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   {/* Crop Mode Switcher */}
                   <div className="relative group inline-flex items-center">
-                    <div className="flex items-center p-0.5 rounded-md border border-slate-300 bg-white shadow-2xs">
+                    <div className="flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
                       <button
                         type="button"
                         onClick={() => handleModeChange("auto")}
@@ -549,8 +549,8 @@ export default function FlipkartLabelCropPage() {
                     </div>
                     {/* Instant Light Tooltip */}
                     <div className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-center">
-                      <div className="w-2 h-2 bg-white border-t border-l border-slate-300 rotate-45 -mb-1 z-10" />
-                      <div className="bg-white text-[#051448] border border-slate-300 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
+                      <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 -mb-1 z-10" />
+                      <div className="bg-white text-[#051448] border border-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
                         Crop Mode: {cropMode === "auto" ? "Standard Crop" : "Custom Box"}
                       </div>
                     </div>
