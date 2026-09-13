@@ -901,15 +901,15 @@ export function FlipkartSkuSorterPanel({
                         scrollToRightGroup(group.id, true);
                       }}
                       className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none transition-colors ${isConnected
-                          ? "bg-blue-50/50 text-blue-950 font-medium"
+                          ? "bg-indigo-100/80 text-indigo-950 font-semibold"
                           : isDragTarget
-                            ? "bg-[#051448]/10"
-                            : "bg-white hover:bg-slate-50"
+                            ? "bg-[#051448]/15"
+                            : "bg-slate-100/70 hover:bg-slate-200/70 text-slate-900"
                         }`}
                     >
                       {/* Group Type Indicator (strictly aligned with Checkbox slot w-6) */}
                       <div className="flex items-center justify-center p-0.5 shrink-0" title="Product Group">
-                        <div className="w-5 h-5 flex items-center justify-center rounded bg-indigo-50 border border-indigo-200 text-indigo-700">
+                        <div className={`w-5 h-5 flex items-center justify-center rounded border ${isConnected ? "bg-indigo-200 border-indigo-400 text-indigo-900" : "bg-indigo-100 border-indigo-300 text-indigo-800"}`}>
                           <Layers size={12} />
                         </div>
                       </div>
@@ -935,7 +935,7 @@ export function FlipkartSkuSorterPanel({
                             }}
                             autoFocus
                             placeholder={`${globalIndex + 1}`}
-                            className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-medium text-indigo-950"
+                            className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-semibold text-indigo-950"
                           />
                           <button
                             type="button"
@@ -961,8 +961,8 @@ export function FlipkartSkuSorterPanel({
                             setJumpRankInput((globalIndex + 1).toString());
                           }}
                           className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${isConnected
-                              ? "bg-blue-50 border-blue-500 text-blue-900"
-                              : "bg-slate-50 hover:bg-slate-100 border-slate-400 text-slate-700"
+                              ? "bg-indigo-200/80 border-indigo-400 text-indigo-950 font-bold"
+                              : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
                             }`}
                           title={`Position ${globalIndex + 1}. Click to jump position`}
                         >
@@ -972,10 +972,10 @@ export function FlipkartSkuSorterPanel({
 
                       {/* Group Name & Badge */}
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <span className="font-medium text-sm text-slate-900 truncate" title={group.name}>
+                        <span className="font-semibold text-sm text-slate-900 truncate" title={group.name}>
                           {getCleanGroupName(group.name)}
                         </span>
-                        <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0">
+                        <span className="text-xs font-medium text-indigo-900 bg-indigo-100 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0">
                           {group.skus.length} SKUs
                         </span>
                       </div>
@@ -1200,13 +1200,15 @@ export function FlipkartSkuSorterPanel({
                       setActiveGroupId(group.id);
                       scrollToLeftGroupSlot(group.id, true);
                     }}
-                    className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer ${isConnected
-                        ? "border-blue-600"
+                    className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer shadow-2xs ${isConnected
+                        ? "border-indigo-600 ring-2 ring-indigo-600/30"
                         : "border-slate-400 hover:border-slate-500"
                       }`}
                   >
                     {/* Clean Compact Group Header */}
-                    <div className="px-3 py-1.5 flex items-center justify-between gap-2 bg-white border-b border-slate-400">
+                    <div className={`px-3 py-1.5 flex items-center justify-between gap-2 border-b border-slate-400 transition-colors ${
+                      isConnected ? "bg-indigo-100/80 text-indigo-950" : "bg-slate-100/80 text-slate-900"
+                    }`}>
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {/* Position Jump */}
                         {isEditingJump ? (
@@ -1223,7 +1225,7 @@ export function FlipkartSkuSorterPanel({
                               }}
                               autoFocus
                               placeholder={`${position}`}
-                              className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-medium text-indigo-950"
+                              className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-bold text-indigo-950"
                             />
                             <button
                               type="button"
@@ -1247,7 +1249,11 @@ export function FlipkartSkuSorterPanel({
                               setJumpItemIndex(globalIndex);
                               setJumpRankInput(position.toString());
                             }}
-                            className="text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-400 text-slate-700 text-center shrink-0 cursor-pointer transition-colors"
+                            className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${
+                              isConnected
+                                ? "bg-indigo-200/90 border-indigo-400 text-indigo-950 font-bold"
+                                : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
+                            }`}
                             title={`Position ${position}. Click to change position`}
                           >
                             {position}
@@ -1276,7 +1282,7 @@ export function FlipkartSkuSorterPanel({
                                 if (e.key === "Escape") setEditingGroupId(null);
                               }}
                               autoFocus
-                              className="text-sm font-medium bg-white border border-indigo-400 rounded px-1.5 py-0.5 text-slate-900 flex-1 min-w-0"
+                              className="text-sm font-semibold bg-white border border-indigo-500 rounded px-1.5 py-0.5 text-slate-900 flex-1 min-w-0"
                             />
                             <button
                               type="button"
@@ -1298,8 +1304,8 @@ export function FlipkartSkuSorterPanel({
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                            <Layers size={15} className="text-slate-900 shrink-0" />
-                            <span className="font-medium text-sm text-slate-900 truncate" title={group.name}>
+                            <Layers size={15} className={`shrink-0 ${isConnected ? "text-indigo-800" : "text-slate-800"}`} />
+                            <span className="font-semibold text-sm text-slate-900 truncate" title={group.name}>
                               {getCleanGroupName(group.name)}
                             </span>
                             <button
@@ -1308,7 +1314,7 @@ export function FlipkartSkuSorterPanel({
                                 setEditingGroupId(group.id);
                                 setGroupNameInput(group.name);
                               }}
-                              className="text-slate-700 hover:text-black p-1 hover:bg-slate-100 rounded cursor-pointer transition-colors"
+                              className="text-slate-700 hover:text-black p-1 hover:bg-slate-200/60 rounded cursor-pointer transition-colors"
                               title="Rename group"
                             >
                               <Edit2 size={13} />
@@ -1316,7 +1322,11 @@ export function FlipkartSkuSorterPanel({
                           </div>
                         )}
 
-                        <span className="text-xs font-normal text-slate-600 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${
+                          isConnected
+                            ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
+                            : "text-slate-800 bg-white border-slate-400"
+                        }`}>
                           {group.skus.length} SKUs
                         </span>
                       </div>
