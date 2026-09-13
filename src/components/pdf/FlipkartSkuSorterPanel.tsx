@@ -45,6 +45,19 @@ import { triggerDownload } from "@/lib/pdf/flipkartCropper";
 
 export type { SkuGroup, OrderItem };
 
+/**
+ * Helper to display clean group names without redundant "Group: Group" prefixes
+ * or outdated static SKU counts like "(2 SKUs)" when the count has changed.
+ */
+function getCleanGroupName(rawName: string): string {
+  let cleaned = rawName.replace(/\s*\(\d+\s*SKUs?\)/gi, "").trim();
+  if (!cleaned) cleaned = "Group";
+  if (cleaned.toLowerCase().startsWith("group")) {
+    return cleaned;
+  }
+  return `Group: ${cleaned}`;
+}
+
 interface FlipkartSkuSorterPanelProps {
   file: File;
   pageSkuMap: PageSkuMap;
@@ -382,7 +395,8 @@ export function FlipkartSkuSorterPanel({
       if (searchQuery.trim()) {
         name = searchQuery.trim();
       } else {
-        name = `Group (${skusToGroup.length} SKUs)`;
+        const existingGroupCount = orderItems.filter((it) => it.type === "group").length;
+        name = `Group ${existingGroupCount + 1}`;
       }
     }
 
@@ -801,7 +815,7 @@ export function FlipkartSkuSorterPanel({
                           }}
                           className="w-full text-left px-2.5 py-1 hover:bg-indigo-50/70 text-slate-800 font-normal flex items-center justify-between gap-1 cursor-pointer transition-colors"
                         >
-                          <span className="truncate">{group.name}</span>
+                          <span className="truncate">{getCleanGroupName(group.name)}</span>
                           <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0 font-medium">
                             Pos {position}
                           </span>
@@ -893,6 +907,13 @@ export function FlipkartSkuSorterPanel({
                             : "bg-white hover:bg-slate-50"
                         }`}
                     >
+                      {/* Group Type Indicator (strictly aligned with Checkbox slot w-6) */}
+                      <div className="flex items-center justify-center p-0.5 shrink-0" title="Product Group">
+                        <div className="w-5 h-5 flex items-center justify-center rounded bg-indigo-50 border border-indigo-200 text-indigo-700">
+                          <Layers size={12} />
+                        </div>
+                      </div>
+
                       {/* Drag Handle */}
                       <GripVertical
                         size={14}
@@ -939,9 +960,9 @@ export function FlipkartSkuSorterPanel({
                             setJumpItemIndex(globalIndex);
                             setJumpRankInput((globalIndex + 1).toString());
                           }}
-                          className={`text-xs font-semibold min-w-[26px] px-1.5 py-0.5 rounded text-center shrink-0 cursor-pointer transition-colors ${isConnected
-                              ? "bg-blue-600 text-white"
-                              : "text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-300"
+                          className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${isConnected
+                              ? "bg-blue-50 border-blue-500 text-blue-900"
+                              : "bg-slate-50 hover:bg-slate-100 border-slate-400 text-slate-700"
                             }`}
                           title={`Position ${globalIndex + 1}. Click to jump position`}
                         >
@@ -949,11 +970,10 @@ export function FlipkartSkuSorterPanel({
                         </button>
                       )}
 
-                      {/* Group Name & Badge (Enlarged) */}
+                      {/* Group Name & Badge */}
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <Layers size={15} className="text-slate-900 shrink-0" />
                         <span className="font-medium text-sm text-slate-900 truncate" title={group.name}>
-                          Group: {group.name}
+                          {getCleanGroupName(group.name)}
                         </span>
                         <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0">
                           {group.skus.length} SKUs
@@ -1063,7 +1083,7 @@ export function FlipkartSkuSorterPanel({
                           setJumpItemIndex(globalIndex);
                           setJumpRankInput((globalIndex + 1).toString());
                         }}
-                        className="text-xs font-medium text-slate-700 min-w-[26px] px-1.5 py-0.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-400 text-center shrink-0 cursor-pointer transition-colors"
+                        className="text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-400 text-slate-700 text-center shrink-0 cursor-pointer transition-colors"
                         title={`Position ${globalIndex + 1}. Click to jump position`}
                       >
                         {globalIndex + 1}
@@ -1227,7 +1247,7 @@ export function FlipkartSkuSorterPanel({
                               setJumpItemIndex(globalIndex);
                               setJumpRankInput(position.toString());
                             }}
-                            className="text-xs font-semibold text-indigo-950 px-2 py-0.5 rounded bg-indigo-50 hover:bg-indigo-100 border border-indigo-300 text-center shrink-0 cursor-pointer transition-colors"
+                            className="text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded bg-slate-50 hover:bg-slate-100 border border-slate-400 text-slate-700 text-center shrink-0 cursor-pointer transition-colors"
                             title={`Position ${position}. Click to change position`}
                           >
                             {position}
@@ -1280,7 +1300,7 @@ export function FlipkartSkuSorterPanel({
                           <div className="flex items-center gap-1.5 min-w-0 flex-1">
                             <Layers size={15} className="text-slate-900 shrink-0" />
                             <span className="font-medium text-sm text-slate-900 truncate" title={group.name}>
-                              {group.name}
+                              {getCleanGroupName(group.name)}
                             </span>
                             <button
                               type="button"
