@@ -33,18 +33,20 @@ import {
   saveSkuOrder,
   clearSkuOrder,
   hasStoredSkuOrder,
+  getStoredSkuGroups,
+  saveOrUpdateSkuGroup,
+  removeStoredSkuGroup,
+  removeSkuFromStoredGroup,
+  syncAllCurrentGroupsToStorage,
+  clearSkuGroups,
+  hasStoredSkuGroups,
+  autoGroupSkus,
+  type SkuGroup,
+  type OrderItem,
 } from "@/lib/flipkartSkuStorage";
 import { triggerDownload } from "@/lib/pdf/flipkartCropper";
 
-export interface SkuGroup {
-  id: string;
-  name: string;
-  skus: string[];
-}
-
-export type OrderItem =
-  | { type: "single"; sku: string }
-  | { type: "group"; group: SkuGroup };
+export type { SkuGroup, OrderItem };
 
 interface FlipkartSkuSorterPanelProps {
   file: File;
@@ -66,15 +68,37 @@ export function FlipkartSkuSorterPanel({
   const [isBuilding, setIsBuilding] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
-  const [hasSavedBefore, setHasSavedBefore] = useState(hasStoredSkuOrder);
+  const [hasSavedBefore, setHasSavedBefore] = useState(() => hasStoredSkuOrder() || hasStoredSkuGroups());
 
-  // Grouped Order Items State
-  const [orderItems, setOrderItems] = useState<OrderItem[]>(() =>
-    skuOrder.map((sku) => ({ type: "single", sku }))
-  );
+  // Grouped Order Items State: auto-detect groups from localStorage upon initial load
+  const [orderItems, setOrderItems] = useState<OrderItem[]>(() => {
+    const storedGroups = getStoredSkuGroups();
+    const { orderItems: initialGrouped } = autoGroupSkus(skuOrder, storedGroups);
+    return initialGrouped;
+  });
+
+  // Track auto-grouped items to display helpful notification & badges
+  const [autoGroupedSet, setAutoGroupedSet] = useState<Set<string>>(() => {
+    const storedGroups = getStoredSkuGroups();
+    const { autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
+    return new Set(autoGroupedGroupIds);
+  });
+
+  const [autoGroupedNotice, setAutoGroupedNotice] = useState<string | null>(() => {
+    const storedGroups = getStoredSkuGroups();
+    const { autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
+    if (autoGroupedGroupIds.length > 0) {
+      return `${autoGroupedGroupIds.length} product group${autoGroupedGroupIds.length > 1 ? "s" : ""} automatically matched & grouped from saved storage`;
+    }
+    return null;
+  });
 
   // Expanded Groups state: Set of group IDs that are expanded
-  const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(new Set());
+  const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(() => {
+    const storedGroups = getStoredSkuGroups();
+    const { autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
+    return new Set(autoGroupedGroupIds);
+  });
 
   // Checkbox selection state for manual multi-select grouping
   const [selectedSkus, setSelectedSkus] = useState<Set<string>>(new Set());
@@ -95,7 +119,7 @@ export function FlipkartSkuSorterPanel({
     }
   }, [skuOrder]);
 
-  // Sync orderItems if external skuOrder changes completely
+  // Sync orderItems if external skuOrder changes completely (e.g. newly uploaded PDF)
   useEffect(() => {
     const currentSkus = orderItems.flatMap((it) =>
       it.type === "single" ? [it.sku] : it.group.skus
@@ -105,8 +129,24 @@ export function FlipkartSkuSorterPanel({
       !skuOrder.every((s) => currentSkus.includes(s));
 
     if (isDifferent) {
-      setOrderItems(skuOrder.map((sku) => ({ type: "single", sku })));
+      const storedGroups = getStoredSkuGroups();
+      const { orderItems: autoGrouped, autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
+      setOrderItems(autoGrouped);
       setSelectedSkus(new Set());
+      if (autoGroupedGroupIds.length > 0) {
+        setAutoGroupedSet(new Set(autoGroupedGroupIds));
+        setExpandedGroupIds((prev) => {
+          const copy = new Set(prev);
+          autoGroupedGroupIds.forEach((id) => copy.add(id));
+          return copy;
+        });
+        setAutoGroupedNotice(
+          `${autoGroupedGroupIds.length} product group${autoGroupedGroupIds.length > 1 ? "s" : ""} automatically matched & grouped from saved storage`
+        );
+      } else {
+        setAutoGroupedSet(new Set());
+        setAutoGroupedNotice(null);
+      }
     }
   }, [skuOrder]);
 
@@ -391,6 +431,10 @@ export function FlipkartSkuSorterPanel({
     const targetIdx = Math.min(firstIndex, remainingItems.length);
     remainingItems.splice(targetIdx, 0, { type: "group", group: newGroup });
 
+    // Persist to localStorage
+    saveOrUpdateSkuGroup(newGroup);
+    setHasSavedBefore(true);
+
     setExpandedGroupIds((prev) => new Set(prev).add(newGroup.id));
     setActiveGroupId(newGroup.id);
     setSelectedSkus(new Set());
@@ -418,6 +462,15 @@ export function FlipkartSkuSorterPanel({
       return copy;
     });
     if (activeGroupId === groupId) setActiveGroupId(null);
+
+    // Remove from localStorage
+    removeStoredSkuGroup(groupId);
+    setAutoGroupedSet((prev) => {
+      const copy = new Set(prev);
+      copy.delete(groupId);
+      return copy;
+    });
+
     updateItemsAndEmit(next);
   };
 
@@ -438,12 +491,20 @@ export function FlipkartSkuSorterPanel({
         sku: s,
       }));
       next.splice(groupIdx, 1, ...remainingSingles, { type: "single", sku: skuToRemove });
+      removeStoredSkuGroup(groupId);
+      setAutoGroupedSet((prev) => {
+        const copy = new Set(prev);
+        copy.delete(groupId);
+        return copy;
+      });
     } else {
+      const updatedGroup = { ...groupItem.group, skus: updatedSkus };
       next[groupIdx] = {
         type: "group",
-        group: { ...groupItem.group, skus: updatedSkus },
+        group: updatedGroup,
       };
       next.splice(groupIdx + 1, 0, { type: "single", sku: skuToRemove });
+      saveOrUpdateSkuGroup(updatedGroup);
     }
     updateItemsAndEmit(next);
   };
@@ -531,6 +592,8 @@ export function FlipkartSkuSorterPanel({
       setExpandedGroupIds(new Set());
       setSelectedSkus(new Set());
       setActiveGroupId(null);
+      setAutoGroupedSet(new Set());
+      setAutoGroupedNotice(null);
       updateItemsAndEmit(defaultItems);
     }
   };
@@ -577,14 +640,19 @@ export function FlipkartSkuSorterPanel({
     setExpandedGroupIds(new Set());
     setSelectedSkus(new Set());
     setActiveGroupId(null);
+    setAutoGroupedSet(new Set());
+    setAutoGroupedNotice(null);
     updateItemsAndEmit(newItems);
     setShowBulkPasteModal(false);
   };
 
-  /* ── Clear Saved Order from LocalStorage ── */
+  /* ── Clear Saved Order and Groups from LocalStorage ── */
   const handleClearSaved = () => {
     clearSkuOrder();
+    clearSkuGroups();
     setHasSavedBefore(false);
+    setAutoGroupedSet(new Set());
+    setAutoGroupedNotice(null);
   };
 
   /* ── Confirm & Download ── */
@@ -596,6 +664,10 @@ export function FlipkartSkuSorterPanel({
         it.type === "single" ? [it.sku] : it.group.skus
       );
       saveSkuOrder(flattened);
+      const activeGroups = orderItems
+        .filter((it): it is { type: "group"; group: SkuGroup } => it.type === "group")
+        .map((it) => it.group);
+      syncAllCurrentGroupsToStorage(activeGroups);
       setHasSavedBefore(true);
       setConfirmed(true);
 
@@ -809,6 +881,26 @@ export function FlipkartSkuSorterPanel({
         </div>
       )}
 
+      {/* ── Auto-Grouped Notification Banner ── */}
+      {autoGroupedNotice && (
+        <div className="mx-3 sm:mx-3.5 mt-2 px-3 py-2 rounded-md border border-emerald-300 bg-emerald-50 text-emerald-900 text-xs flex items-center justify-between shadow-2xs">
+          <div className="flex items-center gap-2">
+            <Sparkles size={14} className="text-emerald-600 shrink-0" />
+            <span>
+              <strong>Auto-Grouped:</strong> {autoGroupedNotice}.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAutoGroupedNotice(null)}
+            className="text-emerald-700 hover:text-emerald-950 font-bold ml-2 p-0.5 rounded hover:bg-emerald-100 cursor-pointer"
+            title="Dismiss notice"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* ── TWO-COLUMN SPLIT VIEW: Left (All Other SKUs & Sequence) | Right (Groups & Position Link) ── */}
       <div className="p-3 sm:p-3.5 grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
         {/* ════════ LEFT COLUMN: Individual SKUs & Sequence Order (7 Cols) ════════ */}
@@ -946,6 +1038,12 @@ export function FlipkartSkuSorterPanel({
                         <span className="text-[10px] text-indigo-700 bg-indigo-100/70 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0">
                           {group.skus.length} SKUs
                         </span>
+                        {autoGroupedSet.has(group.id) && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0" title="Automatically grouped from saved storage">
+                            <Sparkles size={9} />
+                            Auto
+                          </span>
+                        )}
                       </div>
 
                       {/* Total Labels Count */}
@@ -1211,12 +1309,14 @@ export function FlipkartSkuSorterPanel({
                               onChange={(e) => setGroupNameInput(e.target.value)}
                               onKeyDown={(e) => {
                                 if (e.key === "Enter") {
+                                  const updatedGroup = { ...group, name: groupNameInput.trim() || group.name };
                                   const next = [...orderItems];
                                   next[globalIndex] = {
                                     type: "group",
-                                    group: { ...group, name: groupNameInput.trim() || group.name },
+                                    group: updatedGroup,
                                   };
                                   updateItemsAndEmit(next);
+                                  saveOrUpdateSkuGroup(updatedGroup);
                                   setEditingGroupId(null);
                                 }
                                 if (e.key === "Escape") setEditingGroupId(null);
@@ -1227,12 +1327,14 @@ export function FlipkartSkuSorterPanel({
                             <button
                               type="button"
                               onClick={() => {
+                                const updatedGroup = { ...group, name: groupNameInput.trim() || group.name };
                                 const next = [...orderItems];
                                 next[globalIndex] = {
                                   type: "group",
-                                  group: { ...group, name: groupNameInput.trim() || group.name },
+                                  group: updatedGroup,
                                 };
                                 updateItemsAndEmit(next);
+                                saveOrUpdateSkuGroup(updatedGroup);
                                 setEditingGroupId(null);
                               }}
                               className="p-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
@@ -1246,6 +1348,12 @@ export function FlipkartSkuSorterPanel({
                             <span className="font-bold text-xs text-indigo-950 truncate" title={group.name}>
                               {group.name}
                             </span>
+                            {autoGroupedSet.has(group.id) && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0" title="Automatically grouped from saved storage">
+                                <Sparkles size={9} />
+                                Auto
+                              </span>
+                            )}
                             <button
                               type="button"
                               onClick={() => {
