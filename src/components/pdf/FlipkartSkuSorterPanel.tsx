@@ -2,8 +2,6 @@
 
 import { useState, useRef, useMemo, useEffect } from "react";
 import {
-  ChevronsUp,
-  ChevronsDown,
   Download,
   Loader2,
   Package,
@@ -23,7 +21,6 @@ import {
   Check,
   Plus,
   Split,
-  ArrowRight,
   Sparkles,
 } from "lucide-react";
 import type { PageSkuMap } from "@/lib/pdf/flipkartSkuExtractor";
@@ -86,8 +83,9 @@ export function FlipkartSkuSorterPanel({
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [groupNameInput, setGroupNameInput] = useState<string>("");
 
-  // Highlighted Group (when clicking a slot marker on the left)
+  // Highlighted & Hovered Group (for Live Position Connection)
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+  const [hoveredGroupId, setHoveredGroupId] = useState<string | null>(null);
 
   // Remember initial extraction order for "Reset to PDF Order"
   const originalPdfOrderRef = useRef<string[]>(skuOrder);
@@ -209,6 +207,166 @@ export function FlipkartSkuSorterPanel({
     return groups;
   }, [orderItems]);
 
+  // ── Live Scroll Synchronization & Connected Group Refs ──
+  const leftListRef = useRef<HTMLDivElement>(null);
+  const rightListRef = useRef<HTMLDivElement>(null);
+  const groupSlotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const groupCardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const isProgrammaticScrollRef = useRef(false);
+  const scrollAnimFrameRef = useRef<number | null>(null);
+
+  // Smooth scroll helper: Right column scrolls to group card
+  const scrollToRightGroup = (groupId: string, smooth = true) => {
+    const cardEl = groupCardRefs.current.get(groupId);
+    const rightContainer = rightListRef.current;
+    if (cardEl && rightContainer) {
+      const cardTop = cardEl.offsetTop;
+      const cardHeight = cardEl.offsetHeight;
+      const containerHeight = rightContainer.clientHeight;
+      rightContainer.scrollTo({
+        top: Math.max(0, cardTop - containerHeight / 2 + cardHeight / 2),
+        behavior: smooth ? "smooth" : "auto",
+      });
+    }
+  };
+
+  // Smooth scroll helper: Left column scrolls to group position slot
+  const scrollToLeftGroupSlot = (groupId: string, smooth = true) => {
+    const targetIdx = orderItems.findIndex(
+      (it) => it.type === "group" && it.group.id === groupId
+    );
+    if (targetIdx !== -1) {
+      const neededPage = Math.floor(targetIdx / pageSize) + 1;
+      if (currentPage !== neededPage) {
+        setCurrentPage(neededPage);
+        setTimeout(() => {
+          const slotEl = groupSlotRefs.current.get(groupId);
+          const leftContainer = leftListRef.current;
+          if (slotEl && leftContainer) {
+            const slotTop = slotEl.offsetTop;
+            const slotHeight = slotEl.offsetHeight;
+            const containerHeight = leftContainer.clientHeight;
+            leftContainer.scrollTo({
+              top: Math.max(0, slotTop - containerHeight / 2 + slotHeight / 2),
+              behavior: smooth ? "smooth" : "auto",
+            });
+          }
+        }, 60);
+        return;
+      }
+    }
+
+    const slotEl = groupSlotRefs.current.get(groupId);
+    const leftContainer = leftListRef.current;
+    if (slotEl && leftContainer) {
+      const slotTop = slotEl.offsetTop;
+      const slotHeight = slotEl.offsetHeight;
+      const containerHeight = leftContainer.clientHeight;
+      leftContainer.scrollTo({
+        top: Math.max(0, slotTop - containerHeight / 2 + slotHeight / 2),
+        behavior: smooth ? "smooth" : "auto",
+      });
+    }
+  };
+
+  // When scrolling the left column, synchronize the right column's scroll position
+  const handleLeftScroll = () => {
+    if (isProgrammaticScrollRef.current) return;
+    if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
+
+    scrollAnimFrameRef.current = requestAnimationFrame(() => {
+      const leftContainer = leftListRef.current;
+      const rightContainer = rightListRef.current;
+      if (!leftContainer || !rightContainer || allGroupsWithPosition.length === 0) return;
+
+      const containerRect = leftContainer.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerRect.height / 2;
+
+      let closestGroupId: string | null = null;
+      let minDistance = Infinity;
+
+      groupSlotRefs.current.forEach((el, gId) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom >= containerRect.top - 30 && rect.top <= containerRect.bottom + 30) {
+          const slotCenter = rect.top + rect.height / 2;
+          const dist = Math.abs(slotCenter - containerCenter);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestGroupId = gId;
+          }
+        }
+      });
+
+      if (closestGroupId) {
+        if (closestGroupId !== activeGroupId) {
+          setActiveGroupId(closestGroupId);
+        }
+        isProgrammaticScrollRef.current = true;
+        scrollToRightGroup(closestGroupId, true);
+        setTimeout(() => {
+          isProgrammaticScrollRef.current = false;
+        }, 300);
+      } else {
+        // Proportional scroll tracking when no group slot is directly in center
+        const maxScrollLeft = leftContainer.scrollHeight - leftContainer.clientHeight;
+        if (maxScrollLeft > 0) {
+          const scrollFraction = leftContainer.scrollTop / maxScrollLeft;
+          const maxScrollRight = rightContainer.scrollHeight - rightContainer.clientHeight;
+          if (maxScrollRight > 0) {
+            isProgrammaticScrollRef.current = true;
+            rightContainer.scrollTop = scrollFraction * maxScrollRight;
+            setTimeout(() => {
+              isProgrammaticScrollRef.current = false;
+            }, 60);
+          }
+        }
+      }
+    });
+  };
+
+  // When scrolling the right column, synchronize the left column's scroll position
+  const handleRightScroll = () => {
+    if (isProgrammaticScrollRef.current) return;
+    if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
+
+    scrollAnimFrameRef.current = requestAnimationFrame(() => {
+      const rightContainer = rightListRef.current;
+      const leftContainer = leftListRef.current;
+      if (!rightContainer || !leftContainer || allGroupsWithPosition.length === 0) return;
+
+      const containerRect = rightContainer.getBoundingClientRect();
+      const containerCenter = containerRect.top + containerRect.height / 2;
+
+      let closestGroupId: string | null = null;
+      let minDistance = Infinity;
+
+      groupCardRefs.current.forEach((el, gId) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.bottom >= containerRect.top - 30 && rect.top <= containerRect.bottom + 30) {
+          const cardCenter = rect.top + rect.height / 2;
+          const dist = Math.abs(cardCenter - containerCenter);
+          if (dist < minDistance) {
+            minDistance = dist;
+            closestGroupId = gId;
+          }
+        }
+      });
+
+      if (closestGroupId) {
+        if (closestGroupId !== activeGroupId) {
+          setActiveGroupId(closestGroupId);
+        }
+        isProgrammaticScrollRef.current = true;
+        scrollToLeftGroupSlot(closestGroupId, true);
+        setTimeout(() => {
+          isProgrammaticScrollRef.current = false;
+        }, 300);
+      }
+    });
+  };
+
   /* ── Group Creation: From Search or Checkbox Selection ── */
   const createGroupFromSkus = (skusToGroup: string[], defaultName?: string) => {
     if (skusToGroup.length < 2) return;
@@ -305,23 +463,6 @@ export function FlipkartSkuSorterPanel({
       };
       next.splice(groupIdx + 1, 0, { type: "single", sku: skuToRemove });
     }
-    updateItemsAndEmit(next);
-  };
-
-  /* ── Move entire Item (Group or Single) ── */
-  const moveItemToTop = (index: number) => {
-    if (index <= 0) return;
-    const next = [...orderItems];
-    const [item] = next.splice(index, 1);
-    next.unshift(item);
-    updateItemsAndEmit(next);
-  };
-
-  const moveItemToBottom = (index: number) => {
-    if (index >= orderItems.length - 1) return;
-    const next = [...orderItems];
-    const [item] = next.splice(index, 1);
-    next.push(item);
     updateItemsAndEmit(next);
   };
 
@@ -700,12 +841,16 @@ export function FlipkartSkuSorterPanel({
               </span>
             </div>
             <span className="text-[10px] text-black/50 hidden sm:inline">
-              Drag or use Top/Bottom to arrange
+              Drag or click #rank to jump
             </span>
           </div>
 
           {/* Left Scrollable List */}
-          <div className="p-2 space-y-1.5 max-h-[310px] overflow-y-auto">
+          <div
+            ref={leftListRef}
+            onScroll={handleLeftScroll}
+            className="p-2 space-y-1.5 max-h-[310px] overflow-y-auto"
+          >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-black/50 text-xs">
                 No SKUs match &ldquo;{searchQuery}&rdquo;.
@@ -720,123 +865,110 @@ export function FlipkartSkuSorterPanel({
                 if (item.type === "group") {
                   const group = item.group;
                   const totalGroupLabels = getItemLabelCount(item);
-                  const isHighlighted = activeGroupId === group.id;
+                  const isConnected = activeGroupId === group.id || hoveredGroupId === group.id;
 
                   return (
                     <div
                       key={`slot-${group.id}`}
+                      ref={(el) => {
+                        if (el) groupSlotRefs.current.set(group.id, el);
+                        else groupSlotRefs.current.delete(group.id);
+                      }}
                       draggable={!isEditingJump}
                       onDragStart={() => handleDragStart(globalIndex)}
                       onDragEnter={() => handleDragEnter(globalIndex)}
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(globalIndex)}
                       onDragEnd={handleDragEnd}
-                      onClick={() => setActiveGroupId(group.id)}
-                      className={`flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md border-2 border-dashed transition-all cursor-pointer select-none ${
-                        isHighlighted
-                          ? "border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-200"
+                      onMouseEnter={() => {
+                        setHoveredGroupId(group.id);
+                        scrollToRightGroup(group.id, true);
+                      }}
+                      onMouseLeave={() => setHoveredGroupId(null)}
+                      onClick={() => {
+                        setActiveGroupId(group.id);
+                        scrollToRightGroup(group.id, true);
+                      }}
+                      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs cursor-pointer select-none transition-colors ${
+                        isConnected
+                          ? "border-indigo-400 bg-indigo-50/80 shadow-xs ring-1 ring-indigo-200"
                           : isDragTarget
-                          ? "border-indigo-500 bg-indigo-50/60"
-                          : "border-indigo-300/80 bg-indigo-50/30 hover:border-indigo-400 hover:bg-indigo-50/50"
+                          ? "border-[#051448] bg-[#051448]/10"
+                          : "border-indigo-200 bg-indigo-50/40 hover:border-indigo-300 hover:bg-indigo-50/60 shadow-2xs"
                       }`}
                     >
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <span title="Drag to reorder sequence position">
-                          <GripVertical size={13} className="text-indigo-400 shrink-0 cursor-grab" />
-                        </span>
+                      {/* Drag Handle */}
+                      <GripVertical
+                        size={14}
+                        className="shrink-0 text-indigo-400 cursor-grab active:cursor-grabbing"
+                      />
 
-                        {/* Position Jump */}
-                        {isEditingJump ? (
-                          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                            <input
-                              type="number"
-                              min={1}
-                              max={orderItems.length}
-                              value={jumpRankInput}
-                              onChange={(e) => setJumpRankInput(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") applyJumpToRank(globalIndex);
-                                if (e.key === "Escape") setJumpItemIndex(null);
-                              }}
-                              autoFocus
-                              placeholder={`${globalIndex + 1}`}
-                              className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-bold text-indigo-950"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => applyJumpToRank(globalIndex)}
-                              className="text-[10px] bg-indigo-700 text-white px-1.5 py-0.5 rounded font-bold hover:bg-indigo-800 cursor-pointer"
-                            >
-                              Go
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setJumpItemIndex(null)}
-                              className="text-black/50 hover:text-black text-xs px-0.5 cursor-pointer"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ) : (
+                      {/* Position Number */}
+                      {isEditingJump ? (
+                        <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="number"
+                            min={1}
+                            max={orderItems.length}
+                            value={jumpRankInput}
+                            onChange={(e) => setJumpRankInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") applyJumpToRank(globalIndex);
+                              if (e.key === "Escape") setJumpItemIndex(null);
+                            }}
+                            autoFocus
+                            placeholder={`${globalIndex + 1}`}
+                            className="w-11 px-1 py-0.5 text-xs text-center border border-indigo-600 bg-white rounded font-bold text-indigo-950"
+                          />
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setJumpItemIndex(globalIndex);
-                              setJumpRankInput((globalIndex + 1).toString());
-                            }}
-                            className="text-xs font-bold text-indigo-900 min-w-[26px] px-1 py-0.5 rounded bg-indigo-100 hover:bg-indigo-200 border border-indigo-300 text-center shrink-0 cursor-pointer transition-colors"
-                            title={`Position #${globalIndex + 1}. Click to jump position`}
+                            onClick={() => applyJumpToRank(globalIndex)}
+                            className="text-[10px] bg-indigo-700 text-white px-1.5 py-0.5 rounded font-bold hover:bg-indigo-800 cursor-pointer"
                           >
-                            #{globalIndex + 1}
-                          </button>
-                        )}
-
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <Layers size={13} className="text-indigo-600 shrink-0" />
-                          <span className="font-bold text-xs text-indigo-950 truncate" title={group.name}>
-                            Group: {group.name}
-                          </span>
-                          <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100 px-1.5 py-0.2 rounded-full shrink-0">
-                            {group.skus.length} SKUs • {totalGroupLabels} labels
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right indicator pointing to Right Column */}
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="hidden sm:inline text-[10px] font-bold text-indigo-600 flex items-center gap-0.5 bg-white border border-indigo-200 px-1.5 py-0.5 rounded shadow-2xs">
-                          <span>See on right</span>
-                          <ArrowRight size={10} />
-                        </span>
-
-                        <div className="flex items-center gap-0.5">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              moveItemToTop(globalIndex);
-                            }}
-                            disabled={globalIndex === 0}
-                            className="p-1 rounded hover:bg-white disabled:opacity-20 text-indigo-800 cursor-pointer"
-                            title="Move group to Top (#1)"
-                          >
-                            <ChevronsUp size={13} />
+                            Go
                           </button>
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              moveItemToBottom(globalIndex);
-                            }}
-                            disabled={globalIndex === orderItems.length - 1}
-                            className="p-1 rounded hover:bg-white disabled:opacity-20 text-indigo-800 cursor-pointer"
-                            title="Move group to Bottom"
+                            onClick={() => setJumpItemIndex(null)}
+                            className="text-black/50 hover:text-black text-xs px-0.5 cursor-pointer"
                           >
-                            <ChevronsDown size={13} />
+                            ✕
                           </button>
                         </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setJumpItemIndex(globalIndex);
+                            setJumpRankInput((globalIndex + 1).toString());
+                          }}
+                          className={`text-xs font-bold min-w-[26px] px-1 py-0.5 rounded text-center shrink-0 cursor-pointer transition-colors ${
+                            isConnected
+                              ? "bg-indigo-600 text-white shadow-xs"
+                              : "text-indigo-950 bg-indigo-100/80 hover:bg-indigo-200 border border-indigo-200"
+                          }`}
+                          title={`Position #${globalIndex + 1}. Click to jump position`}
+                        >
+                          #{globalIndex + 1}
+                        </button>
+                      )}
+
+                      {/* Group Name & Badge */}
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        <Layers size={13} className="text-indigo-600 shrink-0" />
+                        <span className="font-bold text-xs text-indigo-950 truncate" title={group.name}>
+                          Group: {group.name}
+                        </span>
+                        <span className="text-[10px] text-indigo-700 bg-indigo-100/70 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0">
+                          {group.skus.length} SKUs
+                        </span>
                       </div>
+
+                      {/* Total Labels Count */}
+                      <span className="text-[11px] font-bold text-indigo-900 bg-indigo-100/70 border border-indigo-200 px-2 py-0.5 rounded-full shrink-0">
+                        {totalGroupLabels} {totalGroupLabels === 1 ? "label" : "labels"}
+                      </span>
                     </div>
                   );
                 }
@@ -866,21 +998,36 @@ export function FlipkartSkuSorterPanel({
                         : "border-slate-200 bg-white hover:border-[#051448]/40 hover:bg-blue-50/30 shadow-2xs"
                     }`}
                   >
-                    {/* Selection Checkbox for Grouping */}
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
+                    {/* Selection Checkbox for Grouping (Enlarged with generous click area) */}
+                    <div
+                      className="flex items-center justify-center p-1 -m-1 rounded hover:bg-indigo-100/70 cursor-pointer shrink-0 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setSelectedSkus((prev) => {
                           const copy = new Set(prev);
-                          if (e.target.checked) copy.add(sku);
-                          else copy.delete(sku);
+                          if (copy.has(sku)) copy.delete(sku);
+                          else copy.add(sku);
                           return copy;
                         });
                       }}
-                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
                       title="Select to group with other SKUs"
-                    />
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          setSelectedSkus((prev) => {
+                            const copy = new Set(prev);
+                            if (e.target.checked) copy.add(sku);
+                            else copy.delete(sku);
+                            return copy;
+                          });
+                        }}
+                        className="w-5 h-5 rounded border-2 border-slate-400 text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0 accent-indigo-600"
+                        title="Select to group with other SKUs"
+                      />
+                    </div>
 
                     {/* Drag Handle */}
                     <GripVertical
@@ -952,28 +1099,6 @@ export function FlipkartSkuSorterPanel({
                     >
                       {count} {count === 1 ? "label" : "labels"}
                     </span>
-
-                    {/* Quick Relocate Actions */}
-                    <div className="flex items-center gap-0.5 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => moveItemToTop(globalIndex)}
-                        disabled={globalIndex === 0}
-                        className="p-1 rounded hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors text-black/60 hover:text-[#051448]"
-                        title="Move to Top (#1)"
-                      >
-                        <ChevronsUp size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveItemToBottom(globalIndex)}
-                        disabled={globalIndex === orderItems.length - 1}
-                        className="p-1 rounded hover:bg-slate-100 disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer transition-colors text-black/60 hover:text-[#051448]"
-                        title="Move to Bottom (Last position)"
-                      >
-                        <ChevronsDown size={13} />
-                      </button>
-                    </div>
                   </div>
                 );
               })
@@ -981,33 +1106,37 @@ export function FlipkartSkuSorterPanel({
           </div>
         </div>
 
-        {/* ════════ RIGHT COLUMN: Product Groups & Position Linking (5 Cols) ════════ */}
-        <div className="lg:col-span-5 flex flex-col rounded-md border border-indigo-200 bg-indigo-50/30 overflow-hidden">
+        {/* ════════ RIGHT COLUMN: Product Groups (5 Cols) ════════ */}
+        <div className="lg:col-span-5 flex flex-col rounded-md border border-slate-200 bg-slate-50/50 overflow-hidden">
           {/* Section Header */}
-          <div className="px-3 py-2 bg-white border-b border-indigo-200 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-1.5 font-bold text-indigo-950">
-              <Layers size={14} className="text-indigo-600" />
+          <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-1.5 font-bold text-black">
+              <Layers size={14} className="text-[#051448]" />
               <span>Product Groups</span>
-              <span className="text-[11px] font-normal text-indigo-700">
+              <span className="text-[11px] font-normal text-black/55">
                 ({totalGroupsCount} created)
               </span>
             </div>
-            <span className="text-[10px] text-indigo-600 font-medium">
-              Prints in assigned position
+            <span className="text-[10px] text-black/50">
+              Assigned print position
             </span>
           </div>
 
           {/* Right Scrollable Groups List */}
-          <div className="p-2 space-y-2 max-h-[310px] overflow-y-auto">
+          <div
+            ref={rightListRef}
+            onScroll={handleRightScroll}
+            className="p-2 space-y-2 max-h-[310px] overflow-y-auto"
+          >
             {allGroupsWithPosition.length === 0 ? (
               /* Helpful Empty State */
-              <div className="py-10 px-4 text-center flex flex-col items-center justify-center gap-2 border-2 border-dashed border-indigo-200 rounded-md bg-white">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+              <div className="py-10 px-4 text-center flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-300 rounded-md bg-white">
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                   <Sparkles size={16} />
                 </div>
-                <p className="font-bold text-xs text-indigo-950">No Product Groups Created Yet</p>
-                <p className="text-[11px] text-black/60 max-w-xs leading-relaxed">
-                  Search similar SKUs on the left (e.g. variations of a product) or check their boxes to group them together into a unified printing position.
+                <p className="font-bold text-xs text-black/80">No Product Groups Created Yet</p>
+                <p className="text-[11px] text-black/55 max-w-xs leading-relaxed">
+                  Search similar SKUs on the left or check their boxes to group them together into a unified printing position.
                 </p>
               </div>
             ) : (
@@ -1016,34 +1145,32 @@ export function FlipkartSkuSorterPanel({
                 const totalGroupLabels = group.skus.reduce((sum, s) => sum + (pageCounts[s] || 0), 0);
                 const isEditingName = editingGroupId === group.id;
                 const isEditingJump = jumpItemIndex === globalIndex;
-                const isHighlighted = activeGroupId === group.id;
+                const isConnected = activeGroupId === group.id || hoveredGroupId === group.id;
 
                 return (
                   <div
                     key={group.id}
-                    className={`rounded-md border bg-white transition-all overflow-hidden shadow-xs ${
-                      isHighlighted
-                        ? "border-indigo-600 ring-2 ring-indigo-300"
-                        : "border-indigo-200 hover:border-indigo-300"
+                    ref={(el) => {
+                      if (el) groupCardRefs.current.set(group.id, el);
+                      else groupCardRefs.current.delete(group.id);
+                    }}
+                    onMouseEnter={() => {
+                      setHoveredGroupId(group.id);
+                      scrollToLeftGroupSlot(group.id, true);
+                    }}
+                    onMouseLeave={() => setHoveredGroupId(null)}
+                    onClick={() => {
+                      setActiveGroupId(group.id);
+                      scrollToLeftGroupSlot(group.id, true);
+                    }}
+                    className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer ${
+                      isConnected
+                        ? "border-indigo-400 ring-1 ring-indigo-200 shadow-xs"
+                        : "border-slate-200 hover:border-slate-300 shadow-2xs"
                     }`}
                   >
-                    {/* Visual Position Connector Bar */}
-                    <div className="px-2.5 py-1 bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <span className="bg-white/20 px-1.5 py-0.2 rounded text-[10px] uppercase tracking-wider">
-                          Position #{position}
-                        </span>
-                        <span className="text-[10px] font-medium opacity-90">
-                          ◄── Belongs to Position #{position} in print sequence
-                        </span>
-                      </div>
-                      <span className="text-[10px] opacity-80">
-                        {totalGroupLabels} labels
-                      </span>
-                    </div>
-
-                    {/* Group Header Card */}
-                    <div className="p-2.5 flex items-center justify-between gap-2 bg-indigo-50/40 border-b border-indigo-100">
+                    {/* Clean Compact Group Header */}
+                    <div className="p-2 flex items-center justify-between gap-2 bg-indigo-50/25">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {/* Position Jump */}
                         {isEditingJump ? (
@@ -1084,8 +1211,8 @@ export function FlipkartSkuSorterPanel({
                               setJumpItemIndex(globalIndex);
                               setJumpRankInput(position.toString());
                             }}
-                            className="text-xs font-bold text-indigo-950 px-1.5 py-0.5 rounded bg-indigo-200/80 hover:bg-indigo-200 border border-indigo-300 text-center shrink-0 cursor-pointer transition-colors"
-                            title={`Position #${position}. Click to jump entire group to another rank`}
+                            className="text-xs font-bold text-indigo-950 px-1.5 py-0.5 rounded bg-indigo-100/80 hover:bg-indigo-200 border border-indigo-200 text-center shrink-0 cursor-pointer transition-colors"
+                            title={`Position #${position}. Click to change position`}
                           >
                             #{position}
                           </button>
@@ -1131,6 +1258,7 @@ export function FlipkartSkuSorterPanel({
                           </div>
                         ) : (
                           <div className="flex items-center gap-1 min-w-0 flex-1">
+                            <Layers size={13} className="text-indigo-600 shrink-0" />
                             <span className="font-bold text-xs text-indigo-950 truncate" title={group.name}>
                               {group.name}
                             </span>
@@ -1140,7 +1268,7 @@ export function FlipkartSkuSorterPanel({
                                 setEditingGroupId(group.id);
                                 setGroupNameInput(group.name);
                               }}
-                              className="text-indigo-400 hover:text-indigo-700 p-0.5 cursor-pointer"
+                              className="text-slate-400 hover:text-indigo-700 p-0.5 cursor-pointer"
                               title="Rename group"
                             >
                               <Edit2 size={11} />
@@ -1148,8 +1276,8 @@ export function FlipkartSkuSorterPanel({
                           </div>
                         )}
 
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 shrink-0">
-                          {group.skus.length} SKUs
+                        <span className="text-[11px] font-medium text-black/60 shrink-0">
+                          {totalGroupLabels} labels • {group.skus.length} SKUs
                         </span>
                       </div>
 
@@ -1157,26 +1285,8 @@ export function FlipkartSkuSorterPanel({
                       <div className="flex items-center gap-0.5 shrink-0">
                         <button
                           type="button"
-                          onClick={() => moveItemToTop(globalIndex)}
-                          disabled={globalIndex === 0}
-                          className="p-1 rounded hover:bg-white disabled:opacity-20 text-indigo-800 cursor-pointer"
-                          title="Move entire group to Top (#1)"
-                        >
-                          <ChevronsUp size={13} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => moveItemToBottom(globalIndex)}
-                          disabled={globalIndex === orderItems.length - 1}
-                          className="p-1 rounded hover:bg-white disabled:opacity-20 text-indigo-800 cursor-pointer"
-                          title="Move entire group to Bottom"
-                        >
-                          <ChevronsDown size={13} />
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => handleUngroup(group.id)}
-                          className="p-1 rounded hover:bg-red-50 text-indigo-400 hover:text-red-600 cursor-pointer ml-1"
+                          className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 cursor-pointer"
                           title="Ungroup into individual separate SKUs"
                         >
                           <Split size={13} />
@@ -1191,7 +1301,7 @@ export function FlipkartSkuSorterPanel({
                               return copy;
                             });
                           }}
-                          className="p-1 rounded hover:bg-white text-indigo-700 cursor-pointer"
+                          className="p-1 rounded hover:bg-slate-100 text-slate-500 cursor-pointer"
                           title={isExpanded ? "Collapse group members" : "View group members"}
                         >
                           {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
@@ -1201,9 +1311,9 @@ export function FlipkartSkuSorterPanel({
 
                     {/* Member SKUs list (Expanded) */}
                     {isExpanded && (
-                      <div className="p-2 space-y-1 bg-white border-t border-indigo-100 text-xs">
-                        <p className="text-[10px] font-semibold text-indigo-950 mb-1">
-                          Grouped SKUs (consecutively printed at Position #{position}):
+                      <div className="p-2 space-y-1 bg-white border-t border-slate-200 text-xs">
+                        <p className="text-[10px] font-semibold text-black/60 mb-1">
+                          Grouped SKUs (printed at Position #{position}):
                         </p>
                         {group.skus.map((sku, subIdx) => {
                           const count = pageCounts[sku] || 0;
