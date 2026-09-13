@@ -5,13 +5,11 @@ import {
   Download,
   Loader2,
   Package,
-  RotateCcw,
   GripVertical,
   CheckCircle,
   Trash2,
   Search,
   X,
-  ClipboardPaste,
   ChevronLeft,
   ChevronRight,
   Layers,
@@ -140,11 +138,6 @@ export function FlipkartSkuSorterPanel({
   // Direct Jump Editing State
   const [jumpItemIndex, setJumpItemIndex] = useState<number | null>(null);
   const [jumpRankInput, setJumpRankInput] = useState<string>("");
-
-  // Bulk Paste / Excel Order Modal State
-  const [showBulkPasteModal, setShowBulkPasteModal] = useState(false);
-  const [bulkPasteText, setBulkPasteText] = useState("");
-  const [bulkPasteFeedback, setBulkPasteFeedback] = useState<string | null>(null);
 
   // Drag-and-drop state
   const dragIndexRef = useRef<number | null>(null);
@@ -617,65 +610,6 @@ export function FlipkartSkuSorterPanel({
     updateItemsAndEmit(sorted);
   };
 
-  const handleResetToPdfOrder = () => {
-    if (originalPdfOrderRef.current.length > 0) {
-      const defaultItems: OrderItem[] = originalPdfOrderRef.current.map((sku) => ({
-        type: "single",
-        sku,
-      }));
-      setExpandedGroupIds(new Set());
-      setSelectedSkus(new Set());
-      setActiveGroupId(null);
-      updateItemsAndEmit(defaultItems);
-    }
-  };
-
-  /* ── Bulk Paste Order from Excel / Text ── */
-  const handleOpenBulkPaste = () => {
-    const currentSkus = orderItems.flatMap((it) =>
-      it.type === "single" ? [it.sku] : it.group.skus
-    );
-    setBulkPasteText(currentSkus.join("\n"));
-    setBulkPasteFeedback(null);
-    setShowBulkPasteModal(true);
-  };
-
-  const handleApplyBulkPaste = () => {
-    const lines = bulkPasteText
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    if (lines.length === 0) {
-      setBulkPasteFeedback("Please paste at least one SKU name.");
-      return;
-    }
-
-    const uniquePasted: string[] = [];
-    for (const line of lines) {
-      if (!uniquePasted.includes(line)) {
-        uniquePasted.push(line);
-      }
-    }
-
-    const currentSkus = orderItems.flatMap((it) =>
-      it.type === "single" ? [it.sku] : it.group.skus
-    );
-    const matched = uniquePasted.filter((s) => currentSkus.includes(s));
-    const unmatched = currentSkus.filter((s) => !matched.includes(s));
-    const newFlatOrder = [...matched, ...unmatched];
-
-    const newItems: OrderItem[] = newFlatOrder.map((sku) => ({
-      type: "single",
-      sku,
-    }));
-    setExpandedGroupIds(new Set());
-    setSelectedSkus(new Set());
-    setActiveGroupId(null);
-    updateItemsAndEmit(newItems);
-    setShowBulkPasteModal(false);
-  };
-
   /* ── Clear Saved Order and Groups from LocalStorage ── */
   const handleClearSaved = () => {
     clearSkuOrder();
@@ -739,7 +673,7 @@ export function FlipkartSkuSorterPanel({
           <button
             type="button"
             onClick={() => handleSortAlphabetical(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer shadow-2xs"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
             title="Sort A to Z"
           >
             A→Z
@@ -748,30 +682,10 @@ export function FlipkartSkuSorterPanel({
           <button
             type="button"
             onClick={() => handleSortByQuantity(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer shadow-2xs"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
             title="Sort by highest label quantity first"
           >
             Qty ↓
-          </button>
-
-          <button
-            type="button"
-            onClick={handleOpenBulkPaste}
-            className="font-normal text-[#051448] hover:bg-blue-50/50 border border-blue-200 px-2 py-0.5 rounded bg-white transition-colors flex items-center gap-1 cursor-pointer"
-            title="Paste customized SKU order from Excel or Notepad"
-          >
-            <ClipboardPaste size={12} />
-            <span className="hidden sm:inline">Paste Order</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleResetToPdfOrder}
-            className="font-normal text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 px-2 py-0.5 rounded bg-white transition-colors flex items-center gap-1 cursor-pointer"
-            title="Reset to the original order from the uploaded PDF"
-          >
-            <RotateCcw size={11} />
-            <span className="hidden md:inline">Reset</span>
           </button>
 
           {hasSavedBefore && (
@@ -796,12 +710,12 @@ export function FlipkartSkuSorterPanel({
         </div>
       )}
 
-      {/* ── TWO-COLUMN SPLIT VIEW: Left (All Other SKUs & Sequence) | Right (Groups & Position Link) ── */}
-      <div className="p-2 sm:p-2.5 grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-start">
-        {/* ════════ LEFT COLUMN: Individual SKUs & Sequence Order (7 Cols) ════════ */}
-        <div className="lg:col-span-7 flex flex-col rounded-md border border-slate-200 bg-white overflow-hidden">
+      {/* ── TWO-PART SPLIT: Seamless Left & Right with single vertical divider ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch bg-white">
+        {/* ════════ LEFT PART: SKUs & Sequence Order (7 Cols) ════════ */}
+        <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-200">
           {/* Header with Maximized Search Bar & Quick Group Actions */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[38px]">
+          <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[42px]">
             {/* Maximized Search Bar */}
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
@@ -813,7 +727,7 @@ export function FlipkartSkuSorterPanel({
                   setCurrentPage(1);
                 }}
                 placeholder="Search SKUs to sequence or group..."
-                className="w-full pl-8 pr-6 py-1 text-xs bg-white border border-slate-300 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400"
+                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-200 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {searchQuery && (
                 <button
@@ -931,7 +845,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="p-1.5 space-y-1 max-h-[350px] overflow-y-auto bg-white"
+            className="p-2 space-y-1 max-h-[380px] overflow-y-auto bg-white"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -972,13 +886,12 @@ export function FlipkartSkuSorterPanel({
                         setActiveGroupId(group.id);
                         scrollToRightGroup(group.id, true);
                       }}
-                      className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-pointer select-none transition-colors ${
-                        isConnected
+                      className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-pointer select-none transition-colors ${isConnected
                           ? "border-blue-600 bg-blue-50/20"
                           : isDragTarget
-                          ? "border-[#051448] bg-[#051448]/10"
-                          : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/20"
-                      }`}
+                            ? "border-[#051448] bg-[#051448]/10"
+                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/20"
+                        }`}
                     >
                       {/* Drag Handle */}
                       <GripVertical
@@ -1026,11 +939,10 @@ export function FlipkartSkuSorterPanel({
                             setJumpItemIndex(globalIndex);
                             setJumpRankInput((globalIndex + 1).toString());
                           }}
-                          className={`text-xs font-semibold min-w-[26px] px-1.5 py-0.5 rounded text-center shrink-0 cursor-pointer transition-colors ${
-                            isConnected
+                          className={`text-xs font-semibold min-w-[26px] px-1.5 py-0.5 rounded text-center shrink-0 cursor-pointer transition-colors ${isConnected
                               ? "bg-blue-600 text-white"
                               : "text-indigo-950 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200"
-                          }`}
+                            }`}
                           title={`Position ${globalIndex + 1}. Click to jump position`}
                         >
                           {globalIndex + 1}
@@ -1066,15 +978,14 @@ export function FlipkartSkuSorterPanel({
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(globalIndex)}
                     onDragEnd={handleDragEnd}
-                    className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-grab active:cursor-grabbing transition-all select-none ${
-                      isDragTarget
+                    className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-grab active:cursor-grabbing transition-all select-none ${isDragTarget
                         ? "border-[#051448] bg-[#051448]/10"
                         : isChecked
-                        ? "border-blue-500 bg-blue-50/30"
-                        : isUnknown
-                        ? "border-amber-200 bg-amber-50/40 hover:border-amber-300"
-                        : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/40"
-                    }`}
+                          ? "border-blue-500 bg-blue-50/30"
+                          : isUnknown
+                            ? "border-amber-200 bg-amber-50/40 hover:border-amber-300"
+                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/40"
+                      }`}
                   >
                     {/* Selection Checkbox for Grouping (Enlarged with generous click area) */}
                     <div
@@ -1169,11 +1080,10 @@ export function FlipkartSkuSorterPanel({
 
                     {/* Count Badge */}
                     <span
-                      className={`text-[11px] font-normal px-2 py-0.5 rounded-full border shrink-0 ${
-                        isUnknown
+                      className={`text-[11px] font-normal px-2 py-0.5 rounded-full border shrink-0 ${isUnknown
                           ? "text-amber-800 bg-amber-50 border-amber-200"
                           : "text-slate-600 bg-slate-50 border-slate-200"
-                      }`}
+                        }`}
                     >
                       {count} {count === 1 ? "label" : "labels"}
                     </span>
@@ -1184,10 +1094,10 @@ export function FlipkartSkuSorterPanel({
           </div>
         </div>
 
-        {/* ════════ RIGHT COLUMN: Product Groups (5 Cols) ════════ */}
-        <div className="lg:col-span-5 flex flex-col rounded-md border border-slate-200 bg-white overflow-hidden">
+        {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
+        <div className="lg:col-span-5 flex flex-col">
           {/* Header with Maximized Search Bar for Product Groups */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[38px]">
+          <div className="px-3 py-2 bg-white border-b border-slate-200 flex items-center gap-2 text-xs min-h-[42px]">
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={14} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input
@@ -1195,7 +1105,7 @@ export function FlipkartSkuSorterPanel({
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
                 placeholder="Search Product Groups..."
-                className="w-full pl-8 pr-6 py-1 text-xs bg-white border border-slate-300 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400"
+                className="w-full pl-8 pr-6 py-1 text-xs bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-200 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {groupSearchQuery && (
                 <button
@@ -1221,7 +1131,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={rightListRef}
             onScroll={handleRightScroll}
-            className="p-1.5 space-y-1.5 max-h-[350px] overflow-y-auto bg-white"
+            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white"
           >
             {allGroupsWithPosition.length === 0 ? (
               /* Helpful Empty State */
@@ -1270,11 +1180,10 @@ export function FlipkartSkuSorterPanel({
                       setActiveGroupId(group.id);
                       scrollToLeftGroupSlot(group.id, true);
                     }}
-                    className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer ${
-                      isConnected
+                    className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer ${isConnected
                         ? "border-blue-600"
                         : "border-slate-200 hover:border-slate-300"
-                    }`}
+                      }`}
                   >
                     {/* Clean Compact Group Header */}
                     <div className="p-1.5 px-2 flex items-center justify-between gap-2 bg-white border-b border-slate-100">
@@ -1445,16 +1354,15 @@ export function FlipkartSkuSorterPanel({
       </div>
 
       {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3 py-1.5 border-t border-slate-200 bg-white rounded-b-md flex items-center justify-end gap-2">
+      <div className="px-3 py-2 border-t border-slate-200 bg-white flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={handleConfirmAndDownload}
           disabled={isBuilding}
-          className={`flex items-center justify-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${
-            confirmed
+          className={`flex items-center justify-center gap-1.5 text-xs font-medium px-4 py-1.5 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
               ? "bg-emerald-700 hover:bg-emerald-800 text-white"
-              : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-xs"
-          } disabled:opacity-60`}
+              : "bg-[#051448] hover:bg-[#071a5e] text-white"
+            } disabled:opacity-60`}
         >
           {isBuilding ? (
             <>
@@ -1474,73 +1382,6 @@ export function FlipkartSkuSorterPanel({
           )}
         </button>
       </div>
-
-      {/* ── Bulk Paste Order Modal ── */}
-      {showBulkPasteModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-white rounded-lg border border-[#051448] shadow-2xl w-full max-w-lg flex flex-col overflow-hidden max-h-[85vh]">
-            <div className="px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <ClipboardPaste size={16} className="text-[#051448]" />
-                <h3 className="font-medium text-sm text-slate-900">
-                  Bulk Paste SKU Packing Order
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowBulkPasteModal(false)}
-                className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 cursor-pointer"
-              >
-                <X size={15} />
-              </button>
-            </div>
-
-            <div className="p-3.5 flex flex-col gap-2 overflow-y-auto bg-white">
-              <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                Paste your prioritized SKU list below (one per line, directly from <strong>Excel</strong>, <strong>Google Sheets</strong>, or warehouse ERP).
-                Labels matching your list will be grouped in this exact sequence, and any remaining labels will follow afterward.
-              </p>
-
-              <textarea
-                rows={10}
-                value={bulkPasteText}
-                onChange={(e) => setBulkPasteText(e.target.value)}
-                placeholder="Paste SKU list here (one per line)..."
-                className="w-full text-xs font-mono p-2.5 bg-white border border-slate-300 rounded focus:outline-hidden focus:border-[#051448] text-slate-900 placeholder:text-slate-400"
-              />
-
-              {bulkPasteFeedback && (
-                <div className="text-xs text-red-600 font-normal">
-                  {bulkPasteFeedback}
-                </div>
-              )}
-            </div>
-
-            <div className="px-4 py-2.5 bg-white border-t border-slate-200 flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-500 font-normal">
-                {bulkPasteText.split(/\r?\n/).filter((l) => l.trim().length > 0).length} lines pasted
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowBulkPasteModal(false)}
-                  className="px-3 py-1.5 rounded text-xs font-normal text-slate-700 hover:text-slate-900 border border-slate-300 bg-white hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleApplyBulkPaste}
-                  className="px-4 py-1.5 rounded text-xs font-medium text-white bg-[#051448] hover:bg-[#071a5e] cursor-pointer shadow-xs"
-                >
-                  Apply Reorder
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
