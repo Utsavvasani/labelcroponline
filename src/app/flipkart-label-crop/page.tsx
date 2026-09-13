@@ -6,9 +6,7 @@ import {
   UploadCloud,
   FileText,
   Download,
-  RotateCcw,
   Eye,
-  Info,
   Loader2,
   X,
   Scissors,
@@ -582,25 +580,9 @@ export default function FlipkartLabelCropPage() {
                       icon={Eye}
                       label="Preview Cropped PDF"
                       onClick={() => setShowPreviewModal(true)}
+                      alignRight={true}
                     />
                   )}
-
-                  {/* View Details / Metadata */}
-                  {cropResult && (
-                    <TooltipButton
-                      icon={Info}
-                      label="PDF Information"
-                      onClick={() => setShowMetaModal(true)}
-                    />
-                  )}
-
-                  {/* Reset / Upload Different PDF */}
-                  <TooltipButton
-                    icon={RotateCcw}
-                    label="Upload Different PDF"
-                    onClick={handleReset}
-                    alignRight={true}
-                  />
 
                   {/* Direct Crop & Download button (visible when SKU sorter is not active) */}
                   {skuOrder.length < 2 && (
