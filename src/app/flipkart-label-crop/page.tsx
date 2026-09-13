@@ -73,14 +73,14 @@ function TooltipButton({
         type="button"
         onClick={onClick}
         disabled={disabled}
-        className={`p-2.5 sm:p-2.5 rounded-md border transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-2xs ${
+        className={`h-[34px] w-[34px] rounded-md border transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-2xs ${
           active
             ? "border-[#051448] bg-[#051448] text-white shadow-xs"
             : "border-slate-400 bg-white hover:bg-blue-50 text-[#051448] hover:border-[#051448]/60 hover:text-[#051448]"
         } disabled:opacity-40 disabled:cursor-not-allowed`}
         aria-label={label}
       >
-        <Icon size={17} className="stroke-[2.2]" />
+        <Icon size={16} className="stroke-[2.2]" />
         {badge !== undefined && (
           <span className="text-[11px] font-bold px-1.5 rounded-full bg-blue-100 text-[#051448]">
             {badge}
@@ -523,14 +523,14 @@ export default function FlipkartLabelCropPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   {/* Crop Mode Switcher */}
                   <div className="relative group inline-flex items-center">
-                    <div className="flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
+                    <div className="h-[34px] flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
                       <button
                         type="button"
                         onClick={() => handleModeChange("auto")}
-                        className={`px-2.5 sm:px-3 py-1.5 rounded text-xs font-bold transition-all cursor-pointer ${
+                        className={`h-full px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                           cropMode === "auto"
                             ? "bg-[#051448] text-white shadow-xs"
-                            : "text-black/60 hover:text-black"
+                            : "text-slate-600 hover:text-black"
                         }`}
                       >
                         Standard Crop
@@ -538,10 +538,10 @@ export default function FlipkartLabelCropPage() {
                       <button
                         type="button"
                         onClick={() => handleModeChange("custom")}
-                        className={`px-2.5 sm:px-3 py-1.5 rounded text-xs font-bold transition-all cursor-pointer ${
+                        className={`h-full px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                           cropMode === "custom"
                             ? "bg-[#051448] text-white shadow-xs"
-                            : "text-black/60 hover:text-black"
+                            : "text-slate-600 hover:text-black"
                         }`}
                       >
                         Custom
@@ -590,7 +590,7 @@ export default function FlipkartLabelCropPage() {
                       type="button"
                       onClick={handleCropAndDownloadClick}
                       disabled={isProcessing}
-                      className="flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-4 py-2 rounded-md transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
+                      className="h-[34px] flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs sm:text-sm font-medium px-4 rounded-md transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
                     >
                       {isProcessing ? (
                         <Loader2 size={14} className="animate-spin" />
