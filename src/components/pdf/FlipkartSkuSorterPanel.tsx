@@ -215,22 +215,34 @@ export function FlipkartSkuSorterPanel({
   const isProgrammaticScrollRef = useRef(false);
   const scrollAnimFrameRef = useRef<number | null>(null);
 
-  // Smooth scroll helper: Right column scrolls to group card
+  // Helper: Smoothly scroll an element to the exact vertical center of a container
+  const scrollElementToCenter = (
+    container: HTMLDivElement | null | undefined,
+    element: HTMLDivElement | null | undefined,
+    smooth = true
+  ) => {
+    if (!container || !element) return;
+    const containerRect = container.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+    const currentScrollTop = container.scrollTop;
+    // Calculate the distance of element center from container top in the scroll coordinate space
+    const elementTopInContainer = (elementRect.top - containerRect.top) + currentScrollTop;
+    const targetScrollTop = elementTopInContainer - (container.clientHeight / 2) + (elementRect.height / 2);
+
+    container.scrollTo({
+      top: Math.max(0, targetScrollTop),
+      behavior: smooth ? "smooth" : "auto",
+    });
+  };
+
+  // Smooth scroll helper: Right column scrolls to group card and centers it
   const scrollToRightGroup = (groupId: string, smooth = true) => {
     const cardEl = groupCardRefs.current.get(groupId);
     const rightContainer = rightListRef.current;
-    if (cardEl && rightContainer) {
-      const cardTop = cardEl.offsetTop;
-      const cardHeight = cardEl.offsetHeight;
-      const containerHeight = rightContainer.clientHeight;
-      rightContainer.scrollTo({
-        top: Math.max(0, cardTop - containerHeight / 2 + cardHeight / 2),
-        behavior: smooth ? "smooth" : "auto",
-      });
-    }
+    scrollElementToCenter(rightContainer, cardEl, smooth);
   };
 
-  // Smooth scroll helper: Left column scrolls to group position slot
+  // Smooth scroll helper: Left column scrolls to group position slot and centers it
   const scrollToLeftGroupSlot = (groupId: string, smooth = true) => {
     const targetIdx = orderItems.findIndex(
       (it) => it.type === "group" && it.group.id === groupId
@@ -242,34 +254,18 @@ export function FlipkartSkuSorterPanel({
         setTimeout(() => {
           const slotEl = groupSlotRefs.current.get(groupId);
           const leftContainer = leftListRef.current;
-          if (slotEl && leftContainer) {
-            const slotTop = slotEl.offsetTop;
-            const slotHeight = slotEl.offsetHeight;
-            const containerHeight = leftContainer.clientHeight;
-            leftContainer.scrollTo({
-              top: Math.max(0, slotTop - containerHeight / 2 + slotHeight / 2),
-              behavior: smooth ? "smooth" : "auto",
-            });
-          }
-        }, 60);
+          scrollElementToCenter(leftContainer, slotEl, smooth);
+        }, 80);
         return;
       }
     }
 
     const slotEl = groupSlotRefs.current.get(groupId);
     const leftContainer = leftListRef.current;
-    if (slotEl && leftContainer) {
-      const slotTop = slotEl.offsetTop;
-      const slotHeight = slotEl.offsetHeight;
-      const containerHeight = leftContainer.clientHeight;
-      leftContainer.scrollTo({
-        top: Math.max(0, slotTop - containerHeight / 2 + slotHeight / 2),
-        behavior: smooth ? "smooth" : "auto",
-      });
-    }
+    scrollElementToCenter(leftContainer, slotEl, smooth);
   };
 
-  // When scrolling the left column, synchronize the right column's scroll position
+  // When scrolling the left column, synchronize the right column's scroll position and center the active group
   const handleLeftScroll = () => {
     if (isProgrammaticScrollRef.current) return;
     if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
@@ -288,7 +284,7 @@ export function FlipkartSkuSorterPanel({
       groupSlotRefs.current.forEach((el, gId) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        if (rect.bottom >= containerRect.top - 30 && rect.top <= containerRect.bottom + 30) {
+        if (rect.bottom >= containerRect.top - 20 && rect.top <= containerRect.bottom + 20) {
           const slotCenter = rect.top + rect.height / 2;
           const dist = Math.abs(slotCenter - containerCenter);
           if (dist < minDistance) {
@@ -307,25 +303,11 @@ export function FlipkartSkuSorterPanel({
         setTimeout(() => {
           isProgrammaticScrollRef.current = false;
         }, 300);
-      } else {
-        // Proportional scroll tracking when no group slot is directly in center
-        const maxScrollLeft = leftContainer.scrollHeight - leftContainer.clientHeight;
-        if (maxScrollLeft > 0) {
-          const scrollFraction = leftContainer.scrollTop / maxScrollLeft;
-          const maxScrollRight = rightContainer.scrollHeight - rightContainer.clientHeight;
-          if (maxScrollRight > 0) {
-            isProgrammaticScrollRef.current = true;
-            rightContainer.scrollTop = scrollFraction * maxScrollRight;
-            setTimeout(() => {
-              isProgrammaticScrollRef.current = false;
-            }, 60);
-          }
-        }
       }
     });
   };
 
-  // When scrolling the right column, synchronize the left column's scroll position
+  // When scrolling the right column, synchronize the left column's scroll position and center the active group slot
   const handleRightScroll = () => {
     if (isProgrammaticScrollRef.current) return;
     if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
@@ -344,7 +326,7 @@ export function FlipkartSkuSorterPanel({
       groupCardRefs.current.forEach((el, gId) => {
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        if (rect.bottom >= containerRect.top - 30 && rect.top <= containerRect.bottom + 30) {
+        if (rect.bottom >= containerRect.top - 20 && rect.top <= containerRect.bottom + 20) {
           const cardCenter = rect.top + rect.height / 2;
           const dist = Math.abs(cardCenter - containerCenter);
           if (dist < minDistance) {
@@ -882,6 +864,7 @@ export function FlipkartSkuSorterPanel({
                       onDragEnd={handleDragEnd}
                       onMouseEnter={() => {
                         setHoveredGroupId(group.id);
+                        setActiveGroupId(group.id);
                         scrollToRightGroup(group.id, true);
                       }}
                       onMouseLeave={() => setHoveredGroupId(null)}
@@ -1156,6 +1139,7 @@ export function FlipkartSkuSorterPanel({
                     }}
                     onMouseEnter={() => {
                       setHoveredGroupId(group.id);
+                      setActiveGroupId(group.id);
                       scrollToLeftGroupSlot(group.id, true);
                     }}
                     onMouseLeave={() => setHoveredGroupId(null)}
