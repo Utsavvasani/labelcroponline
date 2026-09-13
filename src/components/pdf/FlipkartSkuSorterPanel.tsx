@@ -77,22 +77,6 @@ export function FlipkartSkuSorterPanel({
     return initialGrouped;
   });
 
-  // Track auto-grouped items to display helpful notification & badges
-  const [autoGroupedSet, setAutoGroupedSet] = useState<Set<string>>(() => {
-    const storedGroups = getStoredSkuGroups();
-    const { autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
-    return new Set(autoGroupedGroupIds);
-  });
-
-  const [autoGroupedNotice, setAutoGroupedNotice] = useState<string | null>(() => {
-    const storedGroups = getStoredSkuGroups();
-    const { autoGroupedGroupIds } = autoGroupSkus(skuOrder, storedGroups);
-    if (autoGroupedGroupIds.length > 0) {
-      return `${autoGroupedGroupIds.length} product group${autoGroupedGroupIds.length > 1 ? "s" : ""} automatically matched & grouped from saved storage`;
-    }
-    return null;
-  });
-
   // Expanded Groups state: Set of group IDs that are expanded
   const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(() => {
     const storedGroups = getStoredSkuGroups();
@@ -106,6 +90,9 @@ export function FlipkartSkuSorterPanel({
   // Group Renaming state
   const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [groupNameInput, setGroupNameInput] = useState<string>("");
+
+  // Add Selected SKUs to existing group dropdown state (left toolbar)
+  const [showAddToGroupMenu, setShowAddToGroupMenu] = useState(false);
 
   // Highlighted & Hovered Group (for Live Position Connection)
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
@@ -134,18 +121,11 @@ export function FlipkartSkuSorterPanel({
       setOrderItems(autoGrouped);
       setSelectedSkus(new Set());
       if (autoGroupedGroupIds.length > 0) {
-        setAutoGroupedSet(new Set(autoGroupedGroupIds));
         setExpandedGroupIds((prev) => {
           const copy = new Set(prev);
           autoGroupedGroupIds.forEach((id) => copy.add(id));
           return copy;
         });
-        setAutoGroupedNotice(
-          `${autoGroupedGroupIds.length} product group${autoGroupedGroupIds.length > 1 ? "s" : ""} automatically matched & grouped from saved storage`
-        );
-      } else {
-        setAutoGroupedSet(new Set());
-        setAutoGroupedNotice(null);
       }
     }
   }, [skuOrder]);
@@ -465,9 +445,57 @@ export function FlipkartSkuSorterPanel({
 
     // Remove from localStorage
     removeStoredSkuGroup(groupId);
-    setAutoGroupedSet((prev) => {
+
+    updateItemsAndEmit(next);
+  };
+
+  /* ── Add SKUs to an Existing Group ── */
+  const handleAddSkusToGroup = (groupId: string, skusToAdd: string[]) => {
+    const cleanSkus = skusToAdd
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    if (cleanSkus.length === 0) return;
+
+    const groupIdx = orderItems.findIndex(
+      (it) => it.type === "group" && it.group.id === groupId
+    );
+    if (groupIdx === -1) return;
+
+    const groupItem = orderItems[groupIdx] as { type: "group"; group: SkuGroup };
+    const existingSkusSet = new Set(groupItem.group.skus);
+    const newUniqueSkus = cleanSkus.filter((s) => !existingSkusSet.has(s));
+    if (newUniqueSkus.length === 0) return;
+
+    const updatedSkus = [...groupItem.group.skus, ...newUniqueSkus];
+    const updatedGroup: SkuGroup = { ...groupItem.group, skus: updatedSkus };
+
+    // Remove newly added SKUs from standalone single items in orderItems
+    const next = orderItems.filter((it) => {
+      if (it.type === "single") {
+        return !newUniqueSkus.includes(it.sku);
+      }
+      return true;
+    });
+
+    const targetIdx = next.findIndex(
+      (it) => it.type === "group" && it.group.id === groupId
+    );
+    if (targetIdx !== -1) {
+      next[targetIdx] = { type: "group", group: updatedGroup };
+    }
+
+    // Persist to localStorage
+    saveOrUpdateSkuGroup(updatedGroup);
+    setHasSavedBefore(true);
+
+    // Expand group so user immediately sees the newly added SKU
+    setExpandedGroupIds((prev) => new Set(prev).add(groupId));
+    setActiveGroupId(groupId);
+
+    // Uncheck added skus from multi-selection
+    setSelectedSkus((prev) => {
       const copy = new Set(prev);
-      copy.delete(groupId);
+      newUniqueSkus.forEach((s) => copy.delete(s));
       return copy;
     });
 
@@ -492,11 +520,6 @@ export function FlipkartSkuSorterPanel({
       }));
       next.splice(groupIdx, 1, ...remainingSingles, { type: "single", sku: skuToRemove });
       removeStoredSkuGroup(groupId);
-      setAutoGroupedSet((prev) => {
-        const copy = new Set(prev);
-        copy.delete(groupId);
-        return copy;
-      });
     } else {
       const updatedGroup = { ...groupItem.group, skus: updatedSkus };
       next[groupIdx] = {
@@ -592,8 +615,6 @@ export function FlipkartSkuSorterPanel({
       setExpandedGroupIds(new Set());
       setSelectedSkus(new Set());
       setActiveGroupId(null);
-      setAutoGroupedSet(new Set());
-      setAutoGroupedNotice(null);
       updateItemsAndEmit(defaultItems);
     }
   };
@@ -640,8 +661,6 @@ export function FlipkartSkuSorterPanel({
     setExpandedGroupIds(new Set());
     setSelectedSkus(new Set());
     setActiveGroupId(null);
-    setAutoGroupedSet(new Set());
-    setAutoGroupedNotice(null);
     updateItemsAndEmit(newItems);
     setShowBulkPasteModal(false);
   };
@@ -651,8 +670,6 @@ export function FlipkartSkuSorterPanel({
     clearSkuOrder();
     clearSkuGroups();
     setHasSavedBefore(false);
-    setAutoGroupedSet(new Set());
-    setAutoGroupedNotice(null);
   };
 
   /* ── Confirm & Download ── */
@@ -809,11 +826,51 @@ export function FlipkartSkuSorterPanel({
               type="button"
               onClick={() => createGroupFromSkus(Array.from(selectedSkus))}
               className="flex items-center gap-1 bg-[#051448] hover:bg-[#071a5e] text-white font-bold px-2.5 py-1 rounded text-xs transition-colors cursor-pointer shadow-xs shrink-0"
-              title={`Group ${selectedSkus.size} selected SKUs together`}
+              title={`Group ${selectedSkus.size} selected SKUs together into a new group`}
             >
               <Plus size={13} />
               <span>Group Selected ({selectedSkus.size})</span>
             </button>
+          )}
+
+          {/* Add Selected SKUs to an Existing Group */}
+          {selectedSkus.size >= 1 && allGroupsWithPosition.length > 0 && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowAddToGroupMenu((prev) => !prev)}
+                className="flex items-center gap-1 bg-white hover:bg-indigo-50 text-indigo-900 border border-indigo-300 font-bold px-2.5 py-1 rounded text-xs transition-colors cursor-pointer shadow-xs shrink-0"
+                title={`Add ${selectedSkus.size} selected SKU(s) to an existing group`}
+              >
+                <Layers size={13} className="text-indigo-600" />
+                <span>Add to Group ({selectedSkus.size})</span>
+                <ChevronDown size={12} />
+              </button>
+
+              {showAddToGroupMenu && (
+                <div className="absolute left-0 mt-1 w-56 bg-white border border-slate-300 rounded-md shadow-xl z-50 py-1 text-xs max-h-52 overflow-y-auto">
+                  <div className="px-2.5 py-1 text-[10px] font-bold text-black/50 border-b border-slate-100 uppercase tracking-wider">
+                    Select Target Group:
+                  </div>
+                  {allGroupsWithPosition.map(({ group, position }) => (
+                    <button
+                      key={group.id}
+                      type="button"
+                      onClick={() => {
+                        handleAddSkusToGroup(group.id, Array.from(selectedSkus));
+                        setShowAddToGroupMenu(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 hover:bg-indigo-50 text-indigo-950 font-medium flex items-center justify-between gap-1 cursor-pointer transition-colors"
+                    >
+                      <span className="truncate font-semibold">{group.name}</span>
+                      <span className="text-[10px] bg-indigo-100 text-indigo-800 px-1.5 py-0.2 rounded-full shrink-0 font-bold">
+                        #{position}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -878,26 +935,6 @@ export function FlipkartSkuSorterPanel({
         <div className="mx-3 mt-2 px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 text-xs flex items-center justify-between">
           <span>{errorMsg}</span>
           <button onClick={() => setErrorMsg(null)} className="font-bold ml-2 cursor-pointer">✕</button>
-        </div>
-      )}
-
-      {/* ── Auto-Grouped Notification Banner ── */}
-      {autoGroupedNotice && (
-        <div className="mx-3 sm:mx-3.5 mt-2 px-3 py-2 rounded-md border border-emerald-300 bg-emerald-50 text-emerald-900 text-xs flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-2">
-            <Sparkles size={14} className="text-emerald-600 shrink-0" />
-            <span>
-              <strong>Auto-Grouped:</strong> {autoGroupedNotice}.
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setAutoGroupedNotice(null)}
-            className="text-emerald-700 hover:text-emerald-950 font-bold ml-2 p-0.5 rounded hover:bg-emerald-100 cursor-pointer"
-            title="Dismiss notice"
-          >
-            ✕
-          </button>
         </div>
       )}
 
@@ -1038,12 +1075,6 @@ export function FlipkartSkuSorterPanel({
                         <span className="text-[10px] text-indigo-700 bg-indigo-100/70 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0">
                           {group.skus.length} SKUs
                         </span>
-                        {autoGroupedSet.has(group.id) && (
-                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0" title="Automatically grouped from saved storage">
-                            <Sparkles size={9} />
-                            Auto
-                          </span>
-                        )}
                       </div>
 
                       {/* Total Labels Count */}
@@ -1348,12 +1379,6 @@ export function FlipkartSkuSorterPanel({
                             <span className="font-bold text-xs text-indigo-950 truncate" title={group.name}>
                               {group.name}
                             </span>
-                            {autoGroupedSet.has(group.id) && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0" title="Automatically grouped from saved storage">
-                                <Sparkles size={9} />
-                                Auto
-                              </span>
-                            )}
                             <button
                               type="button"
                               onClick={() => {
