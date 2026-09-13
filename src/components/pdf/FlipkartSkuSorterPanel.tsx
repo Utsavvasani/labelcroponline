@@ -845,7 +845,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="p-2 space-y-1 max-h-[380px] overflow-y-auto bg-white"
+            className="divide-y divide-slate-200 max-h-[380px] overflow-y-auto bg-white border-t border-slate-200"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -886,11 +886,11 @@ export function FlipkartSkuSorterPanel({
                         setActiveGroupId(group.id);
                         scrollToRightGroup(group.id, true);
                       }}
-                      className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-pointer select-none transition-colors ${isConnected
-                          ? "border-blue-600 bg-blue-50/20"
+                      className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none transition-colors ${isConnected
+                          ? "bg-blue-50/50 text-blue-950 font-medium"
                           : isDragTarget
-                            ? "border-[#051448] bg-[#051448]/10"
-                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/20"
+                            ? "bg-[#051448]/10"
+                            : "bg-white hover:bg-slate-50"
                         }`}
                     >
                       {/* Drag Handle */}
@@ -978,13 +978,13 @@ export function FlipkartSkuSorterPanel({
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop(globalIndex)}
                     onDragEnd={handleDragEnd}
-                    className={`flex items-center gap-2 px-2 py-1 rounded-md border text-xs cursor-grab active:cursor-grabbing transition-all select-none ${isDragTarget
-                        ? "border-[#051448] bg-[#051448]/10"
+                    className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-grab active:cursor-grabbing transition-colors select-none ${isDragTarget
+                        ? "bg-[#051448]/10"
                         : isChecked
-                          ? "border-blue-500 bg-blue-50/30"
+                          ? "bg-blue-50/40"
                           : isUnknown
-                            ? "border-amber-200 bg-amber-50/40 hover:border-amber-300"
-                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/40"
+                            ? "bg-amber-50/40 hover:bg-amber-50/60"
+                            : "bg-white hover:bg-slate-50"
                       }`}
                   >
                     {/* Selection Checkbox for Grouping (Enlarged with generous click area) */}
@@ -1131,7 +1131,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={rightListRef}
             onScroll={handleRightScroll}
-            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white"
+            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white border-t border-slate-200"
           >
             {allGroupsWithPosition.length === 0 ? (
               /* Helpful Empty State */
@@ -1186,7 +1186,7 @@ export function FlipkartSkuSorterPanel({
                       }`}
                   >
                     {/* Clean Compact Group Header */}
-                    <div className="p-1.5 px-2 flex items-center justify-between gap-2 bg-white border-b border-slate-100">
+                    <div className="px-3 py-1.5 flex items-center justify-between gap-2 bg-white border-b border-slate-200">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {/* Position Jump */}
                         {isEditingJump ? (
@@ -1315,15 +1315,15 @@ export function FlipkartSkuSorterPanel({
                     </div>
 
                     {/* Member SKUs list */}
-                    <div className="p-1.5 space-y-1 bg-white border-t border-slate-100">
+                    <div className="divide-y divide-slate-200 bg-white">
                       {group.skus.map((sku, subIdx) => {
                         return (
                           <div
                             key={sku}
-                            className="flex items-center justify-between gap-2 px-2.5 py-1 rounded bg-white border border-slate-200 hover:border-slate-300"
+                            className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white hover:bg-slate-50 transition-colors"
                           >
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
-                              <span className="text-xs font-normal text-indigo-700 w-4">
+                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                              <span className="text-xs font-normal text-indigo-700 w-4 text-center shrink-0">
                                 {subIdx + 1}
                               </span>
                               <span className="font-normal text-sm text-slate-800 truncate" title={sku}>
