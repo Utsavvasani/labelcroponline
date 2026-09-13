@@ -489,13 +489,12 @@ export function FlipkartSkuSorterPanel({
                 onDragOver={handleDragOver}
                 onDrop={() => handleDrop(globalIndex)}
                 onDragEnd={handleDragEnd}
-                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs cursor-grab active:cursor-grabbing transition-all select-none ${
-                  isDragTarget
+                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs cursor-grab active:cursor-grabbing transition-all select-none ${isDragTarget
                     ? "border-[#051448] bg-[#051448]/10 shadow-xs"
                     : isUnknown
-                    ? "border-amber-200 bg-amber-50/50 hover:border-amber-300"
-                    : "border-slate-200 bg-slate-50/70 hover:border-[#051448]/40 hover:bg-blue-50/30 shadow-2xs"
-                }`}
+                      ? "border-amber-200 bg-amber-50/50 hover:border-amber-300"
+                      : "border-slate-200 bg-slate-50/70 hover:border-[#051448]/40 hover:bg-blue-50/30 shadow-2xs"
+                  }`}
               >
                 {/* Drag Handle */}
                 <GripVertical
@@ -559,11 +558,10 @@ export function FlipkartSkuSorterPanel({
 
                 {/* Count Badge */}
                 <span
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${
-                    isUnknown
+                  className={`text-[11px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${isUnknown
                       ? "text-amber-800 bg-amber-100 border-amber-300"
                       : "text-[#051448] bg-[#051448]/8 border-[#051448]/25"
-                  }`}
+                    }`}
                 >
                   {count} {count === 1 ? "label" : "labels"}
                 </span>
@@ -626,11 +624,10 @@ export function FlipkartSkuSorterPanel({
           type="button"
           onClick={handleConfirmAndDownload}
           disabled={isBuilding}
-          className={`flex items-center justify-center gap-1.5 text-xs font-bold px-4 py-2 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${
-            confirmed
+          className={`flex items-center justify-center gap-1.5 text-xs font-bold px-4 py-2 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
               ? "bg-emerald-700 hover:bg-emerald-800 text-white"
               : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-xs"
-          } disabled:opacity-60`}
+            } disabled:opacity-60`}
         >
           {isBuilding ? (
             <>
