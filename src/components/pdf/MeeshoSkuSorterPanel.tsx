@@ -737,7 +737,7 @@ export function MeeshoSkuSorterPanel({
         {/* ════════ LEFT PART: SKUs & Sequence Order (7 Cols) ════════ */}
         <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-400">
           {/* Header with Maximized Search Bar & Quick Group Actions */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
+          <div className="px-2.5 py-1.5 bg-white flex items-center gap-2 text-xs">
             {/* Maximized Search Bar */}
             <div className="relative flex-1 flex items-center min-w-[160px]">
               <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
@@ -1125,7 +1125,7 @@ export function MeeshoSkuSorterPanel({
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
         <div className="lg:col-span-5 flex flex-col">
           {/* Header with Maximized Search Bar for Product Groups */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
+          <div className="px-2.5 py-1.5 bg-white  flex items-center gap-2 text-xs">
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input

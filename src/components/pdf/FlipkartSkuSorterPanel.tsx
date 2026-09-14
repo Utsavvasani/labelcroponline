@@ -729,7 +729,7 @@ export function FlipkartSkuSorterPanel({
         {/* ════════ LEFT PART: SKUs & Sequence Order (7 Cols) ════════ */}
         <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-400">
           {/* Header with Maximized Search Bar & Quick Group Actions */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
+          <div className="px-2.5 py-1.5 bg-white  flex items-center gap-2 text-xs">
             {/* Maximized Search Bar */}
             <div className="relative flex-1 flex items-center min-w-[160px]">
               <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
@@ -1117,7 +1117,7 @@ export function FlipkartSkuSorterPanel({
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
         <div className="lg:col-span-5 flex flex-col">
           {/* Header with Maximized Search Bar for Product Groups */}
-          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
+          <div className="px-2.5 py-1.5 bg-white flex items-center gap-2 text-xs">
             <div className="relative flex-1 flex items-center min-w-[140px]">
               <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input
@@ -1249,8 +1249,8 @@ export function FlipkartSkuSorterPanel({
                               setJumpRankInput(position.toString());
                             }}
                             className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${isConnected
-                                ? "bg-indigo-200/90 border-indigo-400 text-indigo-950 font-bold"
-                                : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
+                              ? "bg-indigo-200/90 border-indigo-400 text-indigo-950 font-bold"
+                              : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
                               }`}
                             title={`Position ${position}. Click to change position`}
                           >
@@ -1321,8 +1321,8 @@ export function FlipkartSkuSorterPanel({
                         )}
 
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${isConnected
-                            ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
-                            : "text-slate-800 bg-white border-slate-400"
+                          ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
+                          : "text-slate-800 bg-white border-slate-400"
                           }`}>
                           {group.skus.length} SKUs
                         </span>
