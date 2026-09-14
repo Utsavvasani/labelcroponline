@@ -909,10 +909,10 @@ export function MeeshoSkuSorterPanel({
                         scrollToRightGroup(group.id, true);
                       }}
                       className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer select-none transition-colors ${isConnected
-                          ? "bg-indigo-100/80 text-indigo-950 font-semibold"
-                          : isDragTarget
-                            ? "bg-[#051448]/15"
-                            : "bg-slate-100/70 hover:bg-slate-200/70 text-slate-900"
+                        ? "bg-indigo-100/80 text-indigo-950 font-semibold"
+                        : isDragTarget
+                          ? "bg-[#051448]/15"
+                          : "bg-slate-100/70 hover:bg-slate-200/70 text-slate-900"
                         }`}
                     >
                       {/* Group Type Indicator (strictly aligned with Checkbox slot w-6) */}
@@ -969,8 +969,8 @@ export function MeeshoSkuSorterPanel({
                             setJumpRankInput((globalIndex + 1).toString());
                           }}
                           className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${isConnected
-                              ? "bg-indigo-200/80 border-indigo-400 text-indigo-950 font-bold"
-                              : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
+                            ? "bg-indigo-200/80 border-indigo-400 text-indigo-950 font-bold"
+                            : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
                             }`}
                           title={`Position ${globalIndex + 1}. Click to jump position`}
                         >
@@ -1007,12 +1007,12 @@ export function MeeshoSkuSorterPanel({
                     onDrop={() => handleDrop(globalIndex)}
                     onDragEnd={handleDragEnd}
                     className={`flex items-center gap-2 px-3 py-1.5 text-xs cursor-grab active:cursor-grabbing transition-colors select-none ${isDragTarget
-                        ? "bg-[#051448]/10"
-                        : isChecked
-                          ? "bg-blue-50/40"
-                          : isUnknown
-                            ? "bg-amber-50/40 hover:bg-amber-50/60"
-                            : "bg-white hover:bg-slate-50"
+                      ? "bg-[#051448]/10"
+                      : isChecked
+                        ? "bg-blue-50/40"
+                        : isUnknown
+                          ? "bg-amber-50/40 hover:bg-amber-50/60"
+                          : "bg-white hover:bg-slate-50"
                       }`}
                   >
                     {/* Selection Checkbox for Grouping (Enlarged with generous click area) */}
@@ -1109,8 +1109,8 @@ export function MeeshoSkuSorterPanel({
                     {/* Count Badge */}
                     <span
                       className={`text-[11px] font-normal px-2 py-0.5 rounded-full border shrink-0 ${isUnknown
-                          ? "text-amber-800 bg-amber-50 border-amber-300"
-                          : "text-slate-600 bg-slate-50 border-slate-400"
+                        ? "text-amber-800 bg-amber-50 border-amber-300"
+                        : "text-slate-600 bg-slate-50 border-slate-400"
                         }`}
                     >
                       {count} {count === 1 ? "label" : "labels"}
@@ -1209,14 +1209,13 @@ export function MeeshoSkuSorterPanel({
                       scrollToLeftGroupSlot(group.id, true);
                     }}
                     className={`rounded-md border bg-white transition-all overflow-hidden cursor-pointer shadow-2xs ${isConnected
-                        ? "border-indigo-600 ring-2 ring-indigo-600/30"
-                        : "border-slate-400 hover:border-slate-500"
+                      ? "border-indigo-600 ring-2 ring-indigo-600/30"
+                      : "border-slate-400 hover:border-slate-500"
                       }`}
                   >
                     {/* Clean Compact Group Header */}
-                    <div className={`px-3 py-1.5 flex items-center justify-between gap-2 border-b border-slate-400 transition-colors ${
-                      isConnected ? "bg-indigo-100/80 text-indigo-950" : "bg-slate-100/80 text-slate-900"
-                    }`}>
+                    <div className={`px-3 py-1.5 flex items-center justify-between gap-2 border-b border-slate-400 transition-colors ${isConnected ? "bg-indigo-100/80 text-indigo-950" : "bg-slate-100/80 text-slate-900"
+                      }`}>
                       <div className="flex items-center gap-2 min-w-0 flex-1">
                         {/* Position Jump */}
                         {isEditingJump ? (
@@ -1257,11 +1256,10 @@ export function MeeshoSkuSorterPanel({
                               setJumpItemIndex(globalIndex);
                               setJumpRankInput(position.toString());
                             }}
-                            className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${
-                              isConnected
+                            className={`text-xs font-semibold min-w-[28px] h-6 px-1.5 rounded border text-center shrink-0 cursor-pointer transition-colors ${isConnected
                                 ? "bg-indigo-200/90 border-indigo-400 text-indigo-950 font-bold"
                                 : "bg-white hover:bg-slate-100 border-slate-400 text-slate-800"
-                            }`}
+                              }`}
                             title={`Position ${position}. Click to change position`}
                           >
                             {position}
@@ -1330,11 +1328,10 @@ export function MeeshoSkuSorterPanel({
                           </div>
                         )}
 
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${
-                          isConnected
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${isConnected
                             ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
                             : "text-slate-800 bg-white border-slate-400"
-                        }`}>
+                          }`}>
                           {group.skus.length} SKUs
                         </span>
                       </div>
@@ -1398,8 +1395,8 @@ export function MeeshoSkuSorterPanel({
           onClick={handleConfirmAndDownload}
           disabled={isBuilding}
           className={`h-[34px] flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium px-4 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
-              ? "bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs"
-              : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-2xs"
+            ? "bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs"
+            : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-2xs"
             } disabled:opacity-60`}
         >
           {isBuilding ? (
