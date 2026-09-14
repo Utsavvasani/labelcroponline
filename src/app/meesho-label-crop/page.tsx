@@ -17,6 +17,8 @@ import {
   Crop,
   FileEdit,
   Sparkles,
+  Files,
+  Plus,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
@@ -35,6 +37,7 @@ import {
 } from "@/lib/pdf/meeshoSkuExtractor";
 import { getStoredSkuOrder } from "@/lib/meeshoSkuStorage";
 import { MeeshoSkuSorterPanel } from "@/components/pdf/MeeshoSkuSorterPanel";
+import { combinePdfFiles, type FilePageBreakdown } from "@/lib/pdf/pdfCombiner";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -131,12 +134,16 @@ export default function MeeshoLabelCropPage() {
   const [showCustomCropModal, setShowCustomCropModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // ── SKU Sorting State ──
+  // ── Multi-File & SKU Sorting State ──
+  const [sourceFiles, setSourceFiles] = useState<File[]>([]);
+  const [fileBreakdown, setFileBreakdown] = useState<FilePageBreakdown[]>([]);
+  const [isCombining, setIsCombining] = useState(false);
   const [pageSkuMap, setPageSkuMap] = useState<PageSkuMap>({});
   const [skuOrder, setSkuOrder] = useState<string[]>([]);
   const [isExtractingSku, setIsExtractingSku] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const appendFileInputRef = useRef<HTMLInputElement>(null);
 
   const getFinalFileName = (fallbackName?: string) => {
     if (customFileName.trim()) {
@@ -230,6 +237,9 @@ export default function MeeshoLabelCropPage() {
 
   const handleReset = () => {
     setFile(null);
+    setSourceFiles([]);
+    setFileBreakdown([]);
+    setIsCombining(false);
     if (cropResult?.blobUrl) {
       const urlToRevoke = cropResult.blobUrl;
       setTimeout(() => URL.revokeObjectURL(urlToRevoke), 1000);
@@ -248,6 +258,7 @@ export default function MeeshoLabelCropPage() {
     setSkuOrder([]);
     setIsExtractingSku(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (appendFileInputRef.current) appendFileInputRef.current.value = "";
   };
 
   const executeDownloadAndReset = (blobUrl: string, fileName: string) => {
@@ -279,20 +290,49 @@ export default function MeeshoLabelCropPage() {
     }
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (
-        selectedFile.type !== "application/pdf" &&
-        !selectedFile.name.toLowerCase().endsWith(".pdf")
-      ) {
-        setErrorMsg("Please upload a valid PDF file.");
-        return;
-      }
-      setFile(selectedFile);
+  const processFiles = async (incomingFiles: File[], append = false) => {
+    const validPdfs = incomingFiles.filter(
+      (f) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf")
+    );
+
+    if (validPdfs.length === 0) {
+      setErrorMsg("Please upload valid PDF file(s).");
+      return;
+    }
+
+    const allFiles = append ? [...sourceFiles, ...validPdfs] : validPdfs;
+    setIsCombining(true);
+    setErrorMsg(null);
+
+    try {
+      const { combinedFile, breakdown } = await combinePdfFiles(allFiles, "meesho_labels");
+      setSourceFiles(allFiles);
+      setFileBreakdown(breakdown);
+      setFile(combinedFile);
       setCustomCropBox(null);
-      handleProcessPdf(selectedFile, selectedFile.name, cropMode, null, false);
-      triggerSkuExtraction(selectedFile);
+      handleProcessPdf(combinedFile, combinedFile.name, cropMode, null, false);
+      triggerSkuExtraction(combinedFile);
+    } catch (err) {
+      console.error("Error processing Meesho PDFs:", err);
+      setErrorMsg(err instanceof Error ? err.message : "Failed to process PDF files.");
+    } finally {
+      setIsCombining(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (appendFileInputRef.current) appendFileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) {
+      processFiles(files, false);
+    }
+  };
+
+  const handleAppendFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) {
+      processFiles(files, true);
     }
   };
 
@@ -309,19 +349,9 @@ export default function MeeshoLabelCropPage() {
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
-      if (
-        droppedFile.type !== "application/pdf" &&
-        !droppedFile.name.toLowerCase().endsWith(".pdf")
-      ) {
-        setErrorMsg("Please upload a valid PDF file.");
-        return;
-      }
-      setFile(droppedFile);
-      setCustomCropBox(null);
-      handleProcessPdf(droppedFile, droppedFile.name, cropMode, null, false);
-      triggerSkuExtraction(droppedFile);
+    const files = e.dataTransfer.files ? Array.from(e.dataTransfer.files) : [];
+    if (files.length > 0) {
+      processFiles(files, false);
     }
   };
 
@@ -361,9 +391,20 @@ export default function MeeshoLabelCropPage() {
           ref={fileInputRef}
           type="file"
           accept="application/pdf"
+          multiple
           onChange={handleFileChange}
           className="hidden"
           id="meesho-file-input"
+        />
+        {/* Hidden Append File Input */}
+        <input
+          ref={appendFileInputRef}
+          type="file"
+          accept="application/pdf"
+          multiple
+          onChange={handleAppendFileChange}
+          className="hidden"
+          id="meesho-append-file-input"
         />
 
         {/* Error Alert */}
@@ -414,7 +455,7 @@ export default function MeeshoLabelCropPage() {
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-4 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
                   >
                     <UploadCloud size={14} />
-                    <span>Choose PDF</span>
+                    <span>Choose PDF(s)</span>
                   </button>
                 </div>
 
@@ -507,10 +548,10 @@ export default function MeeshoLabelCropPage() {
                       <UploadCloud size={20} />
                     </div>
                     <p className="text-xs sm:text-sm font-bold text-black mb-0.5">
-                      Click to select or drop Meesho PDF
+                      Click to select or drop Meesho PDF(s)
                     </p>
                     <p className="text-[10px] sm:text-xs text-black/60">
-                      Single or bulk multi-page order PDF
+                      Single or multiple multi-page order PDFs
                     </p>
                   </div>
                 </div>
@@ -533,12 +574,46 @@ export default function MeeshoLabelCropPage() {
                   />
                   <div className="h-5 w-px bg-slate-400 shrink-0" />
                   <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
-                      title={file.name}
-                    >
-                      {file.name}
-                    </span>
+                    {sourceFiles.length > 1 ? (
+                      <div className="relative group inline-flex items-center">
+                        <div className="flex items-center gap-1.5 cursor-pointer bg-slate-200/70 hover:bg-slate-200 border border-slate-400 px-2 py-1 rounded-md transition-colors shrink-0 shadow-2xs">
+                          <Files size={14} className="text-[#051448] shrink-0" />
+                          <span className="font-bold text-xs sm:text-sm text-black">
+                            {sourceFiles.length} PDFs
+                          </span>
+                        </div>
+                        {/* Instant Light Tooltip with Per-File Breakdown */}
+                        <div className="absolute top-full mt-2.5 left-0 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-start">
+                          <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 ml-4 -mb-1 z-10" />
+                          <div className="bg-white text-[#051448] border border-slate-400 text-xs rounded-md shadow-lg p-2.5 min-w-[240px] max-w-[320px] space-y-1.5">
+                            <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1 flex justify-between items-center">
+                              <span>Combined Files ({sourceFiles.length})</span>
+                              <span>{cropResult ? `${cropResult.pageCount} Labels` : `${fileBreakdown.reduce((a, b) => a + b.pages, 0)} Total`}</span>
+                            </div>
+                            <div className="max-h-40 overflow-y-auto space-y-1">
+                              {fileBreakdown.map((item, idx) => (
+                                <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800">
+                                  <span className="truncate max-w-[170px]" title={item.name}>
+                                    {idx + 1}. {item.name}
+                                  </span>
+                                  <span className="font-semibold shrink-0 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300 text-[#051448]">
+                                    {item.pages} {item.pages === 1 ? "page" : "pages"}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <span
+                        className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
+                        title={file.name}
+                      >
+                        {file.name}
+                      </span>
+                    )}
+
                     {cropResult ? (
                       <span className="text-xs font-bold text-[#051448] bg-blue-100/90 border border-blue-300 px-2.5 py-0.5 rounded-full shrink-0">
                         {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
@@ -548,6 +623,18 @@ export default function MeeshoLabelCropPage() {
                         PDF Loaded
                       </span>
                     )}
+
+                    {/* Add More PDFs Button */}
+                    <button
+                      type="button"
+                      onClick={() => appendFileInputRef.current?.click()}
+                      disabled={isCombining || isProcessing}
+                      className="h-[28px] flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#051448] bg-white hover:bg-blue-50 border border-slate-400 px-2 rounded cursor-pointer transition-colors shadow-2xs shrink-0 disabled:opacity-50"
+                      title="Add and merge more PDF files into this batch"
+                    >
+                      <Plus size={13} className="stroke-[2.5]" />
+                      <span>Add PDF</span>
+                    </button>
                   </div>
                 </div>
 
@@ -645,6 +732,14 @@ export default function MeeshoLabelCropPage() {
                   )}
                 </div>
               </div>
+
+              {/* Combining Overlay / Status Bar */}
+              {isCombining && (
+                <div className="px-3.5 sm:px-4 py-1.5 bg-blue-50/90 border-b border-blue-200 text-xs font-medium text-[#051448] flex items-center gap-2">
+                  <Loader2 size={14} className="animate-spin text-[#051448]" />
+                  <span>Merging PDF files preserving 100% vector quality...</span>
+                </div>
+              )}
 
               {/* 2. Optional Inline File Rename Bar */}
               {showRenameInput && (
