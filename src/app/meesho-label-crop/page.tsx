@@ -15,6 +15,8 @@ import {
   Check,
   FileCheck,
   Crop,
+  FileEdit,
+  Sparkles,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
@@ -25,6 +27,14 @@ import {
   MEESHO_CROP_OPTIONS,
 } from "@/lib/pdf/meeshoCropper";
 import { cropPdfCustomArea, CustomCropBox, CustomCropResult } from "@/lib/pdf/customCropper";
+import {
+  extractSkusFromMeeshoPdf,
+  getUniqueSku,
+  UNKNOWN_SKU,
+  type PageSkuMap,
+} from "@/lib/pdf/meeshoSkuExtractor";
+import { getStoredSkuOrder } from "@/lib/meeshoSkuStorage";
+import { MeeshoSkuSorterPanel } from "@/components/pdf/MeeshoSkuSorterPanel";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -48,11 +58,71 @@ const CustomPdfCropModal = dynamic(
 
 type ExtendedMeeshoCropMode = MeeshoCropMode | "custom";
 
+function TooltipButton({
+  icon: Icon,
+  label,
+  onClick,
+  active = false,
+  badge,
+  disabled = false,
+  alignRight = false,
+}: {
+  icon: React.ElementType;
+  label: string;
+  onClick: () => void;
+  active?: boolean;
+  badge?: string | number;
+  disabled?: boolean;
+  alignRight?: boolean;
+}) {
+  return (
+    <div className="relative group inline-flex items-center">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className={`h-[34px] w-[34px] rounded-md border transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0 shadow-2xs ${
+          active
+            ? "border-[#051448] bg-[#051448] text-white shadow-xs"
+            : "border-slate-400 bg-white hover:bg-blue-50 text-[#051448] hover:border-[#051448]/60 hover:text-[#051448]"
+        } disabled:opacity-40 disabled:cursor-not-allowed`}
+        aria-label={label}
+      >
+        <Icon size={16} className="stroke-[2.2]" />
+        {badge !== undefined && (
+          <span className="text-[11px] font-bold px-1.5 rounded-full bg-blue-100 text-[#051448]">
+            {badge}
+          </span>
+        )}
+      </button>
+
+      {/* Instant, Light-Background Hover Tooltip */}
+      <div
+        className={`absolute top-full mt-2.5 ${
+          alignRight ? "right-0" : "left-1/2 -translate-x-1/2"
+        } opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col ${
+          alignRight ? "items-end" : "items-center"
+        }`}
+      >
+        <div
+          className={`w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 -mb-1 z-10 ${
+            alignRight ? "mr-3.5" : ""
+          }`}
+        />
+        <div className="bg-white text-[#051448] border border-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MeeshoLabelCropPage() {
   const [file, setFile] = useState<File | null>(null);
   const [cropMode, setCropMode] = useState<ExtendedMeeshoCropMode>("invoice");
   const [customCropBox, setCustomCropBox] = useState<CustomCropBox | null>(null);
   const [customFileName, setCustomFileName] = useState<string>("");
+  const [showRenameInput, setShowRenameInput] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cropResult, setCropResult] = useState<CropResult | CustomCropResult | null>(null);
@@ -60,6 +130,11 @@ export default function MeeshoLabelCropPage() {
   const [showMetaModal, setShowMetaModal] = useState(false);
   const [showCustomCropModal, setShowCustomCropModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // ── SKU Sorting State ──
+  const [pageSkuMap, setPageSkuMap] = useState<PageSkuMap>({});
+  const [skuOrder, setSkuOrder] = useState<string[]>([]);
+  const [isExtractingSku, setIsExtractingSku] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -127,6 +202,32 @@ export default function MeeshoLabelCropPage() {
     }
   };
 
+  // ── Non-blocking SKU extraction, runs after file is loaded ──
+  const triggerSkuExtraction = async (inputFile: File) => {
+    setIsExtractingSku(true);
+    setPageSkuMap({});
+    setSkuOrder([]);
+    try {
+      const map = await extractSkusFromMeeshoPdf(inputFile);
+      const unique = getUniqueSku(map);
+      setPageSkuMap(map);
+
+      // Apply saved order if it matches current SKUs, otherwise use extracted order
+      if (unique.length >= 1 && unique[0] !== UNKNOWN_SKU) {
+        const saved = getStoredSkuOrder();
+        const savedFiltered = saved.filter((s) => unique.includes(s));
+        const missing = unique.filter((s) => !savedFiltered.includes(s));
+        setSkuOrder(savedFiltered.length > 0 ? [...savedFiltered, ...missing] : unique);
+      } else if (unique.length >= 2) {
+        setSkuOrder(unique);
+      }
+    } catch (err) {
+      console.warn("SKU extraction error:", err);
+    } finally {
+      setIsExtractingSku(false);
+    }
+  };
+
   const handleReset = () => {
     setFile(null);
     if (cropResult?.blobUrl) {
@@ -141,6 +242,11 @@ export default function MeeshoLabelCropPage() {
     setShowPreviewModal(false);
     setShowMetaModal(false);
     setShowCustomCropModal(false);
+    setShowRenameInput(false);
+    // Reset SKU state
+    setPageSkuMap({});
+    setSkuOrder([]);
+    setIsExtractingSku(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -186,6 +292,7 @@ export default function MeeshoLabelCropPage() {
       setFile(selectedFile);
       setCustomCropBox(null);
       handleProcessPdf(selectedFile, selectedFile.name, cropMode, null, false);
+      triggerSkuExtraction(selectedFile);
     }
   };
 
@@ -214,6 +321,7 @@ export default function MeeshoLabelCropPage() {
       setFile(droppedFile);
       setCustomCropBox(null);
       handleProcessPdf(droppedFile, droppedFile.name, cropMode, null, false);
+      triggerSkuExtraction(droppedFile);
     }
   };
 
@@ -274,309 +382,368 @@ export default function MeeshoLabelCropPage() {
           </div>
         )}
 
-        {/* ── Main Single Card Form matching Contact Us Style ── */}
-        <div className="border border-[#051448] rounded-md p-4 sm:p-7 bg-white shadow-sm">
-          <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-start">
-
-            {/* ── Left Column: Compact on Mobile, Detailed on Desktop ── */}
-            <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-4 md:pb-0 md:pr-6">
-
-              {/* Logo & Title */}
-              <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-2 md:mb-3">
-                <Image
-                  src="/meesho_logo.svg"
-                  alt="Meesho Logo"
-                  width={140}
-                  height={48}
-                  className="h-9 sm:h-11 w-auto object-contain"
-                  priority
-                />
-                <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
-                  Meesho Label Cropper
-                </h1>
-              </div>
-
-              <p className="text-black text-sm sm:text-base leading-relaxed mb-4">
-                Crop Meesho shipping labels with clean border margins, courier auto-detection, or select your own custom area.
-              </p>
-
-              {file && (
-                <div className="w-full bg-slate-50 border border-[#051448]/20 rounded-md p-3 mb-3 text-xs text-black/80 space-y-1 hidden sm:block">
-                  <div className="flex justify-between">
-                    <span>File:</span>
-                    <strong className="truncate max-w-[130px]">{file.name}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Labels:</span>
-                    <strong>{cropResult?.pageCount ? `${cropResult.pageCount} Pages` : "Loaded"}</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Mode:</span>
-                    <strong className="text-[#051448]">{getActiveModeName()}</strong>
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-3.5 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
-              >
-                <UploadCloud size={14} />
-                {file ? "Change PDF" : "Choose PDF"}
-              </button>
-            </div>
-
-            {/* ── Right Column: Mode Selector, Upload & Actions ── */}
-            <div className="md:col-span-8 flex flex-col justify-center">
-
-              {/* Crop Mode Selection Tabs */}
-              <div className="mb-3.5">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-black uppercase tracking-wider">
-                    Crop Option:
-                  </span>
-                  {cropResult && (
-                    <span className="text-[11px] font-semibold text-[#051448] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                      {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""} Ready
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-3 gap-2">
-
-                  {/* Option 1: Full with Tax Invoice */}
-                  <button
-                    type="button"
-                    onClick={() => handleModeChange("invoice")}
-                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "invoice"
-                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
-                      : "border-slate-300 bg-white hover:border-[#051448]/50"
-                      }`}
-                  >
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="font-bold text-xs text-black leading-tight">
-                        With Tax Invoice
-                      </span>
-                      {cropMode === "invoice" && (
-                        <Check size={13} className="text-[#051448] shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-black/70 leading-tight">
-                      Label + SKU + GST Tax Invoice (4×6&quot;)
-                    </p>
-                  </button>
-
-                  {/* Option 2: Label + SKU */}
-                  <button
-                    type="button"
-                    onClick={() => handleModeChange("label_sku")}
-                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "label_sku"
-                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
-                      : "border-slate-300 bg-white hover:border-[#051448]/50"
-                      }`}
-                  >
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="font-bold text-xs text-black leading-tight">
-                        Label + SKU
-                      </span>
-                      {cropMode === "label_sku" && (
-                        <Check size={13} className="text-[#051448] shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-black/70 leading-tight">
-                      Shipping Label + SKU Table (4×4&quot;)
-                    </p>
-                  </button>
-
-                  {/* Option 3: Custom Area Crop */}
-                  <button
-                    type="button"
-                    onClick={() => handleModeChange("custom")}
-                    className={`p-2.5 rounded border text-left transition-all cursor-pointer ${cropMode === "custom"
-                      ? "border-[#051448] bg-[#051448]/10 shadow-xs"
-                      : "border-slate-300 bg-white hover:border-[#051448]/50"
-                      }`}
-                  >
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="font-bold text-xs text-black leading-tight">
-                        Custom Area
-                      </span>
-                      {cropMode === "custom" && (
-                        <Check size={13} className="text-[#051448] shrink-0" />
-                      )}
-                    </div>
-                    <p className="text-[10px] text-black/70 leading-tight">
-                      {customCropBox ? "Custom Area Active" : "Select box on PDF"}
-                    </p>
-                  </button>
-
-                </div>
-              </div>
-
-              {/* Drop / Select Zone */}
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-md p-4 sm:p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${isDragging ? "bg-blue-50/80 border-dashed" : "border-[#051448]"
-                  }`}
-              >
-                <div className="w-9 h-9 sm:w-11 sm:h-11 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
-                  {isProcessing ? (
-                    <Loader2 size={20} className="animate-spin" />
-                  ) : file ? (
-                    <FileCheck size={20} />
-                  ) : (
-                    <UploadCloud size={20} />
-                  )}
-                </div>
-
-                <p
-                  className="text-xs sm:text-sm font-bold text-black mb-0.5 break-all line-clamp-2 max-w-full px-2 mx-auto"
-                  title={file ? file.name : undefined}
-                >
-                  {file ? file.name : "Click to select or drop Meesho PDF"}
-                </p>
-                <p className="text-[10px] sm:text-xs text-black/60 truncate max-w-full">
-                  {file ? "PDF loaded • Ready to crop & download" : "Single or bulk multi-page order PDF"}
-                </p>
-              </div>
-
-              {/* Optional Custom File Name Input */}
-              {file && (
-                <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 bg-slate-50 p-2.5 rounded border border-[#051448]/20 min-w-0">
-                  <label htmlFor="meesho-filename" className="text-xs font-bold text-black shrink-0">
-                    File Name:
-                  </label>
-                  <div className="relative flex-1 min-w-0 max-w-md flex items-center">
-                    <input
-                      id="meesho-filename"
-                      type="text"
-                      value={customFileName}
-                      onChange={(e) => setCustomFileName(e.target.value)}
-                      placeholder={cropResult ? cropResult.fileName.replace(/\.pdf$/i, "") : "custom_filename"}
-                      className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2.5 py-1.5 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium truncate"
+        {/* ── Main Workspace Container ── */}
+        <div className="border border-slate-400 rounded-md bg-white shadow-xs overflow-hidden">
+          {!file ? (
+            /* ── Initial Upload View: Clean 2-column layout matching Contact Us ── */
+            <div className="p-4 sm:p-7">
+              <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-start">
+                {/* Left Column: Logo & Description */}
+                <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-4 md:pb-0 md:pr-6">
+                  <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-2 md:mb-3">
+                    <Image
+                      src="/meesho_logo.svg"
+                      alt="Meesho Logo"
+                      width={140}
+                      height={48}
+                      className="h-9 sm:h-11 w-auto object-contain"
+                      priority
                     />
-                    <span className="absolute right-2.5 text-[11px] text-black/50 font-mono pointer-events-none select-none">
-                      .pdf
-                    </span>
+                    <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
+                      Meesho Label Cropper
+                    </h1>
                   </div>
-                  {customFileName && (
+
+                  <p className="text-black text-sm leading-relaxed mb-4">
+                    Crop Meesho shipping labels with clean border margins, courier auto-detection, or select your own custom area.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-4 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
+                  >
+                    <UploadCloud size={14} />
+                    <span>Choose PDF</span>
+                  </button>
+                </div>
+
+                {/* Right Column: Crop Option Tabs & Drop Zone */}
+                <div className="md:col-span-8 flex flex-col justify-center">
+                  <div className="mb-3">
+                    <span className="text-[11px] font-bold text-black uppercase tracking-wider block mb-1.5">
+                      Crop Option:
+                    </span>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("invoice")}
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                          cropMode === "invoice"
+                            ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                            : "border-slate-300 bg-white hover:border-[#051448]/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-bold text-xs text-black leading-tight">
+                            With Tax Invoice
+                          </span>
+                          {cropMode === "invoice" && (
+                            <Check size={13} className="text-[#051448] shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-black/70 leading-tight">
+                          Label + SKU + GST Tax Invoice (4×6&quot;)
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("label_sku")}
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                          cropMode === "label_sku"
+                            ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                            : "border-slate-300 bg-white hover:border-[#051448]/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-bold text-xs text-black leading-tight">
+                            Label + SKU
+                          </span>
+                          {cropMode === "label_sku" && (
+                            <Check size={13} className="text-[#051448] shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-black/70 leading-tight">
+                          Shipping Label + SKU Table (4×4&quot;)
+                        </p>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("custom")}
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                          cropMode === "custom"
+                            ? "border-[#051448] bg-[#051448]/10 shadow-xs"
+                            : "border-slate-300 bg-white hover:border-[#051448]/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="font-bold text-xs text-black leading-tight">
+                            Custom Area
+                          </span>
+                          {cropMode === "custom" && (
+                            <Check size={13} className="text-[#051448] shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-[10px] text-black/70 leading-tight">
+                          {customCropBox ? "Custom Area Active" : "Select box on PDF"}
+                        </p>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Drop / Select Zone */}
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${
+                      isDragging ? "bg-blue-50/80 border-dashed" : "border-[#051448]"
+                    }`}
+                  >
+                    <div className="w-10 h-10 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
+                      <UploadCloud size={20} />
+                    </div>
+                    <p className="text-xs sm:text-sm font-bold text-black mb-0.5">
+                      Click to select or drop Meesho PDF
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-black/60">
+                      Single or bulk multi-page order PDF
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ── Active Workspace View: Compact, Scroll-Free with Menubar ── */
+            <div className="flex flex-col">
+              {/* 1. Sleek Top Toolbar / Menubar */}
+              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-slate-400 rounded-t-md flex flex-wrap items-center justify-between gap-2">
+                {/* Left: Meesho Logo + File Name + Deduplicated Count Badge */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Image
+                    src="/meesho_logo.svg"
+                    alt="Meesho"
+                    width={110}
+                    height={38}
+                    className="h-8 sm:h-9 w-auto object-contain shrink-0"
+                    priority
+                  />
+                  <div className="h-5 w-px bg-slate-400 shrink-0" />
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span
+                      className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
+                      title={file.name}
+                    >
+                      {file.name}
+                    </span>
+                    {cropResult ? (
+                      <span className="text-xs font-bold text-[#051448] bg-blue-100/90 border border-blue-300 px-2.5 py-0.5 rounded-full shrink-0">
+                        {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-black/60 bg-slate-200/80 px-2.5 py-0.5 rounded-full shrink-0">
+                        PDF Loaded
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right: Menubar of Icon Tools with Instant Light Hover Tooltips */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* Crop Mode Switcher */}
+                  <div className="relative group inline-flex items-center">
+                    <div className="h-[34px] flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("invoice")}
+                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                          cropMode === "invoice"
+                            ? "bg-[#051448] text-white shadow-xs"
+                            : "text-slate-600 hover:text-black"
+                        }`}
+                      >
+                        With Tax Invoice
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("label_sku")}
+                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                          cropMode === "label_sku"
+                            ? "bg-[#051448] text-white shadow-xs"
+                            : "text-slate-600 hover:text-black"
+                        }`}
+                      >
+                        Label + SKU
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModeChange("custom")}
+                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                          cropMode === "custom"
+                            ? "bg-[#051448] text-white shadow-xs"
+                            : "text-slate-600 hover:text-black"
+                        }`}
+                      >
+                        Custom
+                      </button>
+                    </div>
+                    {/* Instant Light Tooltip */}
+                    <div className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-center">
+                      <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 -mb-1 z-10" />
+                      <div className="bg-white text-[#051448] border border-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
+                        Crop Mode: {getActiveModeName()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Adjust Custom Area Button (shown in custom mode) */}
+                  {cropMode === "custom" && (
+                    <TooltipButton
+                      icon={Crop}
+                      label="Adjust Custom Area"
+                      onClick={() => setShowCustomCropModal(true)}
+                      active={!!customCropBox}
+                    />
+                  )}
+
+                  {/* Rename Output File */}
+                  <TooltipButton
+                    icon={FileEdit}
+                    label={customFileName ? `Renamed: ${customFileName}.pdf` : "Rename Output File"}
+                    onClick={() => setShowRenameInput((prev) => !prev)}
+                    active={showRenameInput || !!customFileName}
+                  />
+
+                  {/* Preview Cropped PDF */}
+                  {cropResult && (
+                    <TooltipButton
+                      icon={Eye}
+                      label="Preview Cropped PDF"
+                      onClick={() => setShowPreviewModal(true)}
+                      alignRight={true}
+                    />
+                  )}
+
+                  {/* Direct Crop & Download button (visible when SKU sorter is not active) */}
+                  {skuOrder.length < 2 && (
                     <button
                       type="button"
-                      onClick={() => setCustomFileName("")}
-                      className="text-[11px] text-[#051448] hover:underline cursor-pointer font-semibold shrink-0"
+                      onClick={handleCropAndDownloadClick}
+                      disabled={isProcessing}
+                      className="h-[34px] flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs sm:text-sm font-medium px-4 rounded-md transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
                     >
-                      Reset Name
+                      {isProcessing ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Download size={14} />
+                      )}
+                      <span>Download PDF</span>
                     </button>
                   )}
                 </div>
+              </div>
+
+              {/* 2. Optional Inline File Rename Bar */}
+              {showRenameInput && (
+                <div className="px-3.5 sm:px-4 py-2 bg-blue-50/70 border-b border-[#051448]/15 flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="font-bold text-black shrink-0">Output File Name:</span>
+                    <div className="relative flex-1 max-w-sm flex items-center">
+                      <input
+                        type="text"
+                        value={customFileName}
+                        onChange={(e) => setCustomFileName(e.target.value)}
+                        placeholder={cropResult ? cropResult.fileName.replace(/\.pdf$/i, "") : "custom_filename"}
+                        className="w-full text-xs bg-white border border-[#051448]/30 rounded px-2 py-1 pr-10 focus:outline-hidden focus:border-[#051448] text-black font-medium"
+                      />
+                      <span className="absolute right-2 text-[10px] text-black/50 font-mono pointer-events-none">
+                        .pdf
+                      </span>
+                    </div>
+                    {customFileName && (
+                      <button
+                        type="button"
+                        onClick={() => setCustomFileName("")}
+                        className="text-[11px] text-[#051448] hover:underline font-semibold shrink-0 cursor-pointer"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowRenameInput(false)}
+                    className="p-1 rounded hover:bg-white text-black/60 hover:text-black cursor-pointer"
+                    title="Close rename"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
               )}
 
-              {/* Action Buttons & Status Row */}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2.5 pt-2 border-t border-[#051448]/15">
-
-                {/* Left side actions: Crop / Download button */}
-                <div className="flex flex-wrap items-center gap-2">
+              {/* 3. Central Content Area: Seamlessly Integrated with Main Box (Zero Unwanted Margin) */}
+              {isExtractingSku && skuOrder.length === 0 ? (
+                <div className="py-8 flex flex-col items-center justify-center gap-2 text-xs text-black/70">
+                  <Loader2 size={24} className="animate-spin text-[#051448]" />
+                  <span className="font-semibold">Analyzing labels & detecting SKUs...</span>
+                  <span className="text-[11px] text-black/50">Grouping order will appear automatically</span>
+                </div>
+              ) : skuOrder.length >= 2 ? (
+                /* 2+ SKUs: Seamlessly integrated into main box with NO double borders or extra margins */
+                <MeeshoSkuSorterPanel
+                  file={file}
+                  pageSkuMap={pageSkuMap}
+                  skuOrder={skuOrder}
+                  onSkuOrderChange={(newOrder) => setSkuOrder(newOrder)}
+                  cropMode={cropMode === "custom" ? "invoice" : cropMode}
+                />
+              ) : skuOrder.length === 1 && skuOrder[0] !== UNKNOWN_SKU ? (
+                /* 1 SKU: Compact Notification */
+                <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50/40">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                    <div>
+                      <p className="font-bold text-xs sm:text-sm text-black">
+                        SKU Detected: <code className="bg-white px-2 py-0.5 rounded border border-emerald-300 font-mono text-[#051448] font-bold">{skuOrder[0]}</code>
+                      </p>
+                      <p className="text-[11px] text-black/60 mt-0.5">
+                        All {Object.keys(pageSkuMap).length} labels belong to this product. (Multi-SKU sorting activates when 2+ different SKUs exist).
+                      </p>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={handleCropAndDownloadClick}
                     disabled={isProcessing}
-                    className="flex items-center justify-center gap-1.5 bg-[#051448] text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded hover:bg-[#071a5e] transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="inline-flex items-center justify-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer shrink-0"
                   >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 size={15} className="animate-spin" />
-                        Processing...
-                      </>
-                    ) : cropResult ? (
-                      <>
-                        <Download size={15} />
-                        Crop &amp; Download
-                      </>
-                    ) : (
-                      <>
-                        <Scissors size={15} />
-                        Crop the Label
-                      </>
-                    )}
+                    <Download size={14} />
+                    <span>Crop &amp; Download PDF</span>
                   </button>
-
-                  {/* Customize Area Button if file uploaded */}
-                  {file && (
-                    <button
-                      type="button"
-                      onClick={() => setShowCustomCropModal(true)}
-                      className="text-xs font-semibold text-black border border-[#051448] px-2.5 py-2 rounded hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer"
-                      title="Select custom area to crop"
-                    >
-                      <Crop size={13} className="text-[#051448]" />
-                      <span>{customCropBox ? "Adjust Area" : "Custom Area"}</span>
-                    </button>
-                  )}
-
-                  {file && (
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      className="text-xs font-semibold text-black border border-[#051448] px-2.5 py-2 rounded hover:bg-slate-50 transition-colors flex items-center gap-1 cursor-pointer"
-                      title="Upload a different PDF"
-                    >
-                      <RotateCcw size={12} />
-                      Reset
-                    </button>
-                  )}
                 </div>
-
-                {/* Right side utility icons: Eye (Preview) & Info (Metadata) */}
-                {cropResult && (
-                  <div className="flex items-center gap-2">
-                    {/* Eye Icon for Preview */}
-                    <button
-                      type="button"
-                      onClick={() => setShowPreviewModal(true)}
-                      className="flex items-center gap-1 text-xs font-bold text-black border border-[#051448] px-3 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
-                      title="Preview Cropped PDF"
-                    >
-                      <Eye size={14} className="text-[#051448]" />
-                      <span>Preview</span>
-                    </button>
-
-                    {/* Info Icon for Metadata */}
-                    <button
-                      type="button"
-                      onClick={() => setShowMetaModal(true)}
-                      className="flex items-center gap-1 text-xs font-bold text-black border border-[#051448] px-3 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
-                      title="View PDF Metadata"
-                    >
-                      <Info size={14} className="text-[#051448]" />
-                      <span className="hidden sm:inline">Details</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Status Note */}
-              {cropResult && (
-                <div className="mt-3 pt-2.5 border-t border-[#051448]/15 text-[11px] sm:text-xs text-black/75 flex flex-wrap items-center justify-between gap-1">
-                  <span>
-                    Ready: <strong className="text-black uppercase">{getActiveModeName()}</strong>
-                    {cropResult.partnerSummaryText && (
-                      <span className="text-black/60 ml-1.5 hidden sm:inline">
-                        • Couriers: {cropResult.partnerSummaryText}
-                      </span>
-                    )}
-                  </span>
-                  <span className="font-semibold text-black">
-                    {cropResult.pageCount} Page(s) • {formatFileSize(cropResult.croppedSize)}
-                  </span>
+              ) : (
+                /* Fallback: No SKUs or Unknown (Single action crop & download) */
+                <div className="py-6 flex flex-col items-center justify-center gap-2 text-center p-4">
+                  <p className="font-bold text-xs text-black">Labels Ready for Crop</p>
+                  <p className="text-[11px] text-black/60 max-w-sm">
+                    Labels are ready to crop and download according to the selected mode ({getActiveModeName()}).
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCropAndDownloadClick}
+                    disabled={isProcessing}
+                    className="mt-2 inline-flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-5 py-2.5 rounded transition-colors cursor-pointer"
+                  >
+                    <Download size={14} />
+                    <span>Crop &amp; Download PDF</span>
+                  </button>
                 </div>
               )}
-
             </div>
-          </div>
+          )}
         </div>
 
         {/* ── SEO & User Information Blog / Guide Section ── */}
