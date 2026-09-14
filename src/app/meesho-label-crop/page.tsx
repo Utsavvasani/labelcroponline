@@ -384,8 +384,8 @@ export default function MeeshoLabelCropPage() {
 
   return (
     <>
-      {/* ── Main Content Form Container (Proper spacing below fixed navigation bar) ── */}
-      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[96px] sm:pt-32 pb-6 sm:pb-10">
+      {/* ── Main Content Form Container ── */}
+      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[76px] sm:pt-20 pb-6 sm:pb-10">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -423,15 +423,15 @@ export default function MeeshoLabelCropPage() {
           </div>
         )}
 
-        {/* ── Main Workspace Container ── */}
-        <div className="border border-slate-400 rounded-md bg-white shadow-xs overflow-hidden">
+        {/* ── Main Workspace Card ── */}
+        <div className="border border-[#051448] rounded-md bg-white shadow-sm overflow-hidden">
           {!file ? (
-            /* ── Initial Upload View: Clean 2-column layout matching Contact Us ── */
-            <div className="p-4 sm:p-7">
-              <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-start">
+            /* ── Initial Upload View: Clean 2-Column Card with Large Drop Zone ── */
+            <div className="p-5 sm:p-7">
+              <div className="grid md:grid-cols-12 gap-5 sm:gap-8 items-center">
                 {/* Left Column: Logo & Description */}
-                <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-4 md:pb-0 md:pr-6">
-                  <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-2 md:mb-3">
+                <div className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left border-b md:border-b-0 md:border-r border-[#051448]/20 pb-3 md:pb-0 md:pr-6">
+                  <div className="flex items-center md:flex-col gap-3 md:gap-0 mb-0 md:mb-3">
                     <Image
                       src="/meesho_logo.svg"
                       alt="Meesho Logo"
@@ -445,113 +445,84 @@ export default function MeeshoLabelCropPage() {
                     </h1>
                   </div>
 
-                  <p className="text-black text-sm leading-relaxed mb-4">
+                  <p className="hidden md:block text-black text-sm leading-relaxed mb-4">
                     Crop Meesho shipping labels with clean border margins, courier auto-detection, or select your own custom area.
                   </p>
-
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-[#051448] border border-[#051448] px-4 py-2 rounded hover:bg-blue-50 transition-colors cursor-pointer"
-                  >
-                    <UploadCloud size={14} />
-                    <span>Choose PDF(s)</span>
-                  </button>
                 </div>
 
-                {/* Right Column: Crop Option Tabs & Drop Zone */}
+                {/* Right Column: Crop Option Tabs & Big Drop Zone */}
                 <div className="md:col-span-8 flex flex-col justify-center">
                   <div className="mb-3">
-                    <span className="text-[11px] font-bold text-black uppercase tracking-wider block mb-1.5">
-                      Crop Option:
-                    </span>
+
                     <div className="grid grid-cols-3 gap-2">
                       <button
                         type="button"
                         onClick={() => handleModeChange("invoice")}
-                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer flex items-center justify-between ${
                           cropMode === "invoice"
                             ? "border-[#051448] bg-[#051448]/10 shadow-xs"
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-0.5">
-                          <span className="font-bold text-xs text-black leading-tight">
-                            With Tax Invoice
-                          </span>
-                          {cropMode === "invoice" && (
-                            <Check size={13} className="text-[#051448] shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-[10px] text-black/70 leading-tight">
-                          Label + SKU + GST Tax Invoice (4×6&quot;)
-                        </p>
+                        <span className="text-xs sm:text-sm text-black">
+                          With Tax Invoice
+                        </span>
+                        {cropMode === "invoice" && (
+                          <Check size={14} className="text-[#051448] shrink-0" />
+                        )}
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleModeChange("label_sku")}
-                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer flex items-center justify-between ${
                           cropMode === "label_sku"
                             ? "border-[#051448] bg-[#051448]/10 shadow-xs"
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-0.5">
-                          <span className="font-bold text-xs text-black leading-tight">
-                            Label + SKU
-                          </span>
-                          {cropMode === "label_sku" && (
-                            <Check size={13} className="text-[#051448] shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-[10px] text-black/70 leading-tight">
-                          Shipping Label + SKU Table (4×4&quot;)
-                        </p>
+                        <span className="text-xs sm:text-sm text-black">
+                          Label + SKU
+                        </span>
+                        {cropMode === "label_sku" && (
+                          <Check size={14} className="text-[#051448] shrink-0" />
+                        )}
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleModeChange("custom")}
-                        className={`p-2.5 rounded border text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded border text-left transition-all cursor-pointer flex items-center justify-between ${
                           cropMode === "custom"
                             ? "border-[#051448] bg-[#051448]/10 shadow-xs"
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-0.5">
-                          <span className="font-bold text-xs text-black leading-tight">
-                            Custom Area
-                          </span>
-                          {cropMode === "custom" && (
-                            <Check size={13} className="text-[#051448] shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-[10px] text-black/70 leading-tight">
-                          {customCropBox ? "Custom Area Active" : "Select box on PDF"}
-                        </p>
+                        <span className="text-xs sm:text-sm text-black">
+                          Custom Area
+                        </span>
+                        {cropMode === "custom" && (
+                          <Check size={14} className="text-[#051448] shrink-0" />
+                        )}
                       </button>
                     </div>
                   </div>
 
-                  {/* Drop / Select Zone */}
+                  {/* Big, Attractive Drop Zone */}
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-md p-6 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40 ${
-                      isDragging ? "bg-blue-50/80 border-dashed" : "border-[#051448]"
+                    className={`border-2 border-dashed rounded-md py-10 sm:py-14 px-6 text-center cursor-pointer transition-all duration-150 bg-white hover:bg-blue-50/50 group ${
+                      isDragging ? "bg-blue-50/90 border-[#051448]" : "border-[#051448]"
                     }`}
                   >
-                    <div className="w-10 h-10 mx-auto rounded-full border border-[#051448] flex items-center justify-center text-[#051448] mb-2">
-                      <UploadCloud size={20} />
+                    <div className="w-12 h-12 mx-auto rounded-full border border-[#051448] bg-blue-50/60 flex items-center justify-center text-[#051448] mb-2.5 group-hover:scale-105 transition-transform">
+                      <UploadCloud size={24} className="stroke-[2]" />
                     </div>
-                    <p className="text-xs sm:text-sm font-bold text-black mb-0.5">
-                      Click to select or drop Meesho PDF(s)
-                    </p>
-                    <p className="text-[10px] sm:text-xs text-black/60">
-                      Single or multiple multi-page order PDFs
+                    <p className="text-xs sm:text-sm text-black/80 font-normal">
+                      Upload Meesho PDF
                     </p>
                   </div>
                 </div>
