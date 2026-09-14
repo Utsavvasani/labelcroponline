@@ -440,7 +440,7 @@ export default function MeeshoLabelCropPage() {
                       className="h-9 sm:h-11 w-auto object-contain"
                       priority
                     />
-                    <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
+                    <h1 className="hidden md:block text-base sm:text-lg font-bold text-black md:mt-2">
                       Meesho Label Cropper
                     </h1>
                   </div>

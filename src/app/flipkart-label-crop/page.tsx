@@ -427,7 +427,7 @@ export default function FlipkartLabelCropPage() {
                       className="h-12 sm:h-14 w-auto object-contain"
                       priority
                     />
-                    <h1 className="text-base sm:text-lg font-bold text-black md:mt-2">
+                    <h1 className="hidden md:block text-base sm:text-lg font-bold text-black md:mt-2">
                       Flipkart Label Cropper
                     </h1>
                   </div>
