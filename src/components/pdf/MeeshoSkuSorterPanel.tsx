@@ -987,6 +987,16 @@ export function MeeshoSkuSorterPanel({
                           {group.skus.length} SKUs
                         </span>
                       </div>
+
+                      {/* Group Total Labels Count Badge */}
+                      <span
+                        className={`text-[11px] font-normal px-2 py-0.5 rounded-full border shrink-0 ${isConnected
+                          ? "text-indigo-950 bg-indigo-200/80 border-indigo-300 font-medium"
+                          : "text-slate-600 bg-slate-50 border-slate-400"
+                          }`}
+                      >
+                        {totalGroupLabels} {totalGroupLabels === 1 ? "label" : "labels"}
+                      </span>
                     </div>
                   );
                 }
@@ -1329,10 +1339,16 @@ export function MeeshoSkuSorterPanel({
                         )}
 
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${isConnected
-                            ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
-                            : "text-slate-800 bg-white border-slate-400"
+                          ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
+                          : "text-slate-800 bg-white border-slate-400"
                           }`}>
                           {group.skus.length} SKUs
+                        </span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 border ${isConnected
+                          ? "text-indigo-950 bg-indigo-200/80 border-indigo-300"
+                          : "text-slate-800 bg-white border-slate-400"
+                          }`}>
+                          {totalGroupLabels} {totalGroupLabels === 1 ? "label" : "labels"}
                         </span>
                       </div>
 
