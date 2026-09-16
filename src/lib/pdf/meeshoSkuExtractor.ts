@@ -7,6 +7,7 @@ import {
   type CropResult,
 } from "./meeshoCropper";
 import { getFormattedDateTime } from "@/utils/file";
+import type { OrderItem } from "@/lib/meeshoSkuStorage";
 
 /** Maps page index (0-based) to its SKU string. */
 export type PageSkuMap = Record<number, string>;
@@ -87,7 +88,10 @@ export function extractMeeshoSkuFromText(text: string): string {
  * Returns a map of { pageIndex: skuString }.
  * Pages with no detectable SKU get UNKNOWN_SKU.
  */
-export async function extractSkusFromMeeshoPdf(input: File): Promise<PageSkuMap> {
+export async function extractSkusFromMeeshoPdf(
+  input: File,
+  onProgress?: (current: number, total: number) => void
+): Promise<PageSkuMap> {
   const pageSkuMap: PageSkuMap = {};
 
   try {
@@ -109,6 +113,7 @@ export async function extractSkusFromMeeshoPdf(input: File): Promise<PageSkuMap>
       const tokens = textContent.items.map((it: any) => it.str || "");
       const sku = extractMeeshoSkuFromTokens(tokens);
       pageSkuMap[i - 1] = sku || UNKNOWN_SKU;
+      onProgress?.(i, doc.numPages);
     }
   } catch (err) {
     console.warn("Meesho SKU extraction failed:", err);
@@ -143,10 +148,11 @@ export function countPagesPerSku(pageSkuMap: PageSkuMap): Record<string, number>
 }
 
 /**
- * Builds a new, re-ordered Meesho-cropped PDF where pages are grouped
- * by SKU according to the specified skuOrder array.
+ * Builds a new, re-ordered Meesho-cropped PDF where pages are grouped:
+ * 1. Primarily by the seller's configured SKU groups / SKUs (as arranged in the sorter panel).
+ * 2. Secondarily by Delivery Partner in fixed order (Delhivery -> Shadowfax -> Xpressbees -> Valmo -> Valmo Plus)
+ *    within each group, so all labels for that product are grouped together and sorted courier-by-courier.
  *
- * Within each SKU group, original page order is preserved.
  * Courier partner is auto-detected per original page so calibrated crop boxes are applied.
  */
 export async function buildMeeshoSkuGroupedPdf(
@@ -154,7 +160,8 @@ export async function buildMeeshoSkuGroupedPdf(
   pageSkuMap: PageSkuMap,
   skuOrder: string[],
   cropMode: MeeshoCropMode = "invoice",
-  selectedPartner: MeeshoPartner = "auto"
+  selectedPartner: MeeshoPartner = "auto",
+  orderItems?: OrderItem[]
 ): Promise<CropResult> {
   const originalSize = input.size;
   const arrayBuffer = await input.arrayBuffer();
@@ -184,18 +191,102 @@ export async function buildMeeshoSkuGroupedPdf(
     console.warn("Could not extract page texts for courier detection:", e);
   }
 
-  // Build ordered page index list: pages grouped by SKU order
+  // 1. Detect courier partner for each page
+  const pagePartnerMap: Record<number, Exclude<MeeshoPartner, "auto">> = {};
+  const partnersPresent: Array<Exclude<MeeshoPartner, "auto">> = [];
+
+  for (let i = 0; i < totalPages; i++) {
+    const pageText = pagesText[i] || "";
+    let partnerKey: Exclude<MeeshoPartner, "auto">;
+    if (selectedPartner !== "auto") {
+      partnerKey = selectedPartner;
+    } else if (pageText) {
+      partnerKey = detectCourierFromText(pageText);
+    } else {
+      partnerKey = "delhivery";
+    }
+    pagePartnerMap[i] = partnerKey;
+    if (!partnersPresent.includes(partnerKey)) {
+      partnersPresent.push(partnerKey);
+    }
+  }
+
+  // Consistent courier partner order (standard sorting order)
+  const COURIER_PRIORITY: Array<Exclude<MeeshoPartner, "auto">> = [
+    "delhivery",
+    "shadowfax",
+    "xpressbees",
+    "valmo",
+    "valmo_plus",
+    "elasticrun",
+  ];
+
+  const sortedPartners = [...partnersPresent].sort((a, b) => {
+    const idxA = COURIER_PRIORITY.indexOf(a);
+    const idxB = COURIER_PRIORITY.indexOf(b);
+    return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+  });
+
+  // 2. Build ordered page index list:
+  // Primary: User's arranged SKU groups / SKU sequence
+  // Secondary: Delivery Partners in particular order within each group
   const orderedPageIndices: number[] = [];
 
-  for (const sku of skuOrder) {
-    for (let i = 0; i < totalPages; i++) {
-      if ((pageSkuMap[i] || UNKNOWN_SKU) === sku) {
-        orderedPageIndices.push(i);
+  if (orderItems && orderItems.length > 0) {
+    for (const item of orderItems) {
+      if (item.type === "single") {
+        for (const partner of sortedPartners) {
+          for (let i = 0; i < totalPages; i++) {
+            if (
+              (pageSkuMap[i] || UNKNOWN_SKU) === item.sku &&
+              pagePartnerMap[i] === partner &&
+              !orderedPageIndices.includes(i)
+            ) {
+              orderedPageIndices.push(i);
+            }
+          }
+        }
+      } else if (item.type === "group") {
+        for (const partner of sortedPartners) {
+          for (const sku of item.group.skus) {
+            for (let i = 0; i < totalPages; i++) {
+              if (
+                (pageSkuMap[i] || UNKNOWN_SKU) === sku &&
+                pagePartnerMap[i] === partner &&
+                !orderedPageIndices.includes(i)
+              ) {
+                orderedPageIndices.push(i);
+              }
+            }
+          }
+        }
+      }
+    }
+  } else {
+    // Fallback using skuOrder
+    for (const sku of skuOrder) {
+      for (const partner of sortedPartners) {
+        for (let i = 0; i < totalPages; i++) {
+          if (
+            (pageSkuMap[i] || UNKNOWN_SKU) === sku &&
+            pagePartnerMap[i] === partner &&
+            !orderedPageIndices.includes(i)
+          ) {
+            orderedPageIndices.push(i);
+          }
+        }
       }
     }
   }
 
-  // Any pages whose SKU isn't in skuOrder go at the end
+  // Fallback safety check: Any pages not included go at the end (sorted by courier partner)
+  for (const partner of sortedPartners) {
+    for (let i = 0; i < totalPages; i++) {
+      if (pagePartnerMap[i] === partner && !orderedPageIndices.includes(i)) {
+        orderedPageIndices.push(i);
+      }
+    }
+  }
   for (let i = 0; i < totalPages; i++) {
     if (!orderedPageIndices.includes(i)) {
       orderedPageIndices.push(i);

@@ -18,7 +18,6 @@ import {
   Check,
   Plus,
   Split,
-  Sparkles,
 } from "lucide-react";
 import type { PageSkuMap } from "@/lib/pdf/meeshoSkuExtractor";
 import {
@@ -654,7 +653,8 @@ export function MeeshoSkuSorterPanel({
         pageSkuMap,
         flattened,
         cropMode,
-        selectedPartner
+        selectedPartner,
+        orderItems
       );
       triggerDownload(result.blobUrl, result.fileName);
       setTimeout(() => URL.revokeObjectURL(result.blobUrl), 5000);
@@ -688,6 +688,12 @@ export function MeeshoSkuSorterPanel({
               {totalGroupsCount} {totalGroupsCount === 1 ? "Group" : "Groups"}
             </span>
           )}
+          <span
+            className="hidden sm:inline-flex text-[11px] font-normal text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-full shrink-0 items-center gap-1"
+            title="Labels are grouped by your SKU sequence, with delivery partners sorted in order (Delhivery, Shadowfax, Xpressbees, Valmo...) within each group"
+          >
+            Grouped SKUs • Courier Sorted
+          </span>
         </div>
 
         {/* Right: Smart Bulk Actions */}
@@ -1175,7 +1181,7 @@ export function MeeshoSkuSorterPanel({
               /* Helpful Empty State */
               <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-400 rounded-md bg-white">
                 <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Sparkles size={16} />
+                  <Layers size={16} />
                 </div>
                 <p className="font-medium text-xs text-slate-800">No Product Groups Created Yet</p>
                 <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">
@@ -1405,7 +1411,11 @@ export function MeeshoSkuSorterPanel({
       </div>
 
       {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3 py-2 border-t border-slate-400 bg-white flex items-center justify-end gap-2">
+      <div className="px-3 py-2 border-t border-slate-400 bg-white flex flex-wrap items-center justify-between gap-2">
+        <div className="text-[11px] sm:text-xs text-slate-600 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
+          <span>Labels are arranged in your SKU group order, with delivery partners sorted in order (Delhivery → Shadowfax → Valmo) within each group.</span>
+        </div>
         <button
           type="button"
           onClick={handleConfirmAndDownload}

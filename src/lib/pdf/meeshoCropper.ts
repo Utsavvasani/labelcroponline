@@ -7,7 +7,8 @@ export type MeeshoPartner =
   | "shadowfax"
   | "valmo"
   | "valmo_plus"
-  | "xpressbees";
+  | "xpressbees"
+  | "elasticrun";
 
 export type MeeshoCropMode = "label_sku" | "invoice";
 
@@ -62,9 +63,10 @@ export const MEESHO_PARTNER_LIST: Array<{ id: MeeshoPartner; name: string; short
   { id: "auto", name: "Auto-Detect Courier", shortName: "Auto Detect" },
   { id: "delhivery", name: "Delhivery", shortName: "Delhivery" },
   { id: "shadowfax", name: "Shadowfax", shortName: "Shadowfax" },
+  { id: "xpressbees", name: "Xpressbees", shortName: "Xpressbees" },
   { id: "valmo", name: "Valmo", shortName: "Valmo" },
   { id: "valmo_plus", name: "Valmo Plus", shortName: "Valmo Plus" },
-  { id: "xpressbees", name: "Xpressbees", shortName: "Xpressbees" },
+  { id: "elasticrun", name: "ElasticRun", shortName: "ElasticRun" },
 ];
 
 export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartnerInfo> = {
@@ -218,6 +220,36 @@ export const MEESHO_PARTNERS: Record<Exclude<MeeshoPartner, "auto">, MeeshoPartn
       },
     },
   },
+  elasticrun: {
+    id: "elasticrun",
+    name: "ElasticRun",
+    shortName: "ElasticRun",
+    keywords: ["elasticrun", "elastic run"],
+    options: {
+      invoice: {
+        id: "invoice",
+        name: "Full with Tax Invoice",
+        shortLabel: "With Tax Invoice",
+        desc: "ElasticRun shipping label, SKU table + GST Tax Invoice",
+        suffix: "elasticrun_invoice",
+        x: 6,
+        y: 233,
+        w: 583,
+        h: 609,
+      },
+      label_sku: {
+        id: "label_sku",
+        name: "Label + SKU Details",
+        shortLabel: "Label + SKU",
+        desc: "Crop with SKU & customer address only",
+        suffix: "elasticrun_label_sku",
+        x: 6,
+        y: 434,
+        w: 583,
+        h: 408,
+      },
+    },
+  },
 };
 
 export interface CropResult {
@@ -266,6 +298,9 @@ async function extractPagesText(arrayBuffer: ArrayBuffer): Promise<string[]> {
  */
 export function detectCourierFromText(text: string): Exclude<MeeshoPartner, "auto"> {
   const lower = text.toLowerCase();
+  if (lower.includes("elasticrun") || lower.includes("elastic run") || lower.includes("elastic_run")) {
+    return "elasticrun";
+  }
   if (lower.includes("valmoplus") || lower.includes("valmo plus") || lower.includes("valmo+")) {
     return "valmo_plus";
   }

@@ -14,7 +14,6 @@ import {
   Crop,
   Check,
   FileEdit,
-  Sparkles,
   Files,
   Plus,
 } from "lucide-react";
@@ -30,6 +29,18 @@ import {
 import { getStoredSkuOrder } from "@/lib/flipkartSkuStorage";
 import { FlipkartSkuSorterPanel } from "@/components/pdf/FlipkartSkuSorterPanel";
 import { combinePdfFiles, type FilePageBreakdown } from "@/lib/pdf/pdfCombiner";
+
+type SkuExtractionProgress = { current: number; total: number };
+
+const SKU_PROCESSING_STATUS_STEPS = [
+  "Extracting SKU identifiers...",
+  "Scanning label barcodes & text...",
+  "100% Secure: Processed locally in your browser...",
+  "Analyzing product variations...",
+  "Zero server uploads: Files never leave your device...",
+  "Protecting customer address & order data...",
+  "Organizing identical SKU sequence...",
+];
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -133,6 +144,8 @@ export default function FlipkartLabelCropPage() {
   const [pageSkuMap, setPageSkuMap] = useState<PageSkuMap>({});
   const [skuOrder, setSkuOrder] = useState<string[]>([]);
   const [isExtractingSku, setIsExtractingSku] = useState(false);
+  const [skuProgress, setSkuProgress] = useState<SkuExtractionProgress | null>(null);
+  const [extractionStatusIndex, setExtractionStatusIndex] = useState(0);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const appendFileInputRef = useRef<HTMLInputElement>(null);
@@ -151,6 +164,18 @@ export default function FlipkartLabelCropPage() {
       if (cropResult?.blobUrl) URL.revokeObjectURL(cropResult.blobUrl);
     };
   }, [cropResult]);
+
+  // Frequently cycle status and privacy details during SKU extraction
+  useEffect(() => {
+    if (!isExtractingSku) {
+      setExtractionStatusIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setExtractionStatusIndex((prev) => (prev + 1) % SKU_PROCESSING_STATUS_STEPS.length);
+    }, 1800);
+    return () => clearInterval(interval);
+  }, [isExtractingSku]);
 
   // Process the uploaded PDF (Auto or Custom)
   const handleProcessPdf = async (
@@ -203,10 +228,13 @@ export default function FlipkartLabelCropPage() {
   // ── Non-blocking SKU extraction, runs after file is loaded ──
   const triggerSkuExtraction = async (inputFile: File) => {
     setIsExtractingSku(true);
+    setSkuProgress({ current: 0, total: 0 });
     setPageSkuMap({});
     setSkuOrder([]);
     try {
-      const map = await extractSkusFromFlipkartPdf(inputFile);
+      const map = await extractSkusFromFlipkartPdf(inputFile, (current, total) => {
+        setSkuProgress({ current, total });
+      });
       const unique = getUniqueSku(map);
       setPageSkuMap(map);
 
@@ -248,6 +276,7 @@ export default function FlipkartLabelCropPage() {
     setPageSkuMap({});
     setSkuOrder([]);
     setIsExtractingSku(false);
+    setSkuProgress(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (appendFileInputRef.current) appendFileInputRef.current.value = "";
   };
@@ -649,14 +678,10 @@ export default function FlipkartLabelCropPage() {
                     <button
                       type="button"
                       onClick={handleCropAndDownloadClick}
-                      disabled={isProcessing}
-                      className="h-[34px] flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs sm:text-sm font-medium px-4 rounded-md transition-colors cursor-pointer disabled:opacity-60 shadow-xs"
+                      disabled={isProcessing || isExtractingSku}
+                      className="h-[34px] flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs sm:text-sm font-medium px-4 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
                     >
-                      {isProcessing ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : (
-                        <Download size={14} />
-                      )}
+                      <Download size={14} />
                       <span>Download PDF</span>
                     </button>
                   )}
@@ -711,10 +736,49 @@ export default function FlipkartLabelCropPage() {
 
               {/* 3. Central Content Area: Seamlessly Integrated with Main Box (Zero Unwanted Margin) */}
               {isExtractingSku && skuOrder.length === 0 ? (
-                <div className="py-8 flex flex-col items-center justify-center gap-2 text-xs text-black/70">
-                  <Loader2 size={24} className="animate-spin text-[#051448]" />
-                  <span className="font-semibold">Analyzing labels & detecting SKUs...</span>
-                  <span className="text-[11px] text-black/50">Grouping order will appear automatically</span>
+                <div className="min-h-[300px] sm:min-h-[360px] py-14 sm:py-20 px-4 sm:px-6 flex flex-col items-center justify-center text-center">
+                  <div className="w-full max-w-md sm:max-w-lg flex flex-col items-center gap-3">
+                    {/* 1. Dynamic Status & Privacy Details (Upper Side, Regular Font Size) */}
+                    <div className="flex items-center justify-center gap-2 text-xs sm:text-base font-normal text-slate-700 min-h-[26px]">
+                      <span
+                        key={extractionStatusIndex}
+                        className="animate-in fade-in duration-300 text-center font-normal line-clamp-2"
+                      >
+                        {SKU_PROCESSING_STATUS_STEPS[extractionStatusIndex]}
+                      </span>
+                    </div>
+
+                    {/* 2. Simple Progress Bar */}
+                    <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                      {skuProgress && skuProgress.total > 0 ? (
+                        <div
+                          className="h-full bg-[#051448] transition-all duration-200 rounded-full"
+                          style={{
+                            width: `${Math.max(5, Math.round((skuProgress.current / skuProgress.total) * 100))}%`,
+                          }}
+                        />
+                      ) : (
+                        <div className="h-full w-1/3 bg-[#051448] rounded-full animate-pulse" />
+                      )}
+                    </div>
+
+                    {/* 3. Label Processing Information After Progress Bar */}
+                    <div className="flex items-center justify-between w-full text-xs sm:text-sm font-normal text-slate-600">
+                      <span className="flex items-center gap-1.5 font-normal text-slate-700">
+                        <Loader2 size={13} className="animate-spin text-[#051448]" />
+                        <span>
+                          {skuProgress && skuProgress.total > 0
+                            ? `Analyzing label ${skuProgress.current} of ${skuProgress.total}`
+                            : "Analyzing labels & detecting SKUs..."}
+                        </span>
+                      </span>
+                      <span className="font-semibold text-[#051448]">
+                        {skuProgress && skuProgress.total > 0
+                          ? `${Math.round((skuProgress.current / skuProgress.total) * 100)}%`
+                          : "Processing"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               ) : skuOrder.length >= 2 ? (
                 /* 2+ SKUs: Seamlessly integrated into main box with NO double borders or extra margins */

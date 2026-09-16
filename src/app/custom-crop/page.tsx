@@ -15,7 +15,6 @@ import {
   FileCheck,
   Crop,
   Layers,
-  Sparkles,
   Printer,
   ShieldCheck,
   FileText,

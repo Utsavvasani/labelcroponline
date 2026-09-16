@@ -87,7 +87,8 @@ export function extractFlipkartSkuFromText(text: string): string {
  * Pages with no detectable SKU get UNKNOWN_SKU.
  */
 export async function extractSkusFromFlipkartPdf(
-  input: File
+  input: File,
+  onProgress?: (current: number, total: number) => void
 ): Promise<PageSkuMap> {
   const pageSkuMap: PageSkuMap = {};
 
@@ -110,6 +111,7 @@ export async function extractSkusFromFlipkartPdf(
       const text = textContent.items.map((it: any) => it.str || "").join("\n");
       const sku = extractFlipkartSkuFromText(text);
       pageSkuMap[i - 1] = sku || UNKNOWN_SKU;
+      onProgress?.(i, doc.numPages);
     }
   } catch (err) {
     console.warn("SKU extraction failed:", err);

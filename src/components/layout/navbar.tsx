@@ -15,7 +15,6 @@ import {
   Sliders,
   Split,
   Minimize2,
-  Sparkles,
   Image as ImageIcon,
   RotateCw,
 } from "lucide-react";

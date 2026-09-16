@@ -18,7 +18,6 @@ import {
   Check,
   Plus,
   Split,
-  Sparkles,
 } from "lucide-react";
 import type { PageSkuMap } from "@/lib/pdf/flipkartSkuExtractor";
 import {
@@ -1167,7 +1166,7 @@ export function FlipkartSkuSorterPanel({
               /* Helpful Empty State */
               <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-400 rounded-md bg-white">
                 <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Sparkles size={16} />
+                  <Layers size={16} />
                 </div>
                 <p className="font-medium text-xs text-slate-800">No Product Groups Created Yet</p>
                 <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">

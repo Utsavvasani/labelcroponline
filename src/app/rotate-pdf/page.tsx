@@ -15,7 +15,6 @@ import {
   Check,
   FileCheck,
   RotateCcw as RotateLeft,
-  Sparkles,
   Layers,
 } from "lucide-react";
 import {
@@ -544,7 +543,7 @@ export default function RotatePdfPage() {
               {file && (
                 <div className="mt-3 p-2.5 bg-blue-50 border border-[#051448]/20 rounded text-[11px] sm:text-xs text-black/80 flex items-center justify-between">
                   <span className="flex items-center gap-1 font-semibold text-[#051448]">
-                    <Sparkles size={14} />
+                    <RotateCw size={14} />
                     Live Real-Time Preview Active
                   </span>
                   <span className="font-semibold text-black">
