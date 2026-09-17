@@ -18,6 +18,8 @@ import {
   Check,
   Plus,
   Split,
+  Files,
+  FileText,
 } from "lucide-react";
 import type { PageSkuMap } from "@/lib/pdf/flipkartSkuExtractor";
 import {
@@ -64,6 +66,9 @@ interface FlipkartSkuSorterPanelProps {
   onSkuOrderChange: (newOrder: string[]) => void;
   soldByName?: string;
   onDownloadComplete?: () => void;
+  sourceFilesCount?: number;
+  totalLabelsCount?: number;
+  fileBreakdown?: { name: string; pages: number }[];
 }
 
 export function FlipkartSkuSorterPanel({
@@ -73,6 +78,9 @@ export function FlipkartSkuSorterPanel({
   onSkuOrderChange,
   soldByName,
   onDownloadComplete,
+  sourceFilesCount = 1,
+  totalLabelsCount,
+  fileBreakdown,
 }: FlipkartSkuSorterPanelProps) {
   const [isBuilding, setIsBuilding] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -142,6 +150,24 @@ export function FlipkartSkuSorterPanel({
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
   const [groupSearchQuery, setGroupSearchQuery] = useState("");
+
+  // PDF Breakdown Popover State (clickable & scrollable on both mobile & desktop)
+  const [showPdfBreakdown, setShowPdfBreakdown] = useState(false);
+  const pdfBreakdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (pdfBreakdownRef.current && !pdfBreakdownRef.current.contains(e.target as Node)) {
+        setShowPdfBreakdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
 
   // Direct Jump Editing State
   const [jumpItemIndex, setJumpItemIndex] = useState<number | null>(null);
@@ -638,59 +664,143 @@ export function FlipkartSkuSorterPanel({
   };
 
   const totalGroupsCount = allGroupsWithPosition.length;
+  const effectiveLabelsCount = totalLabelsCount ?? Object.keys(pageSkuMap).length;
+  const effectiveFilesCount = sourceFilesCount ?? 1;
 
   return (
     <div className="w-full flex flex-col bg-white">
-      {/* ── Top Bar: Title + Batch Summary + Smart Bulk Actions ── */}
-      <div className="px-3 py-1.5 bg-white border-b border-slate-400 flex items-center justify-between gap-2">
-        {/* Left: Title & Count Badges */}
-        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-          <span className="font-semibold text-xs sm:text-sm text-slate-900 shrink-0">
-            Arrange SKU Order
-          </span>
-          <span className="text-[11px] font-normal text-slate-700 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
-            {skuOrder.length} SKUs
-          </span>
-          {totalGroupsCount > 0 && (
-            <span className="text-[11px] font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-              <Layers size={10} />
-              {totalGroupsCount} {totalGroupsCount === 1 ? "Group" : "Groups"}
+      {/* ── 2. Information Bar: Clean Stat Strip (Number Top, Description Bottom, Seamless No-Div Style) ── */}
+      <div className="px-4 py-2 bg-slate-50/70 border-b border-slate-300 flex items-center justify-around sm:justify-center sm:gap-14 text-center select-none">
+        {/* Merged PDFs Count */}
+        {effectiveFilesCount > 1 ? (
+          <div
+            ref={pdfBreakdownRef}
+            onClick={() => setShowPdfBreakdown((prev) => !prev)}
+            className="relative flex flex-col items-center cursor-pointer select-none"
+            title="Click to view all merged files and page counts"
+          >
+            <span className="text-sm sm:text-base font-bold text-slate-800 leading-tight flex items-center gap-0.5">
+              <span>{effectiveFilesCount}</span>
+              {fileBreakdown && fileBreakdown.length > 0 && (
+                <ChevronDown
+                  size={11}
+                  className={`text-slate-400 transition-transform duration-150 ${showPdfBreakdown ? "rotate-180 text-[#051448]" : ""}`}
+                />
+              )}
             </span>
-          )}
+            <span className="text-[11px] font-medium text-slate-500">PDFs</span>
+
+            {/* Clickable & Scrollable Breakdown Popover */}
+            {fileBreakdown && fileBreakdown.length > 0 && (
+              <div
+                className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center transition-all duration-150 ${
+                  showPdfBreakdown
+                    ? "opacity-100 pointer-events-auto scale-100"
+                    : "opacity-0 pointer-events-none scale-95"
+                }`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="w-2.5 h-2.5 bg-white border-t border-l border-slate-300 rotate-45 -mb-1.5 z-10" />
+                <div className="bg-white text-slate-900 border border-slate-300 text-xs rounded-lg shadow-xl p-3 min-w-[260px] max-w-[320px] space-y-2 text-left">
+                  <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1.5 flex justify-between items-center">
+                    <span>Combined Files ({effectiveFilesCount})</span>
+                    <span className="text-[10px] font-semibold text-slate-500">{effectiveLabelsCount} Labels</span>
+                  </div>
+                  {/* Scrollable list with mouse wheel and touch scroll */}
+                  <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 overscroll-contain">
+                    {fileBreakdown.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800 py-0.5 border-b border-slate-50 last:border-0">
+                        <span className="truncate max-w-[175px] font-medium" title={item.name}>
+                          {idx + 1}. {item.name}
+                        </span>
+                        <span className="font-semibold shrink-0 bg-blue-50 px-2 py-0.5 rounded text-[#051448] border border-blue-200/60 text-[10px]">
+                          {item.pages} {item.pages === 1 ? "page" : "pages"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-1 border-t border-slate-100 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowPdfBreakdown(false)}
+                      className="text-[10px] font-semibold text-slate-500 hover:text-slate-800 cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center">
+            <span className="text-sm sm:text-base font-bold text-slate-800 leading-tight">1</span>
+            <span className="text-[11px] font-medium text-slate-500">PDF</span>
+          </div>
+        )}
+
+        {/* Total Labels Count */}
+        <div className="flex flex-col items-center">
+          <span className="text-sm sm:text-base font-bold text-[#051448] leading-tight">
+            {effectiveLabelsCount}
+          </span>
+          <span className="text-[11px] font-medium text-slate-500">
+            {effectiveLabelsCount === 1 ? "Label" : "Labels"}
+          </span>
         </div>
 
-        {/* Right: Smart Bulk Actions */}
-        <div className="flex items-center gap-1 shrink-0 text-xs">
-          <button
-            type="button"
-            onClick={() => handleSortAlphabetical(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-1.5 py-0.5 rounded bg-white transition-colors cursor-pointer text-xs"
-            title="Sort A to Z"
-          >
-            A→Z
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSortByQuantity(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-1.5 py-0.5 rounded bg-white transition-colors cursor-pointer text-xs"
-            title="Sort by highest label quantity first"
-          >
-            Qty ↓
-          </button>
-
-          {hasSavedBefore && (
-            <button
-              type="button"
-              onClick={handleClearSaved}
-              className="font-normal text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 px-1.5 py-0.5 rounded bg-white transition-colors flex items-center gap-1 cursor-pointer text-xs"
-              title="Clear saved arrangement from local storage"
-            >
-              <Trash2 size={11} />
-              <span className="hidden md:inline">Clear Saved</span>
-            </button>
-          )}
+        {/* Unique SKUs Count */}
+        <div className="flex flex-col items-center">
+          <span className="text-sm sm:text-base font-bold text-slate-800 leading-tight">
+            {skuOrder.length}
+          </span>
+          <span className="text-[11px] font-medium text-slate-500">
+            SKUs
+          </span>
         </div>
+
+        {/* Product Groups Count */}
+        <div className="flex flex-col items-center">
+          <span className="text-sm sm:text-base font-bold text-indigo-700 leading-tight">
+            {totalGroupsCount}
+          </span>
+          <span className="text-[11px] font-medium text-slate-500">
+            {totalGroupsCount === 1 ? "Group" : "Groups"}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Mobile Direct Action: Confirm & Download (Guaranteed 1st-screen visibility without scrolling) ── */}
+      <div className="sm:hidden px-3 py-2 bg-blue-50/70 border-b border-slate-300 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 text-xs text-[#051448] font-semibold">
+          <span>{effectiveLabelsCount} {effectiveLabelsCount === 1 ? "Label" : "Labels"} ready</span>
+        </div>
+        <button
+          type="button"
+          onClick={handleConfirmAndDownload}
+          disabled={isBuilding}
+          className={`h-[34px] flex items-center justify-center gap-1.5 text-xs font-semibold px-4 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
+            ? "bg-emerald-700 text-white shadow-xs"
+            : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-xs"
+          } disabled:opacity-60`}
+        >
+          {isBuilding ? (
+            <>
+              <Loader2 size={13} className="animate-spin" />
+              <span>Building...</span>
+            </>
+          ) : confirmed ? (
+            <>
+              <CheckCircle size={13} />
+              <span>Download Again</span>
+            </>
+          ) : (
+            <>
+              <Download size={13} />
+              <span>Confirm &amp; Download PDF</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* ── Error Alert ── */}
@@ -705,17 +815,17 @@ export function FlipkartSkuSorterPanel({
       <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch bg-white">
         {/* ════════ LEFT PART: SKUs & Sequence Order (7 Cols) ════════ */}
         <div className="lg:col-span-7 flex flex-col lg:border-r border-slate-400">
-          {/* Header with Maximized Search Bar & Quick Group Actions */}
-          <div className="px-2.5 py-1.5 bg-white  flex items-center gap-2 text-xs">
-            {/* Maximized Search Bar */}
-            <div className="relative flex-1 flex items-center min-w-[160px]">
+          {/* Header with Search Bar & All 3 Buttons Beside It (Height matching Product Groups search bar) */}
+          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-1.5 sm:gap-2 text-xs">
+            {/* Search Bar: Same height & padding as group search bar, width flexible to fit buttons */}
+            <div className="relative flex-1 min-w-0 flex items-center">
               <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search SKUs to sequence or group..."
-                className="w-full pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
+                className="w-full h-[34px] pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {searchQuery && (
                 <button
@@ -729,74 +839,100 @@ export function FlipkartSkuSorterPanel({
               )}
             </div>
 
-            {/* Quick Actions (appearing contextually) */}
-            <div className="flex items-center gap-1.5 shrink-0">
-              {/* Quick Group Filtered SKUs Button */}
+            {/* Actions Beside Search Bar: Contextual Grouping Actions + All 3 Sort Buttons */}
+            <div className="flex items-center gap-1 shrink-0">
               {matchingSingleSkus.length >= 2 && (
                 <button
                   type="button"
                   onClick={() => createGroupFromSkus(matchingSingleSkus)}
-                  className="h-[34px] flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3 rounded-md text-xs sm:text-sm cursor-pointer shrink-0 shadow-2xs transition-colors"
+                  className="h-[34px] flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-2 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
                   title={`Group ${matchingSingleSkus.length} matched SKUs together`}
                 >
-                  <Layers size={14} />
+                  <Layers size={13} />
                   <span>Group {matchingSingleSkus.length}</span>
                 </button>
               )}
 
-              {/* Manual Checkbox Grouping Button */}
               {selectedSkus.size >= 2 && (
-                <button
-                  type="button"
-                  onClick={() => createGroupFromSkus(Array.from(selectedSkus))}
-                  className="h-[30px] sm:h-[34px] flex items-center gap-1 bg-[#051448] hover:bg-[#071a5e] text-white font-medium px-2.5 sm:px-3 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
-                  title={`Group ${selectedSkus.size} selected SKUs together`}
-                >
-                  <Plus size={13} />
-                  <span>Group ({selectedSkus.size})</span>
-                </button>
-              )}
-
-              {/* Add Selected SKUs to an Existing Group Dropdown */}
-              {selectedSkus.size >= 1 && allGroupsWithPosition.length > 0 && (
-                <div className="relative">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
-                    onClick={() => setShowAddToGroupMenu((prev) => !prev)}
-                    className="h-[30px] sm:h-[34px] flex items-center gap-1 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-300 font-medium px-2 sm:px-3 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
-                    title={`Add ${selectedSkus.size} selected SKU(s) to an existing group`}
+                    onClick={() => createGroupFromSkus(Array.from(selectedSkus))}
+                    className="h-[34px] flex items-center gap-1 bg-[#051448] hover:bg-[#071a5e] text-white font-medium px-2 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
+                    title={`Group ${selectedSkus.size} selected SKUs together`}
                   >
-                    <Layers size={13} className="text-indigo-600" />
-                    <span className="hidden sm:inline">Add to Group ({selectedSkus.size})</span>
-                    <span className="sm:hidden">Add ({selectedSkus.size})</span>
-                    <ChevronDown size={13} />
+                    <Plus size={13} />
+                    <span>Group ({selectedSkus.size})</span>
                   </button>
 
-                  {showAddToGroupMenu && (
-                    <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-slate-400 rounded-md shadow-lg z-50 py-1 max-h-48 overflow-y-auto">
-                      <div className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-100">
-                        Choose Target Group
-                      </div>
-                      {allGroupsWithPosition.map(({ group, position }) => (
-                        <button
-                          key={group.id}
-                          type="button"
-                          onClick={() => {
-                            handleAddSkusToGroup(group.id, Array.from(selectedSkus));
-                            setShowAddToGroupMenu(false);
-                          }}
-                          className="w-full text-left px-2.5 py-1.5 hover:bg-indigo-50 text-xs text-slate-800 flex items-center justify-between cursor-pointer"
-                        >
-                          <span className="truncate">{getCleanGroupName(group.name)}</span>
-                          <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0 font-medium">
-                            Pos {position}
-                          </span>
-                        </button>
-                      ))}
+                  {allGroupsWithPosition.length > 0 && (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowAddToGroupMenu((prev) => !prev)}
+                        className="h-[34px] flex items-center gap-1 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-300 font-medium px-1.5 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
+                        title={`Add ${selectedSkus.size} selected SKU(s) to an existing group`}
+                      >
+                        <Layers size={13} className="text-indigo-600" />
+                        <ChevronDown size={12} />
+                      </button>
+
+                      {showAddToGroupMenu && (
+                        <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-slate-400 rounded-md shadow-lg z-50 py-1 text-xs max-h-48 overflow-y-auto">
+                          <div className="px-2.5 py-1 text-[10px] font-medium text-slate-500 border-b border-slate-200 uppercase tracking-wider">
+                            Select Target Group:
+                          </div>
+                          {allGroupsWithPosition.map(({ group, position }) => (
+                            <button
+                              key={group.id}
+                              type="button"
+                              onClick={() => {
+                                handleAddSkusToGroup(group.id, Array.from(selectedSkus));
+                                setShowAddToGroupMenu(false);
+                              }}
+                              className="w-full text-left px-2.5 py-1 hover:bg-indigo-50/70 text-slate-800 font-normal flex items-center justify-between gap-1 cursor-pointer transition-colors"
+                            >
+                              <span className="truncate">{getCleanGroupName(group.name)}</span>
+                              <span className="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.2 rounded-full shrink-0 font-medium">
+                                Pos {position}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
+
+              {/* All Three Sort Buttons beside Search Bar */}
+              <button
+                type="button"
+                onClick={() => handleSortAlphabetical(true)}
+                className="h-[34px] px-2 rounded-md font-medium text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-[#051448] bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center justify-center whitespace-nowrap"
+                title="Sort SKUs A to Z"
+              >
+                A→Z
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSortByQuantity(true)}
+                className="h-[34px] px-2 rounded-md font-medium text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-[#051448] bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center justify-center whitespace-nowrap"
+                title="Sort by highest label quantity first"
+              >
+                Qty ↓
+              </button>
+
+              <button
+                type="button"
+                onClick={handleClearSaved}
+                disabled={!hasSavedBefore}
+                className="h-[34px] px-2 rounded-md font-medium text-red-600 hover:text-red-700 disabled:text-slate-300 border border-slate-400 hover:border-red-400 disabled:border-slate-300 bg-white hover:bg-red-50 disabled:bg-slate-50 transition-colors cursor-pointer disabled:cursor-not-allowed text-xs shadow-2xs flex items-center justify-center"
+                title={hasSavedBefore ? "Reset saved SKU arrangement" : "Default arrangement active"}
+              >
+                <Trash2 size={13} />
+              </button>
             </div>
           </div>
 
@@ -804,7 +940,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="divide-y divide-slate-400 max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
+            className="divide-y divide-slate-400 max-h-[140px] sm:max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -1074,35 +1210,25 @@ export function FlipkartSkuSorterPanel({
 
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
         <div className="lg:col-span-5 flex flex-col border-t lg:border-t-0 border-slate-400">
-          {/* Header with Product Groups Title & Search Bar */}
-          <div className="px-2.5 py-1.5 bg-slate-50 border-b border-slate-400 flex items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Layers size={14} className="text-indigo-700" />
-              <span className="font-semibold text-xs sm:text-sm text-indigo-950">Product Groups</span>
-              {allGroupsWithPosition.length > 0 && (
-                <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100 border border-indigo-200 px-1.5 py-0.2 rounded-full">
-                  {allGroupsWithPosition.length}
-                </span>
-              )}
-            </div>
-
-            <div className="relative flex-1 flex items-center max-w-[170px] sm:max-w-none">
-              <Search size={13} className="absolute left-2 text-slate-400 pointer-events-none" />
+          {/* Header with Maximized Search Bar for Product Groups */}
+          <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
+            <div className="relative flex-1 flex items-center w-full">
+              <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
-                placeholder="Search groups..."
-                className="w-full pl-6.5 pr-6 py-1 text-xs bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 placeholder:text-slate-400"
+                placeholder="Search Product Groups..."
+                className="w-full h-[34px] pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {groupSearchQuery && (
                 <button
                   type="button"
                   onClick={() => setGroupSearchQuery("")}
-                  className="absolute right-1.5 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
+                  className="absolute right-2 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
                   title="Clear search"
                 >
-                  <X size={12} />
+                  <X size={14} />
                 </button>
               )}
             </div>
@@ -1351,15 +1477,50 @@ export function FlipkartSkuSorterPanel({
         </div>
       </div>
 
-      {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3 py-2 border-t border-slate-400 bg-white flex items-center justify-end gap-2">
+      {/* ── Sticky Bottom Footer: Sort Tools on Left, Confirm & Download on Right (Always visible without scrolling) ── */}
+      <div className="sticky bottom-0 z-40 px-3 py-2 border-t border-slate-400 bg-white/95 backdrop-blur-xs flex items-center justify-between gap-2 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
+        {/* Left: Quick Sort SKUs Tools */}
+        <div className="flex items-center gap-1 sm:gap-1.5 text-xs">
+          <span className="text-[11px] text-slate-500 font-medium hidden sm:inline mr-0.5">Sort SKUs:</span>
+          <button
+            type="button"
+            onClick={() => handleSortAlphabetical(true)}
+            className="h-[30px] px-2 rounded font-medium text-slate-700 hover:text-[#051448] border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center gap-0.5"
+            title="Sort SKUs A to Z"
+          >
+            <span>A→Z</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSortByQuantity(true)}
+            className="h-[30px] px-2 rounded font-medium text-slate-700 hover:text-[#051448] border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center gap-0.5"
+            title="Sort by highest label quantity first"
+          >
+            <span>Qty ↓</span>
+          </button>
+
+          {hasSavedBefore && (
+            <button
+              type="button"
+              onClick={handleClearSaved}
+              className="h-[30px] px-2 rounded font-medium text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 bg-white hover:bg-red-50 transition-colors flex items-center gap-1 cursor-pointer text-xs shadow-2xs"
+              title="Clear saved arrangement from local storage"
+            >
+              <Trash2 size={12} />
+              <span className="hidden sm:inline">Reset</span>
+            </button>
+          )}
+        </div>
+
+        {/* Right: Confirm & Download PDF Button */}
         <button
           type="button"
           onClick={handleConfirmAndDownload}
           disabled={isBuilding}
           className={`h-[34px] flex items-center justify-center gap-1.5 text-xs sm:text-sm font-medium px-4 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
-            ? "bg-emerald-700 hover:bg-emerald-800 text-white shadow-2xs"
-            : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-2xs"
+            ? "bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs"
+            : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-xs"
             } disabled:opacity-60`}
         >
           {isBuilding ? (

@@ -16,6 +16,7 @@ import {
   FileEdit,
   Files,
   Plus,
+  Package,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { cropFlipkartPdf, triggerDownload, CropResult } from "@/lib/pdf/flipkartCropper";
@@ -480,8 +481,8 @@ export default function FlipkartLabelCropPage() {
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <span className="text-xs sm:text-sm text-black">
-                          Standard Auto Crop
+                        <span className="text-xs sm:text-sm font-semibold text-black">
+                          Standard Cut
                         </span>
                         {cropMode === "auto" && (
                           <Check size={14} className="text-[#051448] shrink-0" />
@@ -497,8 +498,8 @@ export default function FlipkartLabelCropPage() {
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <span className="text-xs sm:text-sm text-black">
-                          Custom Area
+                        <span className="text-xs sm:text-sm font-semibold text-black">
+                          Custom
                         </span>
                         {cropMode === "custom" && (
                           <Check size={14} className="text-[#051448] shrink-0" />
@@ -530,9 +531,9 @@ export default function FlipkartLabelCropPage() {
           ) : (
             /* ── Active Workspace View: Compact, Scroll-Free with Menubar ── */
             <div className="flex flex-col">
-              {/* 1. Sleek Top Toolbar / Menubar */}
-              <div className="relative z-30 px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-400 rounded-t-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-2">
-                {/* Left / Top Row on Mobile: Flipkart Logo + File Info + Add PDF */}
+              {/* 1. Sleek Top Toolbar / Menu Bar */}
+              <div className="relative z-30 px-3 sm:px-4 py-2 bg-white border-b border-slate-300 rounded-t-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                {/* Row 1 on Mobile / Left on Desktop: Brand Logo + Mobile Action Tools */}
                 <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 w-full sm:w-auto">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                     <Image
@@ -540,120 +541,110 @@ export default function FlipkartLabelCropPage() {
                       alt="Flipkart"
                       width={110}
                       height={38}
-                      className="h-7 sm:h-9 w-auto object-contain shrink-0"
+                      className="h-6 sm:h-8 w-auto object-contain shrink-0"
                       priority
                     />
-                    <div className="hidden sm:block h-5 w-px bg-slate-400 shrink-0" />
-                    <div className="hidden sm:flex items-center gap-2 min-w-0">
-                      {sourceFiles.length > 1 ? (
-                        <div className="relative group inline-flex items-center">
-                          <div className="flex items-center gap-1.5 cursor-pointer bg-slate-200/70 hover:bg-slate-200 border border-slate-400 px-2 py-1 rounded-md transition-colors shrink-0 shadow-2xs">
-                            <Files size={14} className="text-[#051448] shrink-0" />
-                            <span className="font-bold text-xs sm:text-sm text-black">
-                              {sourceFiles.length} PDFs
-                            </span>
-                          </div>
-                          {/* Instant Light Tooltip with Per-File Breakdown */}
-                          <div className="absolute top-full mt-2.5 left-0 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-start">
-                            <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 ml-4 -mb-1 z-10" />
-                            <div className="bg-white text-[#051448] border border-slate-400 text-xs rounded-md shadow-lg p-2.5 min-w-[240px] max-w-[320px] space-y-1.5">
-                              <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1 flex justify-between items-center">
-                                <span>Combined Files ({sourceFiles.length})</span>
-                                <span>{cropResult ? `${cropResult.pageCount} Labels` : `${fileBreakdown.reduce((a, b) => a + b.pages, 0)} Total`}</span>
-                              </div>
-                              <div className="max-h-40 overflow-y-auto space-y-1">
-                                {fileBreakdown.map((item, idx) => (
-                                  <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800">
-                                    <span className="truncate max-w-[170px]" title={item.name}>
-                                      {idx + 1}. {item.name}
-                                    </span>
-                                    <span className="font-semibold shrink-0 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300 text-[#051448]">
-                                      {item.pages} {item.pages === 1 ? "page" : "pages"}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <span
-                          className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
-                          title={file.name}
-                        >
-                          {file.name}
-                        </span>
-                      )}
-                    </div>
+                    <div className="hidden sm:block h-5 w-px bg-slate-300 shrink-0" />
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {sourceFiles.length > 1 && (
-                      <span className="sm:hidden text-xs font-bold text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded-full border border-slate-300">
-                        {sourceFiles.length} PDFs
-                      </span>
-                    )}
-
-                    {cropResult ? (
-                      <span className="text-xs font-bold text-[#051448] bg-blue-100/90 border border-blue-300 px-2.5 py-0.5 rounded-full shrink-0">
-                        {cropResult.pageCount} Label{cropResult.pageCount > 1 ? "s" : ""}
-                      </span>
-                    ) : (
-                      <span className="text-xs font-medium text-black/60 bg-slate-200/80 px-2.5 py-0.5 rounded-full shrink-0">
-                        PDF Loaded
-                      </span>
-                    )}
-
-                    {/* Add More PDFs Button */}
+                  {/* Actions for Mobile (displayed in Row 1 next to logo) */}
+                  <div className="flex sm:hidden items-center gap-1.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => appendFileInputRef.current?.click()}
                       disabled={isCombining || isProcessing}
-                      className="h-[28px] flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-[#051448] bg-white hover:bg-blue-50 border border-slate-400 px-2 rounded cursor-pointer transition-colors shadow-2xs shrink-0 disabled:opacity-50"
+                      className="h-[28px] flex items-center gap-1 text-[11px] font-semibold text-[#051448] bg-blue-50/70 hover:bg-blue-100 border border-blue-200 px-2 rounded cursor-pointer transition-colors shadow-2xs shrink-0 disabled:opacity-50"
                       title="Add and merge more PDF files into this batch"
                     >
-                      <Plus size={13} className="stroke-[2.5]" />
+                      <Plus size={12} className="stroke-[2.5]" />
                       <span>Add PDF</span>
+                    </button>
+
+                    {cropMode === "custom" && (
+                      <TooltipButton
+                        icon={Crop}
+                        label="Adjust Custom Area"
+                        onClick={() => setShowCustomCropModal(true)}
+                        active={!!customCropBox}
+                      />
+                    )}
+
+                    <TooltipButton
+                      icon={FileEdit}
+                      label={customFileName ? `Renamed: ${customFileName}.pdf` : "Rename Output File"}
+                      onClick={() => setShowRenameInput((prev) => !prev)}
+                      active={showRenameInput || !!customFileName}
+                    />
+
+                    {cropResult && (
+                      <TooltipButton
+                        icon={Eye}
+                        label="Preview Cropped PDF"
+                        onClick={() => setShowPreviewModal(true)}
+                        alignRight={true}
+                      />
+                    )}
+
+                    {skuOrder.length < 2 && (
+                      <button
+                        type="button"
+                        onClick={handleCropAndDownloadClick}
+                        disabled={isProcessing || isExtractingSku}
+                        className="h-[28px] flex items-center gap-1 bg-[#051448] hover:bg-[#071a5e] text-white text-[11px] font-medium px-2 rounded transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                      >
+                        <Download size={12} />
+                        <span>Download</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Row 2 on Mobile / Center on Desktop: Segmented Cut Mode Controller */}
+                <div className="w-full sm:w-auto flex items-center gap-1.5">
+                  <span className="hidden md:inline text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    Cut Mode:
+                  </span>
+                  <div className="w-full sm:w-auto grid grid-cols-2 sm:flex items-center h-[34px] p-0.5 rounded-md border border-slate-300 bg-slate-100/80 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => handleModeChange("auto")}
+                      className={`h-full px-2 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-center ${
+                        cropMode === "auto"
+                          ? "bg-[#051448] text-white shadow-xs"
+                          : "text-slate-600 hover:text-black"
+                      }`}
+                      title="Standard Cut: Optimized Flipkart shipping label crop"
+                    >
+                      Standard Cut
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleModeChange("custom")}
+                      className={`h-full px-2 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-center ${
+                        cropMode === "custom"
+                          ? "bg-[#051448] text-white shadow-xs"
+                          : "text-slate-600 hover:text-black"
+                      }`}
+                      title="Custom: Interactive custom crop area"
+                    >
+                      Custom
                     </button>
                   </div>
                 </div>
 
-                {/* Right / Bottom Row on Mobile: Mode Switcher & Tools */}
-                <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
-                  {/* Crop Mode Switcher */}
-                  <div className="relative group inline-flex items-center">
-                    <div className="h-[34px] flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
-                      <button
-                        type="button"
-                        onClick={() => handleModeChange("auto")}
-                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-[11px] sm:text-xs md:text-sm font-semibold transition-all cursor-pointer ${
-                          cropMode === "auto"
-                            ? "bg-[#051448] text-white shadow-xs"
-                            : "text-slate-600 hover:text-black"
-                        }`}
-                      >
-                        Standard Crop
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleModeChange("custom")}
-                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-[11px] sm:text-xs md:text-sm font-semibold transition-all cursor-pointer ${
-                          cropMode === "custom"
-                            ? "bg-[#051448] text-white shadow-xs"
-                            : "text-slate-600 hover:text-black"
-                        }`}
-                      >
-                        Custom
-                      </button>
-                    </div>
-                    {/* Instant Light Tooltip */}
-                    <div className="absolute top-full mt-2.5 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-center">
-                      <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 -mb-1 z-10" />
-                      <div className="bg-white text-[#051448] border border-slate-400 text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg whitespace-nowrap">
-                        Crop Mode: {cropMode === "auto" ? "Standard Crop" : "Custom Box"}
-                      </div>
-                    </div>
-                  </div>
+                {/* Right / Desktop Actions (hidden on mobile) */}
+                <div className="hidden sm:flex items-center justify-end gap-1.5 sm:gap-2">
+                  {/* Add More PDFs Button */}
+                  <button
+                    type="button"
+                    onClick={() => appendFileInputRef.current?.click()}
+                    disabled={isCombining || isProcessing}
+                    className="h-[32px] flex items-center gap-1.5 text-xs font-semibold text-[#051448] bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200 px-2.5 rounded-md cursor-pointer transition-colors shadow-2xs shrink-0 disabled:opacity-50"
+                    title="Add and merge more PDF files into this batch"
+                  >
+                    <Plus size={13} className="stroke-[2.5]" />
+                    <span>Add PDF</span>
+                  </button>
 
                   {/* Adjust Custom Area Button (shown in custom mode) */}
                   {cropMode === "custom" && (
@@ -802,47 +793,84 @@ export default function FlipkartLabelCropPage() {
                       ? cropResult.soldBy
                       : undefined
                   }
+                  sourceFilesCount={sourceFiles.length || 1}
+                  totalLabelsCount={cropResult?.pageCount || Object.keys(pageSkuMap).length}
+                  fileBreakdown={fileBreakdown}
                 />
               ) : skuOrder.length === 1 && skuOrder[0] !== UNKNOWN_SKU ? (
-                /* 1 SKU: Compact Notification */
-                <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50/40">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
-                    <div>
-                      <p className="font-bold text-xs sm:text-sm text-black">
-                        SKU Detected: <code className="bg-white px-2 py-0.5 rounded border border-emerald-300 font-mono text-[#051448] font-bold">{skuOrder[0]}</code>
-                      </p>
-                      <p className="text-[11px] text-black/60 mt-0.5">
-                        All {Object.keys(pageSkuMap).length} labels belong to this product. (Multi-SKU sorting activates when 2+ different SKUs exist).
-                      </p>
+                /* 1 SKU: Information bar + Compact Notification */
+                <div className="flex flex-col">
+                  {/* Information Bar strip */}
+                  <div className="px-3 py-1.5 bg-slate-100/80 border-b border-slate-300 flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-300 px-2 py-0.5 rounded-full shadow-2xs">
+                        <Files size={12} className="text-[#051448]" />
+                        <span>{sourceFiles.length || 1} {(sourceFiles.length || 1) === 1 ? "PDF" : "PDFs"}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-[#051448] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full shadow-2xs">
+                        <FileText size={12} className="text-[#051448]" />
+                        <span>{cropResult?.pageCount || Object.keys(pageSkuMap).length} Labels</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-800 bg-white border border-slate-300 px-2 py-0.5 rounded-full shadow-2xs">
+                        <Package size={12} className="text-slate-600" />
+                        <span>1 SKU</span>
+                      </span>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleCropAndDownloadClick}
-                    disabled={isProcessing}
-                    className="inline-flex items-center justify-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer shrink-0"
-                  >
-                    <Download size={14} />
-                    <span>Crop &amp; Download PDF</span>
-                  </button>
+                  <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50/40">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-3 h-3 rounded-full bg-emerald-500 shrink-0" />
+                      <div>
+                        <p className="font-bold text-xs sm:text-sm text-black">
+                          SKU Detected: <code className="bg-white px-2 py-0.5 rounded border border-emerald-300 font-mono text-[#051448] font-bold">{skuOrder[0]}</code>
+                        </p>
+                        <p className="text-[11px] text-black/60 mt-0.5">
+                          All {Object.keys(pageSkuMap).length} labels belong to this product. (Multi-SKU sorting activates when 2+ different SKUs exist).
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCropAndDownloadClick}
+                      disabled={isProcessing}
+                      className="inline-flex items-center justify-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-4 py-2 rounded transition-colors cursor-pointer shrink-0"
+                    >
+                      <Download size={14} />
+                      <span>Crop &amp; Download PDF</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Fallback: No SKUs or Unknown (Single action crop & download) */
-                <div className="py-6 flex flex-col items-center justify-center gap-2 text-center p-4">
-                  <p className="font-bold text-xs text-black">Labels Ready for Standard Crop</p>
-                  <p className="text-[11px] text-black/60 max-w-sm">
-                    Labels are ready to crop and download according to the selected mode ({cropMode === "custom" ? "Custom Box" : "Standard Crop"}).
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleCropAndDownloadClick}
-                    disabled={isProcessing}
-                    className="mt-2 inline-flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-5 py-2.5 rounded transition-colors cursor-pointer"
-                  >
-                    <Download size={14} />
-                    <span>Crop &amp; Download PDF</span>
-                  </button>
+                <div className="flex flex-col">
+                  {/* Information Bar strip */}
+                  <div className="px-3 py-1.5 bg-slate-100/80 border-b border-slate-300 flex items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1 text-[11px] font-medium text-slate-700 bg-white border border-slate-300 px-2 py-0.5 rounded-full shadow-2xs">
+                        <Files size={12} className="text-[#051448]" />
+                        <span>{sourceFiles.length || 1} {(sourceFiles.length || 1) === 1 ? "PDF" : "PDFs"}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-[#051448] bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full shadow-2xs">
+                        <FileText size={12} className="text-[#051448]" />
+                        <span>{cropResult?.pageCount || Object.keys(pageSkuMap).length} Labels</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="py-6 flex flex-col items-center justify-center gap-2 text-center p-4">
+                    <p className="font-bold text-xs text-black">Labels Ready for Standard Crop</p>
+                    <p className="text-[11px] text-black/60 max-w-sm">
+                      Labels are ready to crop and download according to the selected mode ({cropMode === "custom" ? "Custom Box" : "Standard Cut"}).
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleCropAndDownloadClick}
+                      disabled={isProcessing}
+                      className="mt-2 inline-flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white text-xs font-bold px-5 py-2.5 rounded transition-colors cursor-pointer"
+                    >
+                      <Download size={14} />
+                      <span>Crop &amp; Download PDF</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
