@@ -418,7 +418,7 @@ export default function MeeshoLabelCropPage() {
   return (
     <>
       {/* ── Main Content Form Container ── */}
-      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[56px] sm:pt-14 pb-6 sm:pb-10">
+      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[66px] sm:pt-[76px] pb-6 sm:pb-10">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}

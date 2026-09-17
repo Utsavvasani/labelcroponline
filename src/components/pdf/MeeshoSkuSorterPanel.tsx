@@ -259,8 +259,6 @@ export function MeeshoSkuSorterPanel({
   const rightListRef = useRef<HTMLDivElement>(null);
   const groupSlotRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const groupCardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const isProgrammaticScrollRef = useRef(false);
-  const scrollAnimFrameRef = useRef<number | null>(null);
 
   // Helper: Smoothly scroll an element to the exact vertical center of a container
   const scrollElementToCenter = (
@@ -284,6 +282,18 @@ export function MeeshoSkuSorterPanel({
 
   // Smooth scroll helper: Right column scrolls to group card and centers it
   const scrollToRightGroup = (groupId: string, smooth = true) => {
+    if (groupSearchQuery.trim()) {
+      const isCardRendered = groupCardRefs.current.has(groupId);
+      if (!isCardRendered) {
+        setGroupSearchQuery("");
+        setTimeout(() => {
+          const cardEl = groupCardRefs.current.get(groupId);
+          const rightContainer = rightListRef.current;
+          scrollElementToCenter(rightContainer, cardEl, smooth);
+        }, 50);
+        return;
+      }
+    }
     const cardEl = groupCardRefs.current.get(groupId);
     const rightContainer = rightListRef.current;
     if (cardEl && rightContainer) {
@@ -299,93 +309,29 @@ export function MeeshoSkuSorterPanel({
 
   // Smooth scroll helper: Left column scrolls to group position slot and centers it
   const scrollToLeftGroupSlot = (groupId: string, smooth = true) => {
+    if (searchQuery.trim()) {
+      const isSlotRendered = groupSlotRefs.current.has(groupId);
+      if (!isSlotRendered) {
+        setSearchQuery("");
+        setTimeout(() => {
+          const slotEl = groupSlotRefs.current.get(groupId);
+          const leftContainer = leftListRef.current;
+          scrollElementToCenter(leftContainer, slotEl, smooth);
+        }, 50);
+        return;
+      }
+    }
     const slotEl = groupSlotRefs.current.get(groupId);
     const leftContainer = leftListRef.current;
-    scrollElementToCenter(leftContainer, slotEl, smooth);
-  };
-
-  // When scrolling the left column, synchronize the right column's scroll position and center the active group
-  const handleLeftScroll = () => {
-    if (isProgrammaticScrollRef.current) return;
-    if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
-
-    scrollAnimFrameRef.current = requestAnimationFrame(() => {
-      const leftContainer = leftListRef.current;
-      const rightContainer = rightListRef.current;
-      if (!leftContainer || !rightContainer || allGroupsWithPosition.length === 0) return;
-
-      const containerRect = leftContainer.getBoundingClientRect();
-      const containerCenter = containerRect.top + containerRect.height / 2;
-
-      let closestGroupId: string | null = null;
-      let minDistance = Infinity;
-
-      groupSlotRefs.current.forEach((el, gId) => {
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom >= containerRect.top - 20 && rect.top <= containerRect.bottom + 20) {
-          const slotCenter = rect.top + rect.height / 2;
-          const dist = Math.abs(slotCenter - containerCenter);
-          if (dist < minDistance) {
-            minDistance = dist;
-            closestGroupId = gId;
-          }
-        }
-      });
-
-      if (closestGroupId) {
-        if (closestGroupId !== activeGroupId) {
-          setActiveGroupId(closestGroupId);
-        }
-        isProgrammaticScrollRef.current = true;
-        scrollToRightGroup(closestGroupId, true);
-        setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 300);
-      }
-    });
-  };
-
-  // When scrolling the right column, synchronize the left column's scroll position and center the active group slot
-  const handleRightScroll = () => {
-    if (isProgrammaticScrollRef.current) return;
-    if (scrollAnimFrameRef.current) cancelAnimationFrame(scrollAnimFrameRef.current);
-
-    scrollAnimFrameRef.current = requestAnimationFrame(() => {
-      const rightContainer = rightListRef.current;
-      const leftContainer = leftListRef.current;
-      if (!rightContainer || !leftContainer || allGroupsWithPosition.length === 0) return;
-
-      const containerRect = rightContainer.getBoundingClientRect();
-      const containerCenter = containerRect.top + containerRect.height / 2;
-
-      let closestGroupId: string | null = null;
-      let minDistance = Infinity;
-
-      groupCardRefs.current.forEach((el, gId) => {
-        if (!el) return;
-        const rect = el.getBoundingClientRect();
-        if (rect.bottom >= containerRect.top - 20 && rect.top <= containerRect.bottom + 20) {
-          const cardCenter = rect.top + rect.height / 2;
-          const dist = Math.abs(cardCenter - containerCenter);
-          if (dist < minDistance) {
-            minDistance = dist;
-            closestGroupId = gId;
-          }
-        }
-      });
-
-      if (closestGroupId) {
-        if (closestGroupId !== activeGroupId) {
-          setActiveGroupId(closestGroupId);
-        }
-        isProgrammaticScrollRef.current = true;
-        scrollToLeftGroupSlot(closestGroupId, true);
-        setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 300);
-      }
-    });
+    if (slotEl && leftContainer) {
+      scrollElementToCenter(leftContainer, slotEl, smooth);
+    } else {
+      setTimeout(() => {
+        const s = groupSlotRefs.current.get(groupId);
+        const l = leftListRef.current;
+        scrollElementToCenter(l, s, smooth);
+      }, 50);
+    }
   };
 
   /* ── Group Creation: From Search or Checkbox Selection ── */
@@ -914,7 +860,6 @@ export function MeeshoSkuSorterPanel({
           {/* Left Scrollable List */}
           <div
             ref={leftListRef}
-            onScroll={handleLeftScroll}
             className="divide-y divide-slate-400 max-h-[150px] sm:max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
           >
             {paginatedItems.length === 0 ? (
@@ -946,11 +891,7 @@ export function MeeshoSkuSorterPanel({
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(globalIndex)}
                       onDragEnd={handleDragEnd}
-                      onMouseEnter={() => {
-                        setHoveredGroupId(group.id);
-                        setActiveGroupId(group.id);
-                        scrollToRightGroup(group.id, true);
-                      }}
+                      onMouseEnter={() => setHoveredGroupId(group.id)}
                       onMouseLeave={() => setHoveredGroupId(null)}
                       onClick={() => {
                         setActiveGroupId(group.id);
@@ -1212,7 +1153,6 @@ export function MeeshoSkuSorterPanel({
           {/* Right Scrollable Groups List */}
           <div
             ref={rightListRef}
-            onScroll={handleRightScroll}
             className={`overflow-y-auto bg-white ${
               allGroupsWithPosition.length === 0
                 ? "py-2 px-3"
@@ -1243,11 +1183,7 @@ export function MeeshoSkuSorterPanel({
                       if (el) groupCardRefs.current.set(group.id, el);
                       else groupCardRefs.current.delete(group.id);
                     }}
-                    onMouseEnter={() => {
-                      setHoveredGroupId(group.id);
-                      setActiveGroupId(group.id);
-                      scrollToLeftGroupSlot(group.id, true);
-                    }}
+                    onMouseEnter={() => setHoveredGroupId(group.id)}
                     onMouseLeave={() => setHoveredGroupId(null)}
                     onClick={() => {
                       setActiveGroupId(group.id);
