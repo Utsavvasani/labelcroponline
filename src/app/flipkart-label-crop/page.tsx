@@ -402,7 +402,7 @@ export default function FlipkartLabelCropPage() {
   return (
     <>
       {/* ── Main Content Form Container ── */}
-      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[76px] sm:pt-20 pb-6 sm:pb-10">
+      <div className="max-w-[1200px] mx-auto px-3 sm:px-6 pt-[56px] sm:pt-14 pb-6 sm:pb-10">
         {/* Hidden File Input */}
         <input
           ref={fileInputRef}
@@ -481,11 +481,11 @@ export default function FlipkartLabelCropPage() {
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-semibold text-black">
+                        <span className="text-sm sm:text-base font-normal text-black">
                           Standard Cut
                         </span>
                         {cropMode === "auto" && (
-                          <Check size={14} className="text-[#051448] shrink-0" />
+                          <Check size={16} className="text-[#051448] shrink-0" />
                         )}
                       </button>
 
@@ -498,11 +498,11 @@ export default function FlipkartLabelCropPage() {
                             : "border-slate-300 bg-white hover:border-[#051448]/50"
                         }`}
                       >
-                        <span className="text-xs sm:text-sm font-semibold text-black">
+                        <span className="text-sm sm:text-base font-normal text-black">
                           Custom
                         </span>
                         {cropMode === "custom" && (
-                          <Check size={14} className="text-[#051448] shrink-0" />
+                          <Check size={16} className="text-[#051448] shrink-0" />
                         )}
                       </button>
                     </div>
@@ -521,7 +521,7 @@ export default function FlipkartLabelCropPage() {
                     <div className="w-12 h-12 mx-auto rounded-full border border-[#051448] bg-blue-50/60 flex items-center justify-center text-[#051448] mb-2.5 group-hover:scale-105 transition-transform">
                       <UploadCloud size={24} className="stroke-[2]" />
                     </div>
-                    <p className="text-xs sm:text-sm text-black/80 font-normal">
+                    <p className="text-base sm:text-lg text-black/85 font-normal">
                       Upload Flipkart PDF
                     </p>
                   </div>

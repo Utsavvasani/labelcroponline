@@ -770,39 +770,6 @@ export function FlipkartSkuSorterPanel({
         </div>
       </div>
 
-      {/* ── Mobile Direct Action: Confirm & Download (Guaranteed 1st-screen visibility without scrolling) ── */}
-      <div className="sm:hidden px-3 py-2 bg-blue-50/70 border-b border-slate-300 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-[#051448] font-semibold">
-          <span>{effectiveLabelsCount} {effectiveLabelsCount === 1 ? "Label" : "Labels"} ready</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleConfirmAndDownload}
-          disabled={isBuilding}
-          className={`h-[34px] flex items-center justify-center gap-1.5 text-xs font-semibold px-4 rounded-md transition-all cursor-pointer disabled:cursor-not-allowed ${confirmed
-            ? "bg-emerald-700 text-white shadow-xs"
-            : "bg-[#051448] hover:bg-[#071a5e] text-white shadow-xs"
-          } disabled:opacity-60`}
-        >
-          {isBuilding ? (
-            <>
-              <Loader2 size={13} className="animate-spin" />
-              <span>Building...</span>
-            </>
-          ) : confirmed ? (
-            <>
-              <CheckCircle size={13} />
-              <span>Download Again</span>
-            </>
-          ) : (
-            <>
-              <Download size={13} />
-              <span>Confirm &amp; Download PDF</span>
-            </>
-          )}
-        </button>
-      </div>
-
       {/* ── Error Alert ── */}
       {errorMsg && (
         <div className="mx-3 mt-2 px-3 py-2 rounded-md border border-red-200 bg-red-50 text-red-700 text-xs flex items-center justify-between">
@@ -824,7 +791,7 @@ export function FlipkartSkuSorterPanel({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search SKUs to sequence or group..."
+                placeholder="Search SKUs..."
                 className="w-full h-[34px] pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {searchQuery && (
@@ -940,7 +907,7 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="divide-y divide-slate-400 max-h-[140px] sm:max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white"
+            className="divide-y divide-slate-400 max-h-[150px] sm:max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -1209,7 +1176,7 @@ export function FlipkartSkuSorterPanel({
         </div>
 
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
-        <div className="lg:col-span-5 flex flex-col border-t lg:border-t-0 border-slate-400">
+        <div className="lg:col-span-5 flex flex-col border-t-2 border-slate-800 lg:border-t-0 lg:border-l border-slate-400">
           {/* Header with Maximized Search Bar for Product Groups */}
           <div className="px-2.5 py-1.5 bg-white border-b border-slate-400 flex items-center gap-2 text-xs">
             <div className="relative flex-1 flex items-center w-full">
@@ -1218,7 +1185,7 @@ export function FlipkartSkuSorterPanel({
                 type="text"
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
-                placeholder="Search Product Groups..."
+                placeholder="Search groups..."
                 className="w-full h-[34px] pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {groupSearchQuery && (
@@ -1238,30 +1205,21 @@ export function FlipkartSkuSorterPanel({
           <div
             ref={rightListRef}
             onScroll={handleRightScroll}
-            className="p-2 space-y-1.5 max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white"
+            className={`overflow-y-auto bg-white ${
+              allGroupsWithPosition.length === 0
+                ? "py-2 px-3"
+                : "p-2 space-y-1.5 max-h-[150px] sm:max-h-[165px] lg:max-h-[380px]"
+            }`}
           >
             {allGroupsWithPosition.length === 0 ? (
-              /* Helpful Empty State */
-              <div className="py-4 px-3 text-center flex flex-col items-center justify-center gap-1 border-2 border-dashed border-slate-400 rounded-md bg-white">
-                <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Layers size={13} />
-                </div>
-                <p className="font-medium text-xs text-slate-800">No Product Groups Created Yet</p>
-                <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">
-                  Select SKUs above with checkboxes and click &quot;Group&quot; to combine them.
-                </p>
+              /* Simple, compact 4-word message */
+              <div className="py-1 text-center text-xs text-slate-400 font-normal">
+                No groups created yet
               </div>
             ) : filteredGroupsWithPosition.length === 0 ? (
               /* Search Empty State */
-              <div className="py-4 px-3 text-center flex flex-col items-center justify-center gap-1 border-2 border-dashed border-slate-400 rounded-md bg-white">
-                <p className="font-medium text-xs text-slate-800">No groups matched &quot;{groupSearchQuery}&quot;</p>
-                <button
-                  type="button"
-                  onClick={() => setGroupSearchQuery("")}
-                  className="text-xs text-blue-600 hover:underline mt-1 cursor-pointer font-medium"
-                >
-                  Clear search
-                </button>
+              <div className="py-2 text-center text-xs text-slate-400 font-normal">
+                No groups matched &ldquo;{groupSearchQuery}&rdquo;
               </div>
             ) : (
               filteredGroupsWithPosition.map(({ group, position, globalIndex }) => {
@@ -1479,38 +1437,9 @@ export function FlipkartSkuSorterPanel({
 
       {/* ── Sticky Bottom Footer: Sort Tools on Left, Confirm & Download on Right (Always visible without scrolling) ── */}
       <div className="sticky bottom-0 z-40 px-3 py-2 border-t border-slate-400 bg-white/95 backdrop-blur-xs flex items-center justify-between gap-2 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
-        {/* Left: Quick Sort SKUs Tools */}
-        <div className="flex items-center gap-1 sm:gap-1.5 text-xs">
-          <span className="text-[11px] text-slate-500 font-medium hidden sm:inline mr-0.5">Sort SKUs:</span>
-          <button
-            type="button"
-            onClick={() => handleSortAlphabetical(true)}
-            className="h-[30px] px-2 rounded font-medium text-slate-700 hover:text-[#051448] border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center gap-0.5"
-            title="Sort SKUs A to Z"
-          >
-            <span>A→Z</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSortByQuantity(true)}
-            className="h-[30px] px-2 rounded font-medium text-slate-700 hover:text-[#051448] border border-slate-300 hover:border-slate-400 bg-white hover:bg-slate-50 transition-colors cursor-pointer text-xs shadow-2xs flex items-center gap-0.5"
-            title="Sort by highest label quantity first"
-          >
-            <span>Qty ↓</span>
-          </button>
-
-          {hasSavedBefore && (
-            <button
-              type="button"
-              onClick={handleClearSaved}
-              className="h-[30px] px-2 rounded font-medium text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 bg-white hover:bg-red-50 transition-colors flex items-center gap-1 cursor-pointer text-xs shadow-2xs"
-              title="Clear saved arrangement from local storage"
-            >
-              <Trash2 size={12} />
-              <span className="hidden sm:inline">Reset</span>
-            </button>
-          )}
+        {/* Left: Label status count */}
+        <div className="flex items-center gap-1.5 text-xs text-[#051448] font-semibold">
+          <span>{effectiveLabelsCount} {effectiveLabelsCount === 1 ? "Label" : "Labels"} ready</span>
         </div>
 
         {/* Right: Confirm & Download PDF Button */}
