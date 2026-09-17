@@ -562,56 +562,66 @@ export default function MeeshoLabelCropPage() {
             /* ── Active Workspace View: Compact, Scroll-Free with Menubar ── */
             <div className="flex flex-col">
               {/* 1. Sleek Top Toolbar / Menubar */}
-              <div className="relative z-30 px-3.5 sm:px-4 py-2 bg-slate-50 border-b border-slate-400 rounded-t-md flex flex-wrap items-center justify-between gap-2">
-                {/* Left: Meesho Logo + File Name + Deduplicated Count Badge */}
-                <div className="flex items-center gap-3 min-w-0">
-                  <Image
-                    src="/meesho_logo.svg"
-                    alt="Meesho"
-                    width={110}
-                    height={38}
-                    className="h-8 sm:h-9 w-auto object-contain shrink-0"
-                    priority
-                  />
-                  <div className="h-5 w-px bg-slate-400 shrink-0" />
-                  <div className="flex items-center gap-2 min-w-0">
-                    {sourceFiles.length > 1 ? (
-                      <div className="relative group inline-flex items-center">
-                        <div className="flex items-center gap-1.5 cursor-pointer bg-slate-200/70 hover:bg-slate-200 border border-slate-400 px-2 py-1 rounded-md transition-colors shrink-0 shadow-2xs">
-                          <Files size={14} className="text-[#051448] shrink-0" />
-                          <span className="font-bold text-xs sm:text-sm text-black">
-                            {sourceFiles.length} PDFs
-                          </span>
-                        </div>
-                        {/* Instant Light Tooltip with Per-File Breakdown */}
-                        <div className="absolute top-full mt-2.5 left-0 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-start">
-                          <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 ml-4 -mb-1 z-10" />
-                          <div className="bg-white text-[#051448] border border-slate-400 text-xs rounded-md shadow-lg p-2.5 min-w-[240px] max-w-[320px] space-y-1.5">
-                            <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1 flex justify-between items-center">
-                              <span>Combined Files ({sourceFiles.length})</span>
-                              <span>{cropResult ? `${cropResult.pageCount} Labels` : `${fileBreakdown.reduce((a, b) => a + b.pages, 0)} Total`}</span>
-                            </div>
-                            <div className="max-h-40 overflow-y-auto space-y-1">
-                              {fileBreakdown.map((item, idx) => (
-                                <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800">
-                                  <span className="truncate max-w-[170px]" title={item.name}>
-                                    {idx + 1}. {item.name}
-                                  </span>
-                                  <span className="font-semibold shrink-0 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300 text-[#051448]">
-                                    {item.pages} {item.pages === 1 ? "page" : "pages"}
-                                  </span>
-                                </div>
-                              ))}
+              <div className="relative z-30 px-3 sm:px-4 py-2 bg-slate-50 border-b border-slate-400 rounded-t-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-2">
+                {/* Left / Top Row on Mobile: Meesho Logo + File Info + Add PDF */}
+                <div className="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                    <Image
+                      src="/meesho_logo.svg"
+                      alt="Meesho"
+                      width={110}
+                      height={38}
+                      className="h-7 sm:h-9 w-auto object-contain shrink-0"
+                      priority
+                    />
+                    <div className="hidden sm:block h-5 w-px bg-slate-400 shrink-0" />
+                    <div className="hidden sm:flex items-center gap-2 min-w-0">
+                      {sourceFiles.length > 1 ? (
+                        <div className="relative group inline-flex items-center">
+                          <div className="flex items-center gap-1.5 cursor-pointer bg-slate-200/70 hover:bg-slate-200 border border-slate-400 px-2 py-1 rounded-md transition-colors shrink-0 shadow-2xs">
+                            <Files size={14} className="text-[#051448] shrink-0" />
+                            <span className="font-bold text-xs sm:text-sm text-black">
+                              {sourceFiles.length} PDFs
+                            </span>
+                          </div>
+                          {/* Instant Light Tooltip with Per-File Breakdown */}
+                          <div className="absolute top-full mt-2.5 left-0 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-75 z-50 flex flex-col items-start">
+                            <div className="w-2 h-2 bg-white border-t border-l border-slate-400 rotate-45 ml-4 -mb-1 z-10" />
+                            <div className="bg-white text-[#051448] border border-slate-400 text-xs rounded-md shadow-lg p-2.5 min-w-[240px] max-w-[320px] space-y-1.5">
+                              <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1 flex justify-between items-center">
+                                <span>Combined Files ({sourceFiles.length})</span>
+                                <span>{cropResult ? `${cropResult.pageCount} Labels` : `${fileBreakdown.reduce((a, b) => a + b.pages, 0)} Total`}</span>
+                              </div>
+                              <div className="max-h-40 overflow-y-auto space-y-1">
+                                {fileBreakdown.map((item, idx) => (
+                                  <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800">
+                                    <span className="truncate max-w-[170px]" title={item.name}>
+                                      {idx + 1}. {item.name}
+                                    </span>
+                                    <span className="font-semibold shrink-0 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-300 text-[#051448]">
+                                      {item.pages} {item.pages === 1 ? "page" : "pages"}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ) : (
-                      <span
-                        className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
-                        title={file.name}
-                      >
-                        {file.name}
+                      ) : (
+                        <span
+                          className="font-bold text-sm text-black truncate max-w-[150px] sm:max-w-[260px]"
+                          title={file.name}
+                        >
+                          {file.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {sourceFiles.length > 1 && (
+                      <span className="sm:hidden text-xs font-bold text-slate-700 bg-slate-200/80 px-2 py-0.5 rounded-full border border-slate-300">
+                        {sourceFiles.length} PDFs
                       </span>
                     )}
 
@@ -639,15 +649,15 @@ export default function MeeshoLabelCropPage() {
                   </div>
                 </div>
 
-                {/* Right: Menubar of Icon Tools with Instant Light Hover Tooltips */}
-                <div className="flex items-center gap-2 shrink-0">
+                {/* Right / Bottom Row on Mobile: Mode Switcher & Tools */}
+                <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 w-full sm:w-auto">
                   {/* Crop Mode Switcher */}
                   <div className="relative group inline-flex items-center">
                     <div className="h-[34px] flex items-center p-0.5 rounded-md border border-slate-400 bg-white shadow-2xs">
                       <button
                         type="button"
                         onClick={() => handleModeChange("invoice")}
-                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        className={`h-full px-2 sm:px-3 rounded flex items-center justify-center text-[11px] sm:text-xs md:text-sm font-semibold transition-all cursor-pointer ${
                           cropMode === "invoice"
                             ? "bg-[#051448] text-white shadow-xs"
                             : "text-slate-600 hover:text-black"
@@ -658,7 +668,7 @@ export default function MeeshoLabelCropPage() {
                       <button
                         type="button"
                         onClick={() => handleModeChange("label_sku")}
-                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        className={`h-full px-2 sm:px-3 rounded flex items-center justify-center text-[11px] sm:text-xs md:text-sm font-semibold transition-all cursor-pointer ${
                           cropMode === "label_sku"
                             ? "bg-[#051448] text-white shadow-xs"
                             : "text-slate-600 hover:text-black"
@@ -669,7 +679,7 @@ export default function MeeshoLabelCropPage() {
                       <button
                         type="button"
                         onClick={() => handleModeChange("custom")}
-                        className={`h-full px-2.5 sm:px-3 rounded flex items-center justify-center text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        className={`h-full px-2 sm:px-3 rounded flex items-center justify-center text-[11px] sm:text-xs md:text-sm font-semibold transition-all cursor-pointer ${
                           cropMode === "custom"
                             ? "bg-[#051448] text-white shadow-xs"
                             : "text-slate-600 hover:text-black"

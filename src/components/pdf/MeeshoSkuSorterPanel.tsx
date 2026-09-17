@@ -145,10 +145,6 @@ export function MeeshoSkuSorterPanel({
   const [searchQuery, setSearchQuery] = useState("");
   const [groupSearchQuery, setGroupSearchQuery] = useState("");
 
-  // Pagination State for high-volume batches (left column)
-  const [pageSize, setPageSize] = useState<number>(25);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
   // Direct Jump Editing State
   const [jumpItemIndex, setJumpItemIndex] = useState<number | null>(null);
   const [jumpRankInput, setJumpRankInput] = useState<string>("");
@@ -208,20 +204,7 @@ export function MeeshoSkuSorterPanel({
     return skus;
   }, [filteredItems, searchQuery]);
 
-  // Adjust pagination for left list
-  const effectivePageSize = pageSize === 0 ? Math.max(1, filteredItems.length) : pageSize;
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / effectivePageSize));
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
-
-  const paginatedItems = useMemo(() => {
-    if (pageSize === 0) return filteredItems;
-    const start = (currentPage - 1) * pageSize;
-    return filteredItems.slice(start, start + pageSize);
-  }, [filteredItems, currentPage, pageSize]);
+  const paginatedItems = filteredItems;
 
   // Extract all groups currently created, preserving their sequence position
   const allGroupsWithPosition = useMemo(() => {
@@ -277,27 +260,19 @@ export function MeeshoSkuSorterPanel({
   const scrollToRightGroup = (groupId: string, smooth = true) => {
     const cardEl = groupCardRefs.current.get(groupId);
     const rightContainer = rightListRef.current;
-    scrollElementToCenter(rightContainer, cardEl, smooth);
+    if (cardEl && rightContainer) {
+      scrollElementToCenter(rightContainer, cardEl, smooth);
+    } else {
+      setTimeout(() => {
+        const c = groupCardRefs.current.get(groupId);
+        const r = rightListRef.current;
+        scrollElementToCenter(r, c, smooth);
+      }, 50);
+    }
   };
 
   // Smooth scroll helper: Left column scrolls to group position slot and centers it
   const scrollToLeftGroupSlot = (groupId: string, smooth = true) => {
-    const targetIdx = orderItems.findIndex(
-      (it) => it.type === "group" && it.group.id === groupId
-    );
-    if (targetIdx !== -1) {
-      const neededPage = Math.floor(targetIdx / pageSize) + 1;
-      if (currentPage !== neededPage) {
-        setCurrentPage(neededPage);
-        setTimeout(() => {
-          const slotEl = groupSlotRefs.current.get(groupId);
-          const leftContainer = leftListRef.current;
-          scrollElementToCenter(leftContainer, slotEl, smooth);
-        }, 80);
-        return;
-      }
-    }
-
     const slotEl = groupSlotRefs.current.get(groupId);
     const leftContainer = leftListRef.current;
     scrollElementToCenter(leftContainer, slotEl, smooth);
@@ -438,6 +413,7 @@ export function MeeshoSkuSorterPanel({
     setActiveGroupId(newGroup.id);
     setSelectedSkus(new Set());
     updateItemsAndEmit(remainingItems);
+    scrollToRightGroup(newGroup.id, true);
   };
 
   /* ── Ungroup: Dissolve group back to individual items ── */
@@ -519,6 +495,7 @@ export function MeeshoSkuSorterPanel({
     });
 
     updateItemsAndEmit(next);
+    scrollToRightGroup(groupId, true);
   };
 
   /* ── Remove a single SKU from a group ── */
@@ -673,35 +650,29 @@ export function MeeshoSkuSorterPanel({
   return (
     <div className="w-full flex flex-col bg-white">
       {/* ── Top Bar: Title + Batch Summary + Smart Bulk Actions ── */}
-      <div className="px-3 py-2 bg-white border-b border-slate-400 flex flex-wrap items-center justify-between gap-2">
+      <div className="px-3 py-1.5 bg-white border-b border-slate-400 flex items-center justify-between gap-2">
         {/* Left: Title & Count Badges */}
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="font-semibold text-sm text-slate-900 truncate">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <span className="font-semibold text-xs sm:text-sm text-slate-900 shrink-0">
             Arrange SKU Order
           </span>
-          <span className="text-xs font-normal text-slate-700 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
-            {skuOrder.length} Unique SKUs
+          <span className="text-[11px] font-normal text-slate-700 bg-slate-100 border border-slate-400 px-2 py-0.5 rounded-full shrink-0">
+            {skuOrder.length} SKUs
           </span>
           {totalGroupsCount > 0 && (
-            <span className="text-xs font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
-              <Layers size={11} />
+            <span className="text-[11px] font-normal text-indigo-700 bg-indigo-50 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0 flex items-center gap-1">
+              <Layers size={10} />
               {totalGroupsCount} {totalGroupsCount === 1 ? "Group" : "Groups"}
             </span>
           )}
-          <span
-            className="hidden sm:inline-flex text-[11px] font-normal text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-full shrink-0 items-center gap-1"
-            title="Labels are grouped by your SKU sequence, with delivery partners sorted in order (Delhivery, Shadowfax, Xpressbees, Valmo...) within each group"
-          >
-            Grouped SKUs • Courier Sorted
-          </span>
         </div>
 
         {/* Right: Smart Bulk Actions */}
-        <div className="flex items-center flex-wrap gap-1.5 shrink-0 text-xs">
+        <div className="flex items-center gap-1 shrink-0 text-xs">
           <button
             type="button"
             onClick={() => handleSortAlphabetical(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-1.5 py-0.5 rounded bg-white transition-colors cursor-pointer text-xs"
             title="Sort A to Z"
           >
             A→Z
@@ -710,7 +681,7 @@ export function MeeshoSkuSorterPanel({
           <button
             type="button"
             onClick={() => handleSortByQuantity(true)}
-            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-2 py-0.5 rounded bg-white transition-colors cursor-pointer"
+            className="font-normal text-slate-700 hover:text-[#051448] border border-slate-400 hover:border-slate-500 px-1.5 py-0.5 rounded bg-white transition-colors cursor-pointer text-xs"
             title="Sort by highest label quantity first"
           >
             Qty ↓
@@ -720,7 +691,7 @@ export function MeeshoSkuSorterPanel({
             <button
               type="button"
               onClick={handleClearSaved}
-              className="font-normal text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 px-2 py-0.5 rounded bg-white transition-colors flex items-center gap-1 cursor-pointer"
+              className="font-normal text-red-600 hover:text-red-700 border border-red-200 hover:border-red-300 px-1.5 py-0.5 rounded bg-white transition-colors flex items-center gap-1 cursor-pointer text-xs"
               title="Clear saved arrangement from local storage"
             >
               <Trash2 size={11} />
@@ -750,20 +721,14 @@ export function MeeshoSkuSorterPanel({
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search SKUs to sequence or group..."
                 className="w-full pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
               />
               {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setCurrentPage(1);
-                  }}
+                  onClick={() => setSearchQuery("")}
                   className="absolute right-2 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
                   title="Clear search"
                 >
@@ -792,10 +757,10 @@ export function MeeshoSkuSorterPanel({
                 <button
                   type="button"
                   onClick={() => createGroupFromSkus(Array.from(selectedSkus))}
-                  className="h-[34px] flex items-center gap-1.5 bg-[#051448] hover:bg-[#071a5e] text-white font-medium px-3 rounded-md text-xs sm:text-sm cursor-pointer shrink-0 shadow-2xs transition-colors"
+                  className="h-[30px] sm:h-[34px] flex items-center gap-1 bg-[#051448] hover:bg-[#071a5e] text-white font-medium px-2.5 sm:px-3 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
                   title={`Group ${selectedSkus.size} selected SKUs together`}
                 >
-                  <Plus size={14} />
+                  <Plus size={13} />
                   <span>Group ({selectedSkus.size})</span>
                 </button>
               )}
@@ -806,12 +771,13 @@ export function MeeshoSkuSorterPanel({
                   <button
                     type="button"
                     onClick={() => setShowAddToGroupMenu((prev) => !prev)}
-                    className="h-[34px] flex items-center gap-1.5 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-300 font-medium px-3 rounded-md text-xs sm:text-sm cursor-pointer shrink-0 shadow-2xs transition-colors"
+                    className="h-[30px] sm:h-[34px] flex items-center gap-1 bg-white hover:bg-indigo-50/50 text-indigo-900 border border-indigo-300 font-medium px-2 sm:px-3 rounded-md text-xs cursor-pointer shrink-0 shadow-2xs transition-colors"
                     title={`Add ${selectedSkus.size} selected SKU(s) to an existing group`}
                   >
-                    <Layers size={14} className="text-indigo-600" />
-                    <span>Add to Group ({selectedSkus.size})</span>
-                    <ChevronDown size={14} />
+                    <Layers size={13} className="text-indigo-600" />
+                    <span className="hidden sm:inline">Add to Group ({selectedSkus.size})</span>
+                    <span className="sm:hidden">Add ({selectedSkus.size})</span>
+                    <ChevronDown size={13} />
                   </button>
 
                   {showAddToGroupMenu && (
@@ -839,33 +805,6 @@ export function MeeshoSkuSorterPanel({
                   )}
                 </div>
               )}
-
-              {/* Pagination controls if list > 25 */}
-              {filteredItems.length > 25 && (
-                <div className="flex items-center gap-1 border-l border-slate-400 pl-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage === 1}
-                    className="h-[34px] w-[34px] flex items-center justify-center rounded-md border border-slate-400 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                    title="Previous page"
-                  >
-                    <ChevronLeft size={15} />
-                  </button>
-                  <span className="text-xs sm:text-sm font-medium text-slate-700 px-1">
-                    {currentPage}/{totalPages}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage === totalPages}
-                    className="h-[34px] w-[34px] flex items-center justify-center rounded-md border border-slate-400 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
-                    title="Next page"
-                  >
-                    <ChevronRight size={15} />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
@@ -873,7 +812,7 @@ export function MeeshoSkuSorterPanel({
           <div
             ref={leftListRef}
             onScroll={handleLeftScroll}
-            className="divide-y divide-slate-400 max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
+            className="divide-y divide-slate-400 max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
           >
             {paginatedItems.length === 0 ? (
               <div className="py-8 text-center text-slate-400 text-xs">
@@ -986,7 +925,10 @@ export function MeeshoSkuSorterPanel({
 
                       {/* Group Name & Badge */}
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                        <span className="font-semibold text-sm text-slate-900 truncate" title={group.name}>
+                        <span
+                          className="font-semibold text-sm text-slate-900 truncate"
+                          title={`${group.name}\n${group.skus.map((s, sIdx) => `• ${globalIndex + 1}.${sIdx + 1} ${s}: ${pageCounts[s] || 0} ${(pageCounts[s] || 0) === 1 ? "label" : "labels"}`).join("\n")}`}
+                        >
                           {getCleanGroupName(group.name)}
                         </span>
                         <span className="text-xs font-medium text-indigo-900 bg-indigo-100 border border-indigo-300 px-2 py-0.5 rounded-full shrink-0">
@@ -1139,53 +1081,56 @@ export function MeeshoSkuSorterPanel({
         </div>
 
         {/* ════════ RIGHT PART: Product Groups (5 Cols) ════════ */}
-        <div className="lg:col-span-5 flex flex-col">
-          {/* Header with Maximized Search Bar for Product Groups */}
-          <div className="px-2.5 py-1.5 bg-white  flex items-center gap-2 text-xs">
-            <div className="relative flex-1 flex items-center min-w-[140px]">
-              <Search size={15} className="absolute left-2.5 text-slate-400 pointer-events-none" />
+        <div className="lg:col-span-5 flex flex-col border-t lg:border-t-0 border-slate-400">
+          {/* Header with Product Groups Title & Search Bar */}
+          <div className="px-2.5 py-1.5 bg-slate-50 border-b border-slate-400 flex items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Layers size={14} className="text-indigo-700" />
+              <span className="font-semibold text-xs sm:text-sm text-indigo-950">Product Groups</span>
+              {allGroupsWithPosition.length > 0 && (
+                <span className="text-[11px] font-semibold text-indigo-700 bg-indigo-100 border border-indigo-200 px-1.5 py-0.2 rounded-full">
+                  {allGroupsWithPosition.length}
+                </span>
+              )}
+            </div>
+
+            <div className="relative flex-1 flex items-center max-w-[170px] sm:max-w-none">
+              <Search size={13} className="absolute left-2 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
-                placeholder="Search Product Groups..."
-                className="w-full pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-50/60 hover:bg-white focus:bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 font-normal placeholder:text-slate-400 transition-colors"
+                placeholder="Search groups..."
+                className="w-full pl-6.5 pr-6 py-1 text-xs bg-white border border-slate-400 rounded-md focus:outline-hidden focus:border-[#051448] focus:ring-1 focus:ring-[#051448]/20 text-slate-900 placeholder:text-slate-400"
               />
               {groupSearchQuery && (
                 <button
                   type="button"
                   onClick={() => setGroupSearchQuery("")}
-                  className="absolute right-2 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
+                  className="absolute right-1.5 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
                   title="Clear search"
                 >
-                  <X size={14} />
+                  <X size={12} />
                 </button>
               )}
             </div>
-
-            {/* Total groups count badge */}
-            {allGroupsWithPosition.length > 0 && (
-              <span className="h-[34px] flex items-center text-xs sm:text-sm font-medium text-slate-600 bg-slate-100 border border-slate-400 px-3 rounded-md shrink-0">
-                {filteredGroupsWithPosition.length}/{allGroupsWithPosition.length}
-              </span>
-            )}
           </div>
 
           {/* Right Scrollable Groups List */}
           <div
             ref={rightListRef}
             onScroll={handleRightScroll}
-            className="p-2 space-y-1.5 max-h-[380px] overflow-y-auto bg-white border-t border-slate-400"
+            className="p-2 space-y-1.5 max-h-[165px] lg:max-h-[380px] overflow-y-auto bg-white"
           >
             {allGroupsWithPosition.length === 0 ? (
               /* Helpful Empty State */
-              <div className="py-8 px-4 text-center flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-slate-400 rounded-md bg-white">
-                <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
-                  <Layers size={16} />
+              <div className="py-4 px-3 text-center flex flex-col items-center justify-center gap-1 border-2 border-dashed border-slate-400 rounded-md bg-white">
+                <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+                  <Layers size={13} />
                 </div>
                 <p className="font-medium text-xs text-slate-800">No Product Groups Created Yet</p>
                 <p className="text-[11px] text-slate-500 max-w-xs leading-relaxed">
-                  Search similar SKUs on the left or check their boxes to group them together into a unified printing position.
+                  Select SKUs above with checkboxes and click &quot;Group&quot; to combine them.
                 </p>
               </div>
             ) : filteredGroupsWithPosition.length === 0 ? (
@@ -1374,21 +1319,25 @@ export function MeeshoSkuSorterPanel({
                     {/* Member SKUs list */}
                     <div className="divide-y divide-slate-400 bg-white">
                       {group.skus.map((sku, subIdx) => {
+                        const count = pageCounts[sku] || 0;
                         return (
                           <div
                             key={sku}
                             className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white hover:bg-slate-50 transition-colors"
                           >
                             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                              <span className="text-xs font-normal text-indigo-700 w-4 text-center shrink-0">
-                                {subIdx + 1}
+                              <span className="text-xs font-semibold text-indigo-700 min-w-[28px] text-center shrink-0">
+                                {position}.{subIdx + 1}
                               </span>
                               <span className="font-normal text-sm text-slate-800 truncate" title={sku}>
                                 {sku}
                               </span>
                             </div>
 
-                            <div className="flex items-center shrink-0">
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="text-[11px] font-normal px-2 py-0.5 rounded-full border text-slate-600 bg-slate-50 border-slate-300">
+                                {count} {count === 1 ? "label" : "labels"}
+                              </span>
                               <button
                                 type="button"
                                 onClick={() => handleRemoveSkuFromGroup(group.id, sku)}
@@ -1411,11 +1360,7 @@ export function MeeshoSkuSorterPanel({
       </div>
 
       {/* ── Compact Footer: Confirm & Download ── */}
-      <div className="px-3 py-2 border-t border-slate-400 bg-white flex flex-wrap items-center justify-between gap-2">
-        <div className="text-[11px] sm:text-xs text-slate-600 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
-          <span>Labels are arranged in your SKU group order, with delivery partners sorted in order (Delhivery → Shadowfax → Valmo) within each group.</span>
-        </div>
+      <div className="px-3 py-2 border-t border-slate-400 bg-white flex items-center justify-end gap-2">
         <button
           type="button"
           onClick={handleConfirmAndDownload}
