@@ -639,24 +639,24 @@ export function FlipkartSkuSorterPanel({
             {/* Clickable & Scrollable Breakdown Popover */}
             {fileBreakdown && fileBreakdown.length > 0 && (
               <div
-                className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center transition-all duration-150 ${
+                className={`absolute top-full mt-2 -left-3 sm:left-1/2 sm:-translate-x-1/2 z-50 flex flex-col items-start sm:items-center transition-all duration-150 ${
                   showPdfBreakdown
                     ? "opacity-100 pointer-events-auto scale-100"
                     : "opacity-0 pointer-events-none scale-95"
                 }`}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="w-2.5 h-2.5 bg-white border-t border-l border-slate-300 rotate-45 -mb-1.5 z-10" />
-                <div className="bg-white text-slate-900 border border-slate-300 text-xs rounded-lg shadow-xl p-3 min-w-[260px] max-w-[320px] space-y-2 text-left">
-                  <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1.5 flex justify-between items-center">
-                    <span>Combined Files ({effectiveFilesCount})</span>
-                    <span className="text-[10px] font-semibold text-slate-500">{effectiveLabelsCount} Labels</span>
+                <div className="w-2.5 h-2.5 bg-white border-t border-l border-slate-300 rotate-45 -mb-1.5 z-10 ml-6 sm:ml-0" />
+                <div className="bg-white text-slate-900 border border-slate-300 text-xs rounded-lg shadow-xl p-3 w-[calc(100vw-48px)] sm:w-auto min-w-[250px] max-w-[320px] space-y-2 text-left">
+                  <div className="font-bold text-[11px] uppercase tracking-wider text-[#051448] border-b border-slate-200 pb-1.5 flex justify-between items-center gap-2">
+                    <span className="truncate">Combined Files ({effectiveFilesCount})</span>
+                    <span className="text-[10px] font-semibold text-slate-500 shrink-0">{effectiveLabelsCount} Labels</span>
                   </div>
                   {/* Scrollable list with mouse wheel and touch scroll */}
                   <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1 overscroll-contain">
                     {fileBreakdown.map((item, idx) => (
                       <div key={idx} className="flex items-center justify-between text-[11px] gap-2 text-slate-800 py-0.5 border-b border-slate-50 last:border-0">
-                        <span className="truncate max-w-[175px] font-medium" title={item.name}>
+                        <span className="truncate flex-1 min-w-0 font-medium" title={item.name}>
                           {idx + 1}. {item.name}
                         </span>
                         <span className="font-semibold shrink-0 bg-blue-50 px-2 py-0.5 rounded text-[#051448] border border-blue-200/60 text-[10px]">
