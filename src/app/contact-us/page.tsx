@@ -61,9 +61,9 @@ export default function ContactUs() {
             {submitted ? (
               <div className="flex flex-col items-center justify-center text-center border border-[#051448] rounded-md p-10 bg-slate-50/50 animate-in fade-in duration-300">
                 <CheckCircle size={44} className="text-green-600 mb-3" />
-                <h2 className="text-xl font-bold text-black mb-2">Message Received!</h2>
+                <h2 className="text-xl font-bold text-black mb-2">Message Sent Successfully!</h2>
                 <p className="text-black text-sm max-w-md leading-relaxed">
-                  Thank you for contacting LabelCropOnline. We have safely received your details and will get back to you at{" "}
+                  Thank you for contacting LabelCropOnline. We have received your message and will get back to you at{" "}
                   <strong className="text-black font-semibold">{formData.email}</strong> as soon as possible.
                 </p>
                 <button
@@ -183,7 +183,7 @@ export default function ContactUs() {
                   {loading ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      Saving to DB...
+                      Sending...
                     </>
                   ) : (
                     <>

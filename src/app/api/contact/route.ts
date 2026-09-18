@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        message: "Your message has been received successfully!",
+        message: "Your message has been sent successfully!",
         id: insertResult.insertedId,
       },
       { status: 201 }
