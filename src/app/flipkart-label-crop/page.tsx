@@ -285,6 +285,9 @@ export default function FlipkartLabelCropPage() {
   const executeDownloadAndReset = (blobUrl: string, fileName: string) => {
     triggerDownload(blobUrl, fileName);
     handleReset();
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const handleModeChange = (newMode: FlipkartCropMode) => {
@@ -796,6 +799,12 @@ export default function FlipkartLabelCropPage() {
                   sourceFilesCount={sourceFiles.length || 1}
                   totalLabelsCount={cropResult?.pageCount || Object.keys(pageSkuMap).length}
                   fileBreakdown={fileBreakdown}
+                  onDownloadComplete={() => {
+                    handleReset();
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 500);
+                  }}
                 />
               ) : skuOrder.length === 1 && skuOrder[0] !== UNKNOWN_SKU ? (
                 /* 1 SKU: Information bar + Compact Notification */
