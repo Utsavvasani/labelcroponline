@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import NextImage from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Mail,
@@ -225,9 +226,12 @@ export function Navbar() {
           >
             {/* Logo */}
             <Link href="/" className="shrink-0 flex items-center">
-              <img
+              <NextImage
                 src="/labelcroponline.svg"
                 alt="Label Crop Online Logo"
+                width={160}
+                height={40}
+                priority
                 className="w-32 sm:w-40 h-auto object-contain"
               />
             </Link>
@@ -382,9 +386,11 @@ export function Navbar() {
             <div>
               <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                 <Link href="/" onClick={() => setSheetOpen(false)}>
-                  <img
+                  <NextImage
                     src="/labelcroponline.svg"
                     alt="Logo"
+                    width={144}
+                    height={36}
                     className="w-36 h-auto object-contain"
                   />
                 </Link>

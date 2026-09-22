@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone } from "lucide-react";
 
 export function Footer() {
@@ -10,9 +11,11 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <div className="bg-white rounded-xl px-4 py-2 inline-block">
-                <img
+                <Image
                   src="/labelcroponline.svg"
                   alt="LabelCropOnline – Free Shipping Label Cropper"
+                  width={150}
+                  height={36}
                   className="h-9 w-auto object-contain"
                 />
               </div>
