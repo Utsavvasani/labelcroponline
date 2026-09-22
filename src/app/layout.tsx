@@ -91,9 +91,6 @@ export const metadata: Metadata = {
     images: ["/labelcroponline1.png"],
     creator: "@labelcroponline",
   },
-  alternates: {
-    canonical: "https://www.labelcroponline.com",
-  },
 };
 
 export default function RootLayout({
