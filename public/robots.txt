@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Block admin, API, and internal routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /editor
+Disallow: /editor/
+
+# Allow Googlebot to crawl images
+User-agent: Googlebot-Image
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.labelcroponline.com/sitemap.xml

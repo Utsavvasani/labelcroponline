@@ -15,18 +15,24 @@ export const metadata: Metadata = {
     "custom dimension crop",
     "browser pdf crop",
   ],
+  alternates: {
+    canonical: "https://www.labelcroponline.com/custom-crop",
+  },
   openGraph: {
     title: "Custom PDF Crop Studio — Interactive Visual Area Selector | LabelCropOnline",
     description:
       "Interactive visual crop studio to select custom PDF dimensions and crop shipping labels or documents with live preview.",
     type: "website",
-    url: "https://labelcroponline.com/custom-crop",
+    url: "https://www.labelcroponline.com/custom-crop",
+    siteName: "LabelCropOnline",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Custom PDF Crop Studio – LabelCropOnline" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Custom PDF Crop Studio — LabelCropOnline",
     description:
       "Visually select, crop, and resize any PDF document to custom dimensions directly in your browser.",
+    images: ["/og-image.png"],
   },
 };
 
