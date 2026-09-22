@@ -29,6 +29,7 @@ import {
   getPdfPageCount,
   triggerDownload,
 } from "@/lib/pdf/mergePdf";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -612,6 +613,9 @@ export default function MergePdfPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="merge-pdf" />
       </div>
 
       {/* ── Preview Modal (Opens when Eye is clicked) ── */}
@@ -653,6 +657,7 @@ export default function MergePdfPage() {
               <PdfPreviewViewer
                 key={`merged-${mergeResult.blobUrl}`}
                 url={mergeResult.blobUrl}
+                bytes={mergeResult.pdfBytes}
                 initialScale={1.3}
               />
             </div>

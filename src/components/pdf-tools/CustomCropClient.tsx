@@ -26,6 +26,7 @@ import {
 } from "@/lib/pdf/customCropper";
 import { triggerDownload } from "@/lib/pdf/mergePdf";
 import { PDFDocument } from "pdf-lib";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -929,6 +930,8 @@ export default function CustomCropPage() {
 
         </div>
 
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="custom-crop" />
       </div>
 
       {/* ── Interactive Custom Crop Area Selection Modal ── */}

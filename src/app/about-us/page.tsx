@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 export const metadata: Metadata = {
     title: "About Us – Our Mission, Vision & Story",
@@ -149,6 +150,14 @@ export default function AboutUs() {
                             LabelCropOnline — Simplify Your Labels. Streamline Your Business.
                         </p>
                     </main>
+                </div>
+
+                {/* Free Tools Navigator */}
+                <div className="mt-10">
+                    <RelatedTools
+                        title="Explore Our Free Shipping & PDF Tools"
+                        subtitle="Start cropping shipping labels or converting PDF files right away — 100% free and client-side."
+                    />
                 </div>
             </div>
         </>

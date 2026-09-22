@@ -38,6 +38,7 @@ import {
 import { getStoredSkuOrder } from "@/lib/meeshoSkuStorage";
 import { MeeshoSkuSorterPanel } from "@/components/pdf/MeeshoSkuSorterPanel";
 import { combinePdfFiles, type FilePageBreakdown } from "@/lib/pdf/pdfCombiner";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 type SkuExtractionProgress = { current: number; total: number };
 
@@ -1160,6 +1161,9 @@ export default function MeeshoLabelCropPage() {
           </div>
 
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="meesho" />
       </div>
 
       {/* ── Interactive Custom Crop Area Selection Modal ── */}
@@ -1215,6 +1219,7 @@ export default function MeeshoLabelCropPage() {
               <PdfPreviewViewer
                 key={`cropped-${cropResult.blobUrl}`}
                 url={cropResult.blobUrl}
+                bytes={'pdfBytes' in cropResult ? cropResult.pdfBytes : undefined}
                 initialScale={1.3}
               />
             </div>

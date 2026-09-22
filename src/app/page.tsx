@@ -1,7 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
-import { Layers, Split, Minimize2, RotateCw, Image as ImageIcon, ArrowRight, Star } from "lucide-react";
+import {
+  Layers,
+  Split,
+  Minimize2,
+  RotateCw,
+  Image as ImageIcon,
+  ArrowRight,
+  Star,
+  Sliders,
+  Scissors,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Free Shipping Label Cropper for Meesho & Flipkart – PDF Tools Online",
@@ -113,7 +125,7 @@ const heroPlatforms = [
     name: "Meesho",
     logo: "/meesho_logo.svg",
     href: "/meesho-label-crop",
-    logoH: "h-[30px]",
+    logoH: "h-[28px]",
     lightBg: "#F7EEFE",
     tagText: "Meesho Labels",
   },
@@ -121,43 +133,87 @@ const heroPlatforms = [
     name: "Flipkart",
     logo: "/flipkart_logo.svg",
     href: "/flipkart-label-crop",
-    logoH: "h-9",
+    logoH: "h-8",
     lightBg: "#EEF4FF",
     tagText: "Flipkart Labels",
+  },
+  {
+    name: "Custom Crop",
+    href: "/custom-crop",
+    icon: Sliders,
+    lightBg: "#F0F4FF",
+    tagText: "Custom Crop",
+  },
+  {
+    name: "Rating Cards",
+    href: "/rating-card",
+    icon: Star,
+    lightBg: "#FEF9C3",
+    tagText: "Rating Cards",
   },
   {
     name: "Merge PDF",
     logo: "/merge_icon.svg",
     href: "/merge-pdf",
-    logoH: "h-12",
+    logoH: "h-10",
     lightBg: "#fef7f7ff",
     tagText: "Merge PDFs",
   },
+  {
+    name: "Split PDF",
+    href: "/split-pdf",
+    icon: Split,
+    lightBg: "#F1F5F9",
+    tagText: "Split PDFs",
+  },
 ];
 
-const cardPlatforms = [
+const sellerTools = [
   {
-    name: "Meesho",
+    name: "Meesho Label Crop",
     logo: "/meesho_logo.svg",
     href: "/meesho-label-crop",
     color: "#580a46",
     lightBg: "#F7EEFE",
     logoClass: "h-9 w-auto",
-    desc: "Handle Meesho shipping label PDFs with ease. Crop, resize, and optimize multi-page labels with clean border margins and courier auto-detection for fast dispatching.",
-    tag: "Meesho Label Crop",
+    desc: "Crop Meesho multi-page shipping labels & tax invoices to 4x6 thermal paper. Auto-detects couriers (Delhivery, Shadowfax, Valmo, Xpressbees) with 100% barcode fidelity.",
+    tag: "Meesho Supplier Panel",
     cta: "Crop Meesho Labels →",
   },
   {
-    name: "Flipkart",
+    name: "Flipkart Label Crop",
     logo: "/flipkart_logo.svg",
     href: "/flipkart-label-crop",
     color: "#007cd7",
     lightBg: "#EEF4FF",
     logoClass: "h-11 w-auto",
-    desc: "Process Flipkart seller hub shipping labels in bulk. Extract the shipping label cleanly and download 4x6 print-ready files instantly with 100% vector barcode fidelity.",
-    tag: "Flipkart Label Crop",
+    desc: "Bulk crop Flipkart Seller Hub shipping labels cleanly to 4x6 thermal format. Strips unneeded invoice tables and margins for rapid dispatching.",
+    tag: "Flipkart Seller Hub",
     cta: "Crop Flipkart Labels →",
   },
+  {
+    name: "Custom Crop Studio",
+    icon: Sliders,
+    href: "/custom-crop",
+    color: "#051448",
+    lightBg: "#F0F4FF",
+    desc: "Interactive visual crop selector with draggable bounding box handles. Define custom dimensions on page 1 and crop all pages in multi-page PDFs simultaneously.",
+    tag: "Visual Crop Selector",
+    cta: "Launch Crop Studio →",
+  },
+  {
+    name: "Rating Card Studio",
+    icon: Star,
+    href: "/rating-card",
+    color: "#b45309",
+    lightBg: "#FEF9C3",
+    desc: "Design and print 5-star customer review insert cards with QR codes for your parcel dispatches. Boost ratings on Meesho, Flipkart, and Amazon.",
+    tag: "Seller Review Booster",
+    cta: "Design Review Cards →",
+  },
+];
+
+const pdfTools = [
   {
     name: "Merge PDF",
     logo: "/merge_icon.svg",
@@ -165,9 +221,49 @@ const cardPlatforms = [
     color: "#B42024",
     lightBg: "#fef5f5ff",
     logoClass: "h-14 w-auto",
-    desc: "Combine multiple shipping labels, packing slips, or document PDFs into one single file. Easily reorder files by position number and download immediately with zero quality loss.",
-    tag: "PDF Merge Tool",
+    desc: "Combine multiple shipping labels or document PDFs into one unified file. Easily reorder files and download immediately with zero quality loss.",
+    tag: "Combine Documents",
     cta: "Merge PDF Files →",
+  },
+  {
+    name: "Split PDF",
+    icon: Split,
+    href: "/split-pdf",
+    color: "#051448",
+    lightBg: "#F1F5F9",
+    desc: "Extract pages or separate multi-page PDF documents into individual files or ZIP archives with custom page range controls.",
+    tag: "Extract & Separate",
+    cta: "Split PDF Pages →",
+  },
+  {
+    name: "Compress PDF",
+    icon: Minimize2,
+    href: "/compress-pdf",
+    color: "#047857",
+    lightBg: "#ECFDF5",
+    desc: "Reduce PDF document file size with lossless optimization in your browser. Perfect for email attachments and portal upload limits.",
+    tag: "Reduce File Size",
+    cta: "Compress PDF Now →",
+  },
+  {
+    name: "Rotate PDF",
+    icon: RotateCw,
+    href: "/rotate-pdf",
+    color: "#6D28D9",
+    lightBg: "#F5F3FF",
+    desc: "Rotate all or specific PDF pages 90°, 180°, or 270° with interactive thumbnail preview. Fix upside-down shipping labels in seconds.",
+    tag: "Orientation Fix",
+    cta: "Rotate PDF Pages →",
+  },
+  {
+    name: "PDF to Images",
+    icon: ImageIcon,
+    href: "/pdf-to-images",
+    color: "#0369A1",
+    lightBg: "#F0F9FF",
+    desc: "Convert PDF pages into high-resolution PNG or JPEG images at 72, 150, or 300 DPI resolution for crisp print-ready output.",
+    tag: "Convert to PNG / JPG",
+    cta: "Convert to Images →",
   },
 ];
 
@@ -193,58 +289,71 @@ export default function Home() {
               </p>
 
               {/* Mobile: stacked horizontal cards */}
-              <div className="flex flex-col gap-2.5 sm:hidden mb-8">
-                {heroPlatforms.map((p) => (
-                  <Link
-                    key={p.name}
-                    href={p.href}
-                    className="flex items-stretch border border-[#051448] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02]"
-                  >
-                    {/* Part 1: Logo — fixed width, brand bg */}
-                    <div
-                      className="w-28 flex-shrink-0 flex items-center justify-center px-3 py-3"
-                      style={{ backgroundColor: p.lightBg }}
+              <div className="grid grid-cols-2 gap-2 sm:hidden mb-8">
+                {heroPlatforms.map((p) => {
+                  const Icon = p.icon;
+                  return (
+                    <Link
+                      key={p.name}
+                      href={p.href}
+                      className="flex items-center gap-2 p-2.5 border border-[#051448] rounded-xl bg-white transition-all duration-200 hover:scale-[1.02]"
                     >
-                      <Image
-                        src={p.logo}
-                        alt={`${p.name} Tool`}
-                        width={100}
-                        height={40}
-                        className="object-contain w-full h-8"
-                      />
-                    </div>
-                    {/* Part 2: Text — remaining width, white bg */}
-                    <div className="flex-1 flex items-center justify-between px-4 py-3 bg-white">
-                      <span className="text-[#051448] text-sm font-semibold">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: p.lightBg }}
+                      >
+                        {p.logo ? (
+                          <Image
+                            src={p.logo}
+                            alt={`${p.name} Tool`}
+                            width={28}
+                            height={28}
+                            className="object-contain"
+                          />
+                        ) : Icon ? (
+                          <Icon size={16} className="text-[#051448]" />
+                        ) : null}
+                      </div>
+                      <span className="text-[#051448] text-xs font-semibold truncate">
                         {p.tagText}
                       </span>
-                      <span className="text-[#051448]/40 text-xs ml-2">→</span>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
 
-              {/* Desktop: 3 equal cards */}
-              <div className="hidden sm:grid grid-cols-3 gap-3 mb-8">
-                {heroPlatforms.map((p) => (
-                  <Link
-                    key={p.name}
-                    href={p.href}
-                    className="group flex flex-col items-center justify-center gap-2 border border-[#051448] rounded-xl py-4 px-3 transition-all duration-200 hover:scale-105"
-                    style={{ backgroundColor: p.lightBg }}
-                  >
-                    <Image
-                      src={p.logo}
-                      alt={`${p.name} Tool`}
-                      width={120}
-                      height={48}
-                      className={`object-contain w-auto ${p.logoH}`}
-                    />
-                    <span className="text-[#051448] text-[10px] font-medium">
-                      {p.tagText}
-                    </span>
-                  </Link>
-                ))}
+              {/* Desktop: 6 equal grid cards */}
+              <div className="hidden sm:grid grid-cols-3 gap-2.5 mb-8">
+                {heroPlatforms.map((p) => {
+                  const Icon = p.icon;
+                  return (
+                    <Link
+                      key={p.name}
+                      href={p.href}
+                      className="group flex flex-col items-center justify-center gap-1.5 border border-[#051448] rounded-xl py-3 px-2.5 transition-all duration-200 hover:scale-105 bg-white shadow-2xs"
+                    >
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: p.lightBg }}
+                      >
+                        {p.logo ? (
+                          <Image
+                            src={p.logo}
+                            alt={`${p.name} Tool`}
+                            width={80}
+                            height={32}
+                            className={`object-contain ${p.logoH || "h-6"}`}
+                          />
+                        ) : Icon ? (
+                          <Icon size={20} className="text-[#051448]" />
+                        ) : null}
+                      </div>
+                      <span className="text-[#051448] text-[11px] font-semibold">
+                        {p.tagText}
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </div>
 
@@ -259,64 +368,148 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ─── Platform Cards Section ─── */}
+      {/* ─── Platform Cards Section (All Tools) ─── */}
       <div className="bg-white border-b border-slate-100">
         <div className="max-w-[1200px] mx-auto px-6 py-16">
 
-          <div className="text-center mb-12">
+          {/* Section 1: E-Commerce Shipping & Seller Tools */}
+          <div className="text-center mb-10">
             <p className="text-xs font-semibold tracking-widest uppercase text-black mb-2">
-              How It Works
+              eCommerce Dispatch Tools
             </p>
-            <h2 className="text-3xl font-bold text-black">
-              Pick your tool, process your files
+            <h2 className="text-2xl sm:text-3xl font-bold text-black">
+              Shipping Label Cropper &amp; Seller Suite
             </h2>
-            <p className="text-black text-sm mt-3 max-w-lg mx-auto leading-relaxed text-justify">
-              Whether you sell on Meesho or Flipkart, or need to merge multiple PDF documents — our tools are built for speed and precision. Crop unwanted margins, organize dispatches, and print directly on 4x6 thermal paper.
+            <p className="text-black text-sm mt-2 max-w-lg mx-auto leading-relaxed text-justify">
+              Custom-tailored for Indian online sellers on Meesho, Flipkart, and Amazon to format invoices and labels for 4×6 thermal roll printers.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cardPlatforms.map((p) => (
-              <Link
-                key={p.name}
-                href={p.href}
-                className="group block border border-[#051448] rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200"
-              >
-                {/* Logo area — fixed h-32 so all cards are identical */}
-                <div
-                  className="flex items-center justify-center h-32"
-                  style={{ backgroundColor: p.lightBg }}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
+            {sellerTools.map((p) => {
+              const Icon = p.icon;
+              return (
+                <Link
+                  key={p.name}
+                  href={p.href}
+                  className="group flex flex-col justify-between border border-[#051448] rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200 bg-white"
                 >
-                  <Image
-                    src={p.logo}
-                    alt={`${p.name} Tool`}
-                    width={160}
-                    height={60}
-                    className={`object-contain ${p.logoClass}`}
-                  />
-                </div>
+                  <div>
+                    <div
+                      className="flex items-center justify-center h-28"
+                      style={{ backgroundColor: p.lightBg }}
+                    >
+                      {p.logo ? (
+                        <Image
+                          src={p.logo}
+                          alt={`${p.name} Tool`}
+                          width={140}
+                          height={50}
+                          className={`object-contain ${p.logoClass}`}
+                        />
+                      ) : Icon ? (
+                        <div className="w-14 h-14 rounded-2xl bg-white/80 shadow-xs flex items-center justify-center">
+                          <Icon size={28} style={{ color: p.color }} />
+                        </div>
+                      ) : null}
+                    </div>
 
-                {/* Text area */}
-                <div className="p-6 bg-white">
-                  <span
-                    className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-3"
-                    style={{ backgroundColor: p.lightBg, color: p.color }}
-                  >
-                    {p.tag}
-                  </span>
-                  <p className="text-black text-sm leading-relaxed text-justify">
-                    {p.desc}
-                  </p>
-                  <p
-                    className="mt-4 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all"
-                    style={{ color: p.color }}
-                  >
-                    {p.cta}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                    <div className="p-5">
+                      <span
+                        className="inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-2.5"
+                        style={{ backgroundColor: p.lightBg, color: p.color }}
+                      >
+                        {p.tag}
+                      </span>
+                      <h3 className="text-base font-bold text-black mb-1.5">{p.name}</h3>
+                      <p className="text-black/80 text-xs leading-relaxed text-justify">
+                        {p.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="px-5 pb-5 pt-0">
+                    <p
+                      className="text-xs font-bold flex items-center gap-1 group-hover:gap-2 transition-all pt-3 border-t border-slate-100"
+                      style={{ color: p.color }}
+                    >
+                      {p.cta}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
+
+          {/* Section 2: All-in-One Free PDF Utility Suite */}
+          <div className="text-center mb-10 pt-6 border-t border-slate-200">
+            <p className="text-xs font-semibold tracking-widest uppercase text-black mb-2">
+              Free Browser Utilities
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-black">
+              All-in-One Free PDF Tool Suite
+            </h2>
+            <p className="text-black text-sm mt-2 max-w-lg mx-auto leading-relaxed text-justify">
+              Merge, split, compress, rotate, and convert PDF documents in your browser with zero file uploads and 100% privacy.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            {pdfTools.map((p) => {
+              const Icon = p.icon;
+              return (
+                <Link
+                  key={p.name}
+                  href={p.href}
+                  className="group flex flex-col justify-between border border-[#051448]/30 hover:border-[#051448] rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 bg-white"
+                >
+                  <div>
+                    <div
+                      className="flex items-center justify-center h-24"
+                      style={{ backgroundColor: p.lightBg }}
+                    >
+                      {p.logo ? (
+                        <Image
+                          src={p.logo}
+                          alt={`${p.name} Tool`}
+                          width={120}
+                          height={40}
+                          className={`object-contain ${p.logoClass}`}
+                        />
+                      ) : Icon ? (
+                        <div className="w-12 h-12 rounded-xl bg-white shadow-2xs flex items-center justify-center">
+                          <Icon size={24} style={{ color: p.color }} />
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="p-4">
+                      <span
+                        className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded mb-2"
+                        style={{ backgroundColor: p.lightBg, color: p.color }}
+                      >
+                        {p.tag}
+                      </span>
+                      <h3 className="text-sm font-bold text-black mb-1">{p.name}</h3>
+                      <p className="text-black/75 text-xs leading-relaxed line-clamp-3">
+                        {p.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="px-4 pb-4 pt-0">
+                    <p
+                      className="text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all pt-2.5 border-t border-slate-100"
+                      style={{ color: p.color }}
+                    >
+                      {p.cta}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
         </div>
       </div>
 

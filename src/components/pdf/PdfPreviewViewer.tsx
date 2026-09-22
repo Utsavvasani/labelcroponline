@@ -88,11 +88,37 @@ export function PdfPreviewViewer({ url, bytes, initialScale = 1.3 }: PdfPreviewV
           pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
         }
 
-        if (url) {
-          loadingTask = pdfjs.getDocument({ url });
-        } else if (bytes) {
+        let docData: Uint8Array | null = null;
+
+        if (bytes) {
           const bufferCopy = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-          loadingTask = pdfjs.getDocument({ data: new Uint8Array(bufferCopy) });
+          docData = new Uint8Array(bufferCopy);
+        } else if (url) {
+          // Fetch blob, data, or local URLs directly on the main thread
+          // This eliminates worker cross-origin restrictions and "ResponseException: Unexpected server response (0)"
+          try {
+            const res = await fetch(url);
+            if (res.ok) {
+              const ab = await res.arrayBuffer();
+              docData = new Uint8Array(ab);
+            }
+          } catch (fetchErr) {
+            console.warn("Main thread fetch of PDF blob failed, falling back to getDocument({ url }):", fetchErr);
+          }
+        }
+
+        if (docData) {
+          loadingTask = pdfjs.getDocument({
+            data: docData,
+            cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+            cMapPacked: true,
+          });
+        } else if (url) {
+          loadingTask = pdfjs.getDocument({
+            url,
+            cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+            cMapPacked: true,
+          });
         }
 
         if (!loadingTask) return;

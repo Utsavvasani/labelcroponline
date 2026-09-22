@@ -23,6 +23,7 @@ import {
   RotateResult,
 } from "@/lib/pdf/rotatePdf";
 import { triggerDownload } from "@/lib/pdf/mergePdf";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -649,6 +650,9 @@ export default function RotatePdfPage() {
             </div>
           )}
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="rotate-pdf" />
       </div>
 
       {/* ── Full Interactive PDF Preview Modal ── */}
@@ -683,7 +687,7 @@ export default function RotatePdfPage() {
               </div>
             </div>
             <div className="flex-1 bg-slate-100 p-2 min-h-[480px] h-[650px] flex flex-col overflow-hidden">
-              <PdfPreviewViewer url={rotateResult.blobUrl} initialScale={1.3} />
+              <PdfPreviewViewer url={rotateResult.blobUrl} bytes={rotateResult.pdfBytes} initialScale={1.3} />
             </div>
           </div>
         </div>

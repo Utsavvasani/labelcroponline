@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Rating Card Studio – Create Custom 5-Star Review Cards for Your Shop",
@@ -56,14 +56,42 @@ function RatingCardJsonLd() {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
 }
 
+import { RelatedTools } from "@/components/shared/RelatedTools";
+
 // Rating Card Studio page — client component will be added here once built
 export default function RatingCardRoute() {
   return (
     <>
       <RatingCardJsonLd />
-      <div className="max-w-[1200px] mx-auto px-6 py-20 text-center">
-        <h1 className="text-3xl font-bold text-[#051448] mb-4">Rating Card Studio</h1>
-        <p className="text-gray-600">Coming soon — design custom review insert cards for your shipments.</p>
+      <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12">
+        <div className="border border-[#051448] rounded-md bg-white p-8 sm:p-12 text-center shadow-xs">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded bg-amber-100 text-amber-800 border border-amber-300 mb-4">
+            Under Development
+          </span>
+          <h1 className="text-2xl sm:text-4xl font-bold text-[#051448] mb-4">
+            Rating Card Studio
+          </h1>
+          <p className="text-slate-600 max-w-xl mx-auto text-sm sm:text-base leading-relaxed mb-6">
+            Design and print 5-star customer review insert cards with dynamic QR codes, coupon rewards, and custom branding for your Meesho, Flipkart, and Amazon parcels.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="/meesho-label-crop"
+              className="px-5 py-2.5 rounded-md bg-[#051448] text-white text-xs sm:text-sm font-semibold hover:bg-[#071a5e] transition-colors"
+            >
+              Go to Meesho Label Cropper
+            </a>
+            <a
+              href="/flipkart-label-crop"
+              className="px-5 py-2.5 rounded-md border border-[#051448] text-[#051448] text-xs sm:text-sm font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Go to Flipkart Label Cropper
+            </a>
+          </div>
+        </div>
+
+        {/* Full navigation to all other tools */}
+        <RelatedTools currentToolId="rating-card" />
       </div>
     </>
   );

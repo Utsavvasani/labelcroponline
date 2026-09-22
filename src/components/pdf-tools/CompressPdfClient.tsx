@@ -26,6 +26,7 @@ import {
   CompressionLevel,
 } from "@/lib/pdf/compressPdf";
 import { triggerDownload } from "@/lib/pdf/mergePdf";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 const PdfPreviewViewer = dynamic(
   () => import("@/components/pdf/PdfPreviewViewer").then((m) => m.PdfPreviewViewer),
@@ -447,6 +448,9 @@ export default function CompressPdfPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="compress-pdf" />
       </div>
 
       {/* ── Preview Modal ── */}
@@ -481,7 +485,7 @@ export default function CompressPdfPage() {
               </div>
             </div>
             <div className="flex-1 bg-slate-100 p-2 min-h-[480px] h-[650px] flex flex-col overflow-hidden">
-              <PdfPreviewViewer url={compressResult.blobUrl} initialScale={1.3} />
+              <PdfPreviewViewer url={compressResult.blobUrl} bytes={compressResult.pdfBytes} initialScale={1.3} />
             </div>
           </div>
         </div>

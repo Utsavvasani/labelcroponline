@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 export default function ContactUs() {
   const [formData, setFormData] = useState({
@@ -231,6 +232,9 @@ export default function ContactUs() {
           </aside>
 
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools title="Explore Free Label & PDF Tools" />
       </div>
     </div>
   );

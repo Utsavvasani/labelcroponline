@@ -23,6 +23,7 @@ import {
   ImageDpi,
 } from "@/lib/pdf/pdfToImages";
 import { triggerDownload } from "@/lib/pdf/mergePdf";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + " B";
@@ -487,6 +488,9 @@ export default function PdfToImagesPage() {
             </div>
           )}
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="pdf-to-images" />
       </div>
 
       {/* ── Enlarge Image Modal ── */}

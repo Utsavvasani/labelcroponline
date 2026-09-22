@@ -27,6 +27,7 @@ import {
   SplitChunk,
 } from "@/lib/pdf/splitPdf";
 import { triggerDownload } from "@/lib/pdf/mergePdf";
+import { RelatedTools } from "@/components/shared/RelatedTools";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + " B";
@@ -537,6 +538,9 @@ export default function SplitPdfPage() {
             </div>
           )}
         </div>
+
+        {/* ── Related Tools Cross-Navigation Section ── */}
+        <RelatedTools currentToolId="split-pdf" />
       </div>
 
       {/* ── Details Modal ── */}
