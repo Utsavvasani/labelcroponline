@@ -8,6 +8,7 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -62,6 +63,9 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  alternates: {
+    canonical: "https://www.labelcroponline.com",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -97,11 +101,78 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "LabelCropOnline",
+    url: "https://www.labelcroponline.com",
+    description:
+      "Free online tool to crop, resize, merge, and bulk-process shipping labels and PDF documents for ecommerce sellers.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://www.labelcroponline.com/?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "LabelCropOnline",
+    url: "https://www.labelcroponline.com",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://www.labelcroponline.com/tab_logo.png",
+      width: 512,
+      height: 512,
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+91-99095-20532",
+      contactType: "customer support",
+      availableLanguage: ["English", "Hindi"],
+    },
+    sameAs: [
+      "https://www.facebook.com/labelcroponline",
+      "https://www.instagram.com/labelcroponline",
+      "https://twitter.com/labelcroponline",
+      "https://www.linkedin.com/company/labelcroponline",
+    ],
+    email: "labelcroponline@gmail.com",
+    foundingDate: "2024",
+    areaServed: "IN",
+    knowsAbout: [
+      "Shipping Label Processing",
+      "PDF Cropping",
+      "Ecommerce Operations",
+      "Thermal Printing",
+    ],
+  };
+
   return (
     <html
       lang="en"
       className={`${poppins.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        {/* Google AdSense — uncomment and replace pub-XXXXXXXXXXXXXXXX with your actual publisher ID after AdSense approval */}
+        {/* <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+          crossOrigin="anonymous"
+        /> */}
+      </head>
       <body className="min-h-full flex flex-col pt-[44px] font-sans bg-white">
         <Navbar />
         <main className="flex-1 w-full">

@@ -1,18 +1,16 @@
 User-agent: *
 Allow: /
 
-# Block internal/admin routes
+# Block admin, API, and internal routes
 Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 Disallow: /editor
 Disallow: /editor/
 
-# Block redirect alias pages (canonical is the destination URL)
-Disallow: /meesho-thermal-label-crop
-Disallow: /meesho-tax-invoice-crop
-Disallow: /flipkart-shipping-label-cropper
-Disallow: /flipkart-thermal-label-crop
+# Allow Googlebot to crawl images
+User-agent: Googlebot-Image
+Allow: /
 
-# Sitemap
+# Sitemap location
 Sitemap: https://www.labelcroponline.com/sitemap.xml

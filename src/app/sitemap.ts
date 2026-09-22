@@ -1,93 +1,88 @@
-import type { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
+
+const BASE_URL = "https://www.labelcroponline.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://www.labelcroponline.com";
   const now = new Date();
 
   return [
     {
-      url: base,
+      url: BASE_URL,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
-      url: `${base}/meesho-label-crop`,
+      url: `${BASE_URL}/meesho-label-crop`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     {
-      url: `${base}/flipkart-label-crop`,
+      url: `${BASE_URL}/flipkart-label-crop`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.95,
     },
     {
-      url: `${base}/merge-pdf`,
+      url: `${BASE_URL}/merge-pdf`,
       lastModified: now,
       changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/custom-crop`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.85,
     },
     {
-      url: `${base}/split-pdf`,
+      url: `${BASE_URL}/compress-pdf`,
       lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
-      url: `${base}/compress-pdf`,
+      url: `${BASE_URL}/split-pdf`,
       lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
-      url: `${base}/rotate-pdf`,
+      url: `${BASE_URL}/rotate-pdf`,
       lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.80,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
-      url: `${base}/pdf-to-images`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.80,
-    },
-    {
-      url: `${base}/custom-crop`,
+      url: `${BASE_URL}/pdf-to-images`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.75,
     },
     {
-      url: `${base}/rating-card`,
+      url: `${BASE_URL}/about-us`,
       lastModified: now,
       changeFrequency: "monthly",
-      priority: 0.70,
+      priority: 0.6,
     },
     {
-      url: `${base}/about-us`,
+      url: `${BASE_URL}/contact-us`,
       lastModified: now,
       changeFrequency: "yearly",
-      priority: 0.50,
+      priority: 0.5,
     },
     {
-      url: `${base}/contact-us`,
+      url: `${BASE_URL}/privacy-policy`,
       lastModified: now,
       changeFrequency: "yearly",
-      priority: 0.50,
+      priority: 0.3,
     },
     {
-      url: `${base}/privacy-policy`,
+      url: `${BASE_URL}/terms-and-conditions`,
       lastModified: now,
       changeFrequency: "yearly",
-      priority: 0.30,
-    },
-    {
-      url: `${base}/terms-and-conditions`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.30,
+      priority: 0.3,
     },
   ];
 }

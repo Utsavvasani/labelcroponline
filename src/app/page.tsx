@@ -18,38 +18,141 @@ import {
 export const metadata: Metadata = {
   title: "Free Shipping Label Cropper for Meesho & Flipkart – PDF Tools Online",
   description:
-    "Crop Meesho & Flipkart shipping labels for 4x6 thermal printers. Free browser-based PDF tools: merge, split, compress, rotate, convert PDF to images. No signup, 100% private.",
+    "Crop and resize PDF shipping labels for Meesho, Flipkart, and merge multi-page PDF documents for 4x6 thermal printers and A4 sheets. Free, fast, and secure. No upload needed.",
   keywords: [
     "meesho label crop",
-    "flipkart label crop",
-    "crop shipping labels online free",
-    "4x6 thermal label crop",
-    "meesho supplier panel label crop",
-    "flipkart seller hub label crop",
-    "merge pdf free",
-    "split pdf online",
-    "compress pdf size",
-    "rotate pdf pages",
-    "pdf to png converter",
-    "ecommerce label tool india",
-    "online shipping label crop tool",
-    "labelcroponline",
+    "merge pdf",
+    "combine pdf files",
+    "thermal printer label crop",
+    "4x6 label crop",
+    "ecommerce label resize",
+    "shipping label pdf cropper",
+    "meesho supplier panel label",
+    "flipkart seller hub label",
+    "free shipping label tool",
   ],
-  alternates: { canonical: "https://www.labelcroponline.com" },
+  alternates: {
+    canonical: "https://www.labelcroponline.com",
+  },
   openGraph: {
     title: "Free Shipping Label Cropper for Meesho & Flipkart – PDF Tools Online",
     description:
       "Crop Meesho & Flipkart shipping labels for 4x6 thermal printers. Merge, split, compress, rotate PDFs free in your browser. No signup required.",
     type: "website",
     url: "https://www.labelcroponline.com",
-    images: [{ url: "/labelcroponline1.png", width: 1200, height: 630, alt: "LabelCropOnline – Shipping Label & PDF Tools" }],
+    siteName: "LabelCropOnline",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "LabelCropOnline – Shipping Label PDF Cropper" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Free Shipping Label Cropper – Meesho & Flipkart",
     description:
-      "Crop Meesho & Flipkart shipping labels for 4x6 thermal printing. Free PDF merge, split, compress & more.",
-    images: ["/labelcroponline1.png"],
+      "Instant, lossless shipping label cropping and PDF merging for ecommerce sellers.",
+    images: ["/og-image.png"],
+  },
+};
+
+const homepageFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is LabelCropOnline free to use?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, LabelCropOnline is 100% free with no hidden charges, watermarks, or daily file restrictions.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How does cropping save money on thermal printing?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Standard A4 PDFs contain large empty white margins and unneeded footer space. By cropping only the relevant shipping label and tax details to 4×6 inches, you print 1 label per thermal sticker rather than wasting full A4 adhesive sheets.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Can I crop multi-page bulk orders at once?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Whether you have 5 orders or a bulk PDF with 500+ order pages, our engine processes the entire file in seconds while keeping the pages organized and cleanly aligned.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Are my customer details and order files kept private?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes, completely. All PDF parsing, coordinate cropping, reordering, and previews run 100% inside your browser using client-side WebAssembly and JavaScript. No files or personal data are ever uploaded to any server.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Which platforms does LabelCropOnline support?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "LabelCropOnline supports Meesho Supplier Panel and Flipkart Seller Hub shipping labels. It also provides general PDF tools including Merge PDF, Split PDF, Compress PDF, Rotate PDF, and PDF to Images conversion.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Does the tool work without installing any software?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. LabelCropOnline runs entirely in your web browser — no installation, no app download, and no account required. Simply open the website, upload your PDF, and download your processed file.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What thermal printer sizes does LabelCropOnline support?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "LabelCropOnline primarily supports 4×6 inch (100×150 mm) thermal label rolls, the standard size for direct thermal printers used in Indian ecommerce warehouses. Custom crop dimensions are also supported.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Which courier partners are auto-detected in Meesho label cropping?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The Meesho Label Crop tool automatically detects Delhivery, Shadowfax, Valmo, Valmo Plus, and Xpressbees courier labels and applies the correct crop margins for each.",
+      },
+    },
+  ],
+};
+
+const webAppJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "LabelCropOnline",
+  url: "https://www.labelcroponline.com",
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Web Browser",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "INR",
+  },
+  description:
+    "Free online shipping label cropper and PDF tool suite for ecommerce sellers. Crop Meesho and Flipkart labels, merge, split, compress, rotate PDFs, and convert PDFs to images — all in your browser.",
+  featureList: [
+    "Meesho shipping label crop",
+    "Flipkart shipping label crop",
+    "Merge PDF files",
+    "Split PDF pages",
+    "Compress PDF",
+    "Rotate PDF pages",
+    "PDF to PNG/JPEG images",
+    "Custom PDF crop studio",
+    "100% browser-based processing",
+    "Zero server file upload",
+  ],
+  provider: {
+    "@type": "Organization",
+    name: "LabelCropOnline",
+    url: "https://www.labelcroponline.com",
   },
 };
 
@@ -267,10 +370,28 @@ const pdfTools = [
   },
 ];
 
+const allTools = [
+  { name: "Meesho Label Crop", href: "/meesho-label-crop", desc: "Crop Meesho supplier labels to 4x6 thermal format", color: "#580a46", bg: "#F7EEFE" },
+  { name: "Flipkart Label Crop", href: "/flipkart-label-crop", desc: "Crop Flipkart seller hub labels to print-ready 4x6", color: "#007cd7", bg: "#EEF4FF" },
+  { name: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into one document", color: "#B42024", bg: "#fef5f5" },
+  { name: "Split PDF", href: "/split-pdf", desc: "Split a PDF into individual pages or ranges", color: "#1a7f4b", bg: "#edfaf3" },
+  { name: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss", color: "#7c3a00", bg: "#fff8f0" },
+  { name: "Rotate PDF", href: "/rotate-pdf", desc: "Rotate all or specific PDF pages 90°/180°/270°", color: "#374151", bg: "#f3f4f6" },
+  { name: "PDF to Images", href: "/pdf-to-images", desc: "Convert PDF pages to PNG or JPEG images", color: "#5b21b6", bg: "#f5f3ff" },
+  { name: "Custom Crop Studio", href: "/custom-crop", desc: "Visually select any custom crop area in a PDF", color: "#051448", bg: "#EEF4FF" },
+];
+
 export default function Home() {
   return (
     <>
-      <HomeJsonLd />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppJsonLd) }}
+      />
       {/* ─── Hero ─── */}
       <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
         <div className="max-w-[1200px] mx-auto px-6 pt-28 pb-16">
@@ -513,6 +634,39 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ─── All PDF Tools Section ─── */}
+      <div className="bg-slate-50 border-b border-slate-200">
+        <div className="max-w-[1200px] mx-auto px-6 py-14">
+          <div className="text-center mb-10">
+            <p className="text-xs font-semibold tracking-widest uppercase text-[#051448]/60 mb-2">Complete Toolkit</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-black">All Free PDF Tools</h2>
+            <p className="text-sm text-black/60 mt-2 max-w-md mx-auto">
+              Everything you need to process shipping labels and PDF documents — all free, all in your browser.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {allTools.map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="group flex flex-col gap-2 p-4 rounded-xl border border-slate-200 bg-white hover:border-[#051448]/40 hover:shadow-md transition-all duration-200"
+              >
+                <span
+                  className="inline-block text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full w-fit"
+                  style={{ backgroundColor: tool.bg, color: tool.color }}
+                >
+                  {tool.name}
+                </span>
+                <p className="text-xs text-black/65 leading-snug">{tool.desc}</p>
+                <span className="text-xs font-semibold mt-auto" style={{ color: tool.color }}>
+                  Open →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ─── Detailed Home Information & SEO Guide Blog Section ─── */}
       <div className="bg-slate-50/70 border-b border-slate-200">
         <div className="max-w-[1200px] mx-auto px-6 py-16 space-y-12 text-black">
@@ -673,12 +827,48 @@ export default function Home() {
                 </p>
               </div>
 
-              <div>
+              <div className="border-b border-slate-200 pb-3">
                 <h4 className="font-bold text-black mb-1">
                   Are my customer details and order files kept private?
                 </h4>
                 <p className="text-black/75 leading-relaxed text-justify">
                   Yes, completely. All PDF parsing, coordinate cropping, reordering, and previews run 100% inside your browser using client-side WebAssembly and JavaScript. No files or personal data are ever uploaded to any server.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Which platforms does LabelCropOnline support?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  LabelCropOnline currently supports <strong>Meesho Supplier Panel</strong> and <strong>Flipkart Seller Hub</strong> shipping labels with platform-specific crop presets. General PDF tools (Merge, Split, Compress, Rotate, PDF to Images) work with labels and documents from any source.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  Does the tool require any software installation?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  No. LabelCropOnline runs entirely in your web browser — no installation, no app download, and no account registration required. Open the website, upload your PDF, and download the processed file instantly.
+                </p>
+              </div>
+
+              <div className="border-b border-slate-200 pb-3">
+                <h4 className="font-bold text-black mb-1">
+                  What thermal printer sizes are supported?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  The primary format is <strong>4×6 inch (100×150 mm)</strong> thermal label rolls — the standard used by most Indian ecommerce warehouses. The Custom Crop Studio lets you define any exact dimension for other printer formats.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-bold text-black mb-1">
+                  Which courier partners are auto-detected for Meesho labels?
+                </h4>
+                <p className="text-black/75 leading-relaxed text-justify">
+                  The Meesho label cropper automatically detects <strong>Delhivery</strong>, <strong>Shadowfax</strong>, <strong>Valmo</strong>, <strong>Valmo Plus</strong>, and <strong>Xpressbees</strong> and applies the correct crop margins for each courier&apos;s label layout.
                 </p>
               </div>
             </div>
