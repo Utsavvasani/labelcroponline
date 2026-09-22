@@ -1,36 +1,112 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
+import { Layers, Split, Minimize2, RotateCw, Image as ImageIcon, ArrowRight, Star } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Crop Shipping Labels Online - Free Ecommerce PDF Label Cropper",
+  title: "Free Shipping Label Cropper for Meesho & Flipkart – PDF Tools Online",
   description:
-    "Crop and resize PDF shipping labels for Meesho, Flipkart, and merge multi-page PDF documents for 4x6 thermal printers and A4 sheets. Free, fast, and secure.",
+    "Crop Meesho & Flipkart shipping labels for 4x6 thermal printers. Free browser-based PDF tools: merge, split, compress, rotate, convert PDF to images. No signup, 100% private.",
   keywords: [
-    "label cropper",
-    "crop shipping labels",
-    "flipkart label crop",
     "meesho label crop",
-    "merge pdf",
-    "combine pdf files",
-    "thermal printer label crop",
-    "4x6 label crop",
-    "ecommerce label resize",
+    "flipkart label crop",
+    "crop shipping labels online free",
+    "4x6 thermal label crop",
+    "meesho supplier panel label crop",
+    "flipkart seller hub label crop",
+    "merge pdf free",
+    "split pdf online",
+    "compress pdf size",
+    "rotate pdf pages",
+    "pdf to png converter",
+    "ecommerce label tool india",
+    "online shipping label crop tool",
+    "labelcroponline",
   ],
+  alternates: { canonical: "https://www.labelcroponline.com" },
   openGraph: {
-    title: "Crop Shipping Labels Online - Free Ecommerce PDF Cropper",
+    title: "Free Shipping Label Cropper for Meesho & Flipkart – PDF Tools Online",
     description:
-      "Instant, lossless shipping label cropping and PDF merging for ecommerce sellers. Works directly in your browser.",
+      "Crop Meesho & Flipkart shipping labels for 4x6 thermal printers. Merge, split, compress, rotate PDFs free in your browser. No signup required.",
     type: "website",
-    url: "https://labelcroponline.com",
+    url: "https://www.labelcroponline.com",
+    images: [{ url: "/labelcroponline1.png", width: 1200, height: 630, alt: "LabelCropOnline – Shipping Label & PDF Tools" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Crop Shipping Labels Online - LabelCropOnline",
+    title: "Free Shipping Label Cropper – Meesho & Flipkart",
     description:
-      "Instant, lossless shipping label cropping and PDF merging for ecommerce sellers.",
+      "Crop Meesho & Flipkart shipping labels for 4x6 thermal printing. Free PDF merge, split, compress & more.",
+    images: ["/labelcroponline1.png"],
   },
 };
+
+// JSON-LD structured data
+function HomeJsonLd() {
+  const data = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://www.labelcroponline.com/#website",
+        "url": "https://www.labelcroponline.com",
+        "name": "LabelCropOnline",
+        "description": "Free shipping label cropper and PDF tools for Meesho, Flipkart, and Amazon sellers",
+        "publisher": { "@id": "https://www.labelcroponline.com/#organization" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": { "@type": "EntryPoint", "urlTemplate": "https://www.labelcroponline.com/?q={search_term_string}" },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://www.labelcroponline.com/#organization",
+        "name": "LabelCropOnline",
+        "url": "https://www.labelcroponline.com",
+        "logo": { "@type": "ImageObject", "url": "https://www.labelcroponline.com/labelcroponline.svg" },
+        "contactPoint": { "@type": "ContactPoint", "contactType": "customer support", "url": "https://www.labelcroponline.com/contact-us" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "LabelCropOnline",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any (Browser-based)",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+        "url": "https://www.labelcroponline.com",
+        "description": "Free browser-based shipping label cropper and PDF suite for Indian eCommerce sellers on Meesho, Flipkart and Amazon.",
+        "featureList": [
+          "Meesho label crop for 4x6 thermal printers",
+          "Flipkart label crop with courier auto-detection",
+          "PDF merge, split, compress, rotate online",
+          "PDF to PNG/JPEG image converter",
+          "Rating card studio for seller review inserts"
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "name": "LabelCropOnline PDF Tools",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Meesho Label Crop", "url": "https://www.labelcroponline.com/meesho-label-crop" },
+          { "@type": "ListItem", "position": 2, "name": "Flipkart Label Crop", "url": "https://www.labelcroponline.com/flipkart-label-crop" },
+          { "@type": "ListItem", "position": 3, "name": "Merge PDF", "url": "https://www.labelcroponline.com/merge-pdf" },
+          { "@type": "ListItem", "position": 4, "name": "Split PDF", "url": "https://www.labelcroponline.com/split-pdf" },
+          { "@type": "ListItem", "position": 5, "name": "Compress PDF", "url": "https://www.labelcroponline.com/compress-pdf" },
+          { "@type": "ListItem", "position": 6, "name": "Rotate PDF", "url": "https://www.labelcroponline.com/rotate-pdf" },
+          { "@type": "ListItem", "position": 7, "name": "PDF to Images", "url": "https://www.labelcroponline.com/pdf-to-images" },
+          { "@type": "ListItem", "position": 8, "name": "Custom Crop Studio", "url": "https://www.labelcroponline.com/custom-crop" },
+          { "@type": "ListItem", "position": 9, "name": "Rating Card Studio", "url": "https://www.labelcroponline.com/rating-card" }
+        ]
+      }
+    ]
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
 
 const heroPlatforms = [
   {
@@ -98,6 +174,7 @@ const cardPlatforms = [
 export default function Home() {
   return (
     <>
+      <HomeJsonLd />
       {/* ─── Hero ─── */}
       <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border-b border-slate-200">
         <div className="max-w-[1200px] mx-auto px-6 pt-28 pb-16">

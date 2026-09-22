@@ -142,9 +142,8 @@ export function Navbar() {
     <div className="relative w-full">
       {/* Single fixed header wrapper */}
       <div
-        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-200 ${
-          hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
-        }`}
+        className={`fixed top-0 left-0 z-50 w-full transition-transform duration-200 ${hideAppbar ? "-translate-y-[44px]" : "translate-y-0"
+          }`}
       >
         {/* Blue Top Announcement Bar */}
         <div className="bg-[#051448] w-full px-4 py-3 text-white">
@@ -237,9 +236,8 @@ export function Navbar() {
               <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
                 <Link
                   href="/"
-                  className={`flex items-center h-full ${
-                    pathname === "/" ? "text-[#051448] font-bold" : ""
-                  }`}
+                  className={`flex items-center h-full ${pathname === "/" ? "text-[#051448] font-bold" : ""
+                    }`}
                 >
                   Home
                 </Link>
@@ -249,11 +247,10 @@ export function Navbar() {
               <li className="hover:text-[#580a46] cursor-pointer transition-colors flex items-center h-full">
                 <Link
                   href="/meesho-label-crop"
-                  className={`flex items-center h-full ${
-                    pathname === "/meesho-label-crop"
+                  className={`flex items-center h-full ${pathname === "/meesho-label-crop"
                       ? "text-[#580a46] font-bold"
                       : "hover:text-[#580a46]"
-                  }`}
+                    }`}
                 >
                   Meesho Label Crop
                 </Link>
@@ -263,11 +260,10 @@ export function Navbar() {
               <li className="hover:text-[#007cd7] cursor-pointer transition-colors flex items-center h-full">
                 <Link
                   href="/flipkart-label-crop"
-                  className={`flex items-center h-full ${
-                    pathname === "/flipkart-label-crop"
+                  className={`flex items-center h-full ${pathname === "/flipkart-label-crop"
                       ? "text-[#007cd7] font-bold"
                       : "hover:text-[#007cd7]"
-                  }`}
+                    }`}
                 >
                   Flipkart Label Crop
                 </Link>
@@ -282,17 +278,15 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setPdfDropdownOpen((prev) => !prev)}
-                  className={`flex items-center gap-1.5 transition-colors cursor-pointer h-full ${
-                    pdfDropdownOpen || isPdfRoute ? "text-[#051448] font-bold" : "hover:text-[#051448]"
-                  }`}
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer h-full ${pdfDropdownOpen || isPdfRoute ? "text-[#051448] font-bold" : "hover:text-[#051448]"
+                    }`}
                   aria-expanded={pdfDropdownOpen}
                 >
                   <span>PDF Tools</span>
                   <ChevronDown
                     size={17}
-                    className={`transition-transform duration-200 ${
-                      pdfDropdownOpen ? "rotate-180 text-[#051448]" : "text-black/60"
-                    }`}
+                    className={`transition-transform duration-200 ${pdfDropdownOpen ? "rotate-180 text-[#051448]" : "text-black/60"
+                      }`}
                   />
                 </button>
               </li>
@@ -300,9 +294,8 @@ export function Navbar() {
               <li className="hover:text-[#051448] cursor-pointer transition-colors flex items-center h-full">
                 <Link
                   href="/contact-us"
-                  className={`flex items-center h-full ${
-                    pathname === "/contact-us" ? "text-[#051448] font-bold" : ""
-                  }`}
+                  className={`flex items-center h-full ${pathname === "/contact-us" ? "text-[#051448] font-bold" : ""
+                    }`}
                 >
                   Contact Us
                 </Link>
@@ -318,7 +311,7 @@ export function Navbar() {
                 }}
                 onMouseLeave={handleMouseLeave}
               >
-                
+
                 <div className="grid grid-cols-2 gap-2">
                   {pdfToolItems.map((item) => {
                     const Icon = item.icon;
@@ -435,9 +428,8 @@ export function Navbar() {
                     <span>PDF Tools</span>
                     <ChevronDown
                       size={20}
-                      className={`transition-transform duration-200 ${
-                        mobilePdfOpen ? "rotate-180 text-[#051448]" : "text-black/60"
-                      }`}
+                      className={`transition-transform duration-200 ${mobilePdfOpen ? "rotate-180 text-[#051448]" : "text-black/60"
+                        }`}
                     />
                   </button>
 
