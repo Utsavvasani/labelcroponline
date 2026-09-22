@@ -49,9 +49,10 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "LabelCropOnline", url: "https://www.labelcroponline.com" }],
   creator: "LabelCropOnline",
-  publisher: "LabelCropOnline",
-  // Google Search Console verification — replace with your actual code after GSC verification
-  // verification: { google: "YOUR_GSC_VERIFICATION_CODE" },
+  // Google Search Console verification
+  verification: {
+    google: "_jeH06Tr6QZ_HPu5PidRRKMoTRhkD0M_5U6-CybEDKw",
+  },
   robots: {
     index: true,
     follow: true,
