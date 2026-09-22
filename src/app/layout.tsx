@@ -156,6 +156,10 @@ export default function RootLayout({
       className={`${poppins.variable} h-full antialiased`}
     >
       <head>
+        <meta
+          name="google-site-verification"
+          content="_jeH06Tr6QZ_HPu5PidRRKMoTRhkD0M_5U6-CybEDKw"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
